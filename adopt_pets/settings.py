@@ -31,7 +31,12 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
-    'mi_app',
+    'usuarios',
+    'mascotas',
+    'refugios',
+    'adopciones',
+    'blog',
+    'reportes',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -75,8 +80,12 @@ WSGI_APPLICATION = 'adopt_pets.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'adopcion_mascotas',
+        'USER': 'root',
+        'PASSWORD': 'andres',
+        'HOST': 'localhost',
+        'PORT': '3306',
     }
 }
 
