@@ -1,3 +1,6 @@
 from django.contrib import admin
+from .models import Blog, Noticia, Comentario
 
-# Register your models here.
+admin.site.register(Blog)
+admin.site.register(Noticia)
+admin.site.register(Comentario)

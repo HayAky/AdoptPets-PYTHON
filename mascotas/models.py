@@ -30,7 +30,7 @@ class Mascota(models.Model):
     )
 
     fecha_ingreso = models.DateField(null=True, blank=True)
-    fcha_registro = models.DateTimeField(auto_now_add=True)
+    fecha_registro = models.DateTimeField(auto_now_add=True)
 
     refugio = models.ForeignKey(
         Refugio,
@@ -47,3 +47,23 @@ class Mascota(models.Model):
     def __str__(self):
         return f"{self.nombre} - {self.especie}"
 
+
+class GaleriaFoto(models.Model):
+    id_foto = models.BigAutoField(primary_key=True)
+    url_foto = models.CharField(max_length=255)
+    descripcion = models.CharField(max_length=255, null=True, blank=True)
+    es_principal = models.BooleanField(default=False)
+    fecha_subida = models.DateTimeField(auto_now_add=True)
+
+    mascota = models.ForeignKey(
+        'Mascota',  # Usamos comillas porque la clase Mascota ya está definida arriba en este archivo
+        on_delete=models.CASCADE,  # Si se borra la mascota, se borran sus fotos
+        db_column='id_mascota',
+        related_name='fotos'
+    )
+
+    class Meta:
+        db_table = 'galeria_fotos'
+
+    def __str__(self):
+        return f"Foto de {self.mascota.nombre}"
