@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Iniciar sesión - AdoptPets{% endblock %}
+
+{% block extra_css %}
+    <link href="{% static 'css/login.css' %}" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+<section class="login-container">
+    <div class="login-formulario">
+        <h1>AdoptPets</h1>
+        <h2>¡Bienvenido!</h2>
+        <p>Inicie sesión para empezar a adoptar,<br>si no tienes cuenta puedes registrarte</p>
+
+        <form method="post" action="{% url 'login' %}">
+            {% csrf_token %}
+            
+            <input type="email" name="username" id="email" placeholder="Correo Electronico" required>
+            <input type="password" name="password" id="password" placeholder="Contraseña" required>
+            
+            <div class="recordar">
+                <input type="checkbox" id="recordar" name="recordar">
+                <label for="recordar">Recordar contraseña</label>
+            </div>
+
+            <button type="submit">Iniciar sesión</button>
+        </form>
+
+        {% if form.errors %}
+            <div style="color:red; margin-top: 10px;">
+                <p>Usuario o contraseña incorrectos</p>
+            </div>
+        {% endif %}
+
+        {% if request.GET.logout %}
+            <div style="color:green; margin-top: 10px;">
+                <p>Has cerrado sesión exitosamente</p>
+            </div>
+        {% endif %}
+
+        <p class="registro-link">¿No tienes cuenta? <a href="{% url 'registro' %}">Regístrate</a></p>
+    </div>
+
+    <div class="login-imagen">
+        <img src="{% static 'img/Perro_viento.png' %}" alt="Perro feliz">
+    </div>
+</section>
+{% endblock %}

@@ -18,10 +18,26 @@ from django.contrib import admin
 from django.urls import path
 
 from django.contrib import admin
-from django.urls import path, include # <-- Importa include
-
+from django.urls import path, include
+from django.views.generic import TemplateView
+from django.contrib.auth import views as auth_views  # <-- Importamos las vistas de auth
+from usuarios import views as usuarios_views
 urlpatterns = [
     path('admin/', admin.site.urls),
-    # Conectamos las rutas de mascotas
-    path('mascotas/', include('mascotas.urls')), 
+
+    # Rutas de Autenticación
+    path('login/', auth_views.LoginView.as_view(template_name='login.html'), name='login'),
+    # Al cerrar sesión, redirigimos al login enviando la variable ?logout=true
+    path('logout/', auth_views.LogoutView.as_view(next_page='/login/?logout=true'), name='logout'),
+    path('register/', usuarios_views.registro, name='registro'),
+    # Ruta raíz
+    path('', TemplateView.as_view(template_name='main.html'), name='inicio'),
+
+    # Tus aplicaciones
+    path('mascotas/', include('mascotas.urls')),
+    path('refugios/', include('refugios.urls')),
+    path('usuarios/', include('usuarios.urls')),
+    path('adopciones/', include('adopciones.urls')),
+    path('blog/', include('blog.urls')),
+    path('reportes/', include('reportes.urls')),
 ]

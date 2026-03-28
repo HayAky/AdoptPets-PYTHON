@@ -1,0 +1,493 @@
+/* ========================================
+   VARIABLES GLOBALES
+   ======================================== */
+:root {
+    --altura-header-total: 0px;
+    --altura-header-up: 0px;
+    --color-primary: #22C55E;
+    --color-primary-dark: #1B9E4B;
+    --color-secondary: #2ecc71;
+    --color-secondary-dark: #27ae60;
+}
+
+/* ========================================
+   ESTILOS BASE
+   ======================================== */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0;
+    padding: 0;
+}
+
+header {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+
+/* ========================================
+   HEADER - ESTILOS PÚBLICOS (Adoptantes)
+   ======================================== */
+.header-base {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.header-base .header-public{
+    backdrop-filter: blur(10px);
+}
+
+header .logo img {
+    width: 130px;
+    height: auto;
+    display: flex;
+    align-items: center;
+    text-transform: uppercase;
+}
+
+header .contenedor {
+    padding: 40px 100px;
+    align-items: center;
+    justify-content: space-between;
+    display: flex;
+    max-width: 100%;
+    backdrop-filter: blur(10px);
+}
+
+header nav {
+    margin: auto;
+    margin-right: 10px;
+    display: flex;
+    gap: 80px;
+    flex-direction: row;
+    text-align: center;
+    padding-right: 10px;
+}
+
+header a {
+    padding: 3px 5px;
+    font-weight: 600;
+    font-size: 18px;
+    color: var(--color-primary);
+    text-decoration: none;
+}
+
+header a:hover {
+    color: var(--color-primary-dark);
+}
+
+/* ========================================
+   HEADER - ESTILOS ADMIN
+   ======================================== */
+.header-fixed {
+    position: fixed;
+    left: 0;
+    right: 0;
+    transition: transform 0.3s ease;
+}
+
+#headerup {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    padding: 20px 100px 10px 100px;
+    display: flex;
+    justify-content: space-between;
+    background-color: rgba(255,255,255,1);
+    transition: transform 0.25s linear;
+}
+
+#headerup .logo img {
+    padding-left: 10px;
+}
+
+.contenedor .derecha {
+    float: right;
+}
+
+.contenedor .izquierda {
+    float: left;
+}
+
+.contenedor {
+    overflow: visible;
+}
+
+#headadmin {
+    position: fixed;
+    top: var(--altura-header-up);
+    left: 0;
+    right: 0;
+    z-index: 900;
+    padding: 10px 100px 20px 100px;
+    display: flex;
+    justify-content: space-between;
+    background-color: rgba(255,255,255,1);
+    border-bottom: 1px solid rgba(0,0,0,0.1);
+    transition: top 0.25s linear;
+}
+
+#headadmin nav {
+    display: flex;
+    gap: 60px;
+    flex-direction: row;
+    text-align: center;
+    margin: auto;
+}
+
+#header-spacer {
+    height: var(--altura-header-total);
+    width: 100%;
+    visibility: hidden;
+}
+
+.user-menu {
+    position: relative;
+    display: inline-block;
+}
+
+.user-button {
+    background: transparent;
+    border: none;
+    padding: 6px 10px;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--color-primary);
+    cursor: pointer;
+}
+
+.user-button:hover {
+    color: var(--color-primary-dark);
+}
+
+/* ===== CONTENIDO DEL MENU USUARIO ===== */
+
+.user-dropdown {
+    display: none;
+    flex-direction: column;
+    gap: 10px;
+    min-width: 260px;
+    padding: 18px;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.18);
+}
+
+/* Enlaces dentro del menu (Mi perfil) */
+.user-dropdown .dropdown-link {
+    display: block;
+    padding: 10px 14px;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 500;
+    color: #051B0D;
+    text-decoration: none;
+}
+
+.user-dropdown .dropdown-link:hover {
+    background-color: #D3F3DC;
+}
+
+/* Separador visual */
+.user-dropdown .menu-separator {
+    height: 1px;
+    background-color: rgba(0,0,0,0.1);
+    margin: 6px 0;
+}
+
+/* Ajuste del formulario logout */
+.user-dropdown form {
+    margin: 0;
+}
+
+/* Boton logout dentro del menu */
+.user-dropdown .logout-btn {
+    margin-top: 2px;
+}
+
+#headadmin,
+#headrefugio {
+    position: fixed;
+    top: var(--altura-header-up);
+    left: 0;
+    right: 0;
+    z-index: 900;
+    padding: 10px 100px 20px 100px;
+    display: flex;
+    justify-content: space-between;
+    background-color: rgba(255,255,255,1);
+    border-bottom: 1px solid rgba(0,0,0,0.1);
+    transition: transform 0.25s linear;
+}
+
+#headadmin nav,
+#headrefugio nav {
+    display: flex;
+    gap: 60px;
+    flex-direction: row;
+    text-align: center;
+    margin: auto;
+}
+
+
+
+body.scroll-hide-header #headerup,
+body.scroll-hide-header #headadmin,
+body.scroll-hide-header #headrefugio {
+    transform: translateY(calc(var(--altura-header-up) * -1));
+}
+
+
+/* ========================================
+   FOOTER - ESTILOS PÚBLICOS (Adoptantes)
+   ======================================== */
+.site-footer {
+    background-color: #2c3e50;
+    color: #ffffff;
+    padding: 60px 0 30px;
+    font-size: 15px;
+    line-height: 1.6;
+}
+
+.footer-container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 20px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 40px;
+}
+
+.footer-col {
+    flex: 1;
+    min-width: 250px;
+}
+
+.footer-logo {
+    font-size: 28px;
+    font-weight: bold;
+    color: #fff;
+    margin-bottom: 20px;
+    display: inline-block;
+    text-decoration: none;
+}
+
+.footer-logo span {
+    color: var(--color-secondary);
+}
+
+.footer-col h3 {
+    color: #fff;
+    font-size: 18px;
+    margin-bottom: 25px;
+    position: relative;
+    font-weight: 600;
+}
+
+.footer-col h3::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    bottom: -10px;
+    background-color: var(--color-secondary);
+    height: 3px;
+    width: 50px;
+    border-radius: 2px;
+}
+
+.footer-links {
+    list-style: none;
+    padding: 0;
+}
+
+.footer-links li {
+    margin-bottom: 12px;
+}
+
+.footer-links a {
+    color: #bdc3c7;
+    text-decoration: none;
+    transition: 0.3s;
+}
+
+.footer-links a:hover {
+    color: var(--color-secondary);
+    padding-left: 5px;
+}
+
+.newsletter-form {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.newsletter-input {
+    padding: 12px 15px;
+    border-radius: 25px;
+    border: none;
+    outline: none;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.newsletter-btn {
+    background-color: var(--color-secondary);
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 25px;
+    cursor: pointer;
+    font-weight: bold;
+    transition: background 0.3s;
+    width: fit-content;
+}
+
+.newsletter-btn:hover {
+    background-color: var(--color-secondary-dark);
+}
+
+.social-links {
+    margin-top: 20px;
+}
+
+.social-links a {
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+    width: 40px;
+    height: 40px;
+    background-color: rgba(255,255,255,0.1);
+    color: #fff;
+    border-radius: 50%;
+    margin-right: 10px;
+    text-decoration: none;
+    transition: 0.3s;
+}
+
+.social-links a:hover {
+    background-color: var(--color-secondary);
+    transform: translateY(-3px);
+}
+
+.footer-bottom {
+    text-align: center;
+    padding-top: 40px;
+    margin-top: 40px;
+    border-top: 1px solid rgba(255,255,255,0.1);
+    color: #7f8c8d;
+    font-size: 14px;
+}
+
+/* ========================================
+   FOOTER - ESTILOS ADMIN (Simplificado)
+   ======================================== */
+.site-footer.admin-footer .footer-container {
+    justify-content: center;
+}
+
+.site-footer.admin-footer .footer-col {
+    min-width: auto;
+    flex: none;
+    text-align: center;
+}
+
+.site-footer.admin-footer .social-links,
+.site-footer.admin-footer .newsletter-form,
+.site-footer.admin-footer .footer-links {
+    display: none;
+}
+
+/* ========================================
+   MENÚ USUARIO (ADMIN/LOGOUT)
+   ======================================== */
+
+.user-menu {
+    position: relative;
+    display: inline-block;
+}
+
+.user-button {
+    background: transparent;
+    border: none;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--color-primary); /* Usando tu variable */
+    cursor: pointer;
+    padding: 6px 10px;
+}
+
+.user-button:hover {
+    color: var(--color-primary-dark);
+}
+
+.user-dropdown {
+    position: absolute;
+    right: 0;
+    /* Ajustado a 100% para que quede pegado al botón y no se cierre al bajar el mouse */
+    top: 100%;
+    background-color: #ffffff;
+    border-radius: 14px; /* Un poco menos redondeado para encajar mejor */
+    box-shadow: 0px 4px 12px rgba(0,0,0,0.15);
+    padding: 10px;
+    min-width: 180px;
+    display: none; /* Oculto por defecto */
+    z-index: 2000;
+}
+
+/* Esta regla hace que aparezca al pasar el mouse */
+.user-menu:hover .user-dropdown {
+    display: block;
+}
+
+.user-dropdown form {
+    margin: 0;
+}
+
+.logout-btn {
+    background: #ef4444;
+    color: white;
+    padding: 8px 20px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: 600;
+    text-decoration: none;
+    display: block; /* Para que ocupe todo el ancho si es necesario */
+    width: 100%;
+    text-align: center;
+    box-sizing: border-box;
+}
+
+.logout-btn:hover {
+    background: #dc2626;
+}
+
+/* ========================================
+   RESPONSIVE - MÓVIL
+   ======================================== */
+@media (max-width: 768px) {
+    .footer-container {
+        flex-direction: column;
+    }
+
+    .footer-col {
+        margin-bottom: 20px;
+    }
+}
+
+@media (max-width: 480px) {
+    header nav {
+        display: none;
+    }
+
+    header .contenedor {
+        padding: 20px 0px 10px 0px;
+        align-items: center;
+        display: flex;
+        flex-direction: column;
+        max-width: 100%;
+        gap: 8px;
+    }
+}

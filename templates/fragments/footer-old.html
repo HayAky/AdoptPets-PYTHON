@@ -1,0 +1,38 @@
+<footer class="site-footer">
+    <div class="footer-container">
+        <div class="footer-col">
+            <a href="/" class="footer-logo">Adopt<span>Pets</span></a>
+            <p>Ayudamos a conectar mascotas adorables con familias amorosas. Tu nuevo mejor amigo te está esperando.</p>
+            <div class="social-links">
+                <a href="#"><i class="fab fa-facebook-f"></i></a>
+                <a href="#"><i class="fab fa-instagram"></i></a>
+                <a href="#"><i class="fab fa-twitter"></i></a>
+                <a href="#"><i class="fab fa-whatsapp"></i></a>
+            </div>
+        </div>
+
+        <div class="footer-col">
+            <h3>Explorar</h3>
+            <ul class="footer-links">
+                <li><a href="/">Inicio</a></li>
+                <li><a href="{% url 'lista_mascotas' %}">Adoptar</a></li>
+                <li><a href="{% url 'lista_refugios' %}">Refugios</a></li>
+                <li><a href="{% url 'lista_blogs' %}">Historias de éxito</a></li>
+                <li><a href="#">Contáctanos</a></li>
+            </ul>
+        </div>
+
+        <div class="footer-col">
+            <h3>Boletín</h3>
+            <p>Suscríbete para recibir noticias sobre nuevas mascotas y eventos de adopción.</p>
+            <form class="newsletter-form">
+                <input type="email" placeholder="Tu correo electrónico" class="newsletter-input">
+                <button type="button" class="newsletter-btn">Suscribirse</button>
+            </form>
+        </div>
+    </div>
+
+    <div class="footer-bottom">
+        <p>&copy; 2026 AdoptPets. Todos los derechos reservados.</p>
+    </div>
+</footer>

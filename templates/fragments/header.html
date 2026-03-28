@@ -1,0 +1,119 @@
+{% load static %}
+
+{% if request.user.is_authenticated and request.user.is_superuser %}
+<header>
+    <div class="contenedor" id="headerup">
+        <a href="/" class="logo">
+            <img src="{% static 'img/AdoptPets (1).png' %}" alt="logo de la pagina">
+        </a>
+        <nav>
+            <div class="user-menu">
+                <button class="user-button" type="button">
+                    <span>{{ request.user.nombre|default:"Admin" }}</span>
+                </button>
+
+                <div class="user-dropdown">
+                    <form action="/logout/" method="post">
+                        {% csrf_token %}
+                        <button type="submit" class="logout-btn">
+                            Cerrar sesión
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </nav>
+    </div>
+
+    <div class="headadmin" id="headadmin">
+        <nav>
+            <a href="/">Ir al sitio</a>
+            <a href="/admin/">Dashboard</a>
+            <a href="{% url 'lista_mascotas' %}">Mascotas</a>
+            <a href="{% url 'lista_adopciones' %}">Adopciones</a>
+            <a href="{% url 'lista_refugios' %}">Refugios</a>
+            <a href="{% url 'lista_usuarios' %}">Usuarios</a>
+            <a href="{% url 'panel_reportes' %}">Reportes</a>
+        </nav>
+    </div>
+    <div id="header-spacer"></div>
+</header>
+
+{% elif request.user.is_authenticated and request.user.is_staff %}
+<header>
+    <div class="contenedor" id="headerup">
+        <a href="/" class="logo">
+            <img src="{% static 'img/AdoptPets (1).png' %}" alt="logo de la pagina">
+        </a>
+        <nav>
+            <div class="user-menu">
+                <button class="user-button" type="button">
+                    <span>{{ request.user.nombre|default:"Refugio" }}</span>
+                </button>
+
+                <div class="user-dropdown">
+                    <a href="/refugio/perfil/" class="dropdown-link" style="display:block; padding: 10px 20px; color: #333; text-decoration: none;">
+                        Configurar Refugio
+                    </a>
+                    <form action="/logout/" method="post">
+                        {% csrf_token %}
+                        <button type="submit" class="logout-btn">
+                            Cerrar sesión
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </nav>
+    </div>
+
+    <div class="headadmin" id="headrefugio">
+        <nav>
+            <a href="/">Ir al sitio</a>
+            <a href="/refugio/dashboard/">Dashboard</a>
+            <a href="{% url 'lista_mascotas' %}">Mis Mascotas</a>
+            <a href="{% url 'lista_adopciones' %}">Solicitudes</a>
+            <a href="#">Contáctanos</a>
+        </nav>
+    </div>
+    <div id="header-spacer"></div>
+</header>
+
+{% else %}
+<header>
+    <div class="contenedor">
+        <a href="/" class="logo">
+            <img src="{% static 'img/AdoptPets (1).png' %}" alt="logo de la pagina">
+        </a>
+
+        <nav>
+            <a href="{% url 'lista_mascotas' %}">Mascotas</a>
+            <a href="{% url 'lista_refugios' %}">Refugios</a>
+            <a href="#">Contáctanos</a>
+
+            {% if not request.user.is_authenticated %}
+            <a href="/login/" class="boton">
+                Iniciar sesión
+            </a>
+            
+            {% else %}
+            <div class="user-menu">
+                <button class="user-button" type="button">
+                    <span>{{ request.user.nombre|default:"Usuario" }}</span>
+                </button>
+
+                <div class="user-dropdown">
+                    <a href="/adoptante/perfil/" class="dropdown-link">
+                        Mi perfil
+                    </a>
+                    <form action="/logout/" method="post">
+                        {% csrf_token %}
+                        <button type="submit" class="logout-btn">
+                            Cerrar sesión
+                        </button>
+                    </form>
+                </div>
+            </div>
+            {% endif %}
+        </nav>
+    </div>
+</header>
+{% endif %}

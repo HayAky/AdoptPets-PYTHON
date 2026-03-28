@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Registro - AdoptPets{% endblock %}
+
+{% block extra_css %}
+    <link href="{% static 'css/register.css' %}" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+<section class="registro-container">
+    <div class="registro-formulario">
+        <h1>AdoptPets</h1>
+        <h2>CREAR CUENTA</h2>
+        <p>Regístrate para encontrar y adoptar a tu nuevo amigo</p>
+
+        {% if messages %}
+            <div style="color: red; margin-bottom: 15px;">
+                {% for message in messages %}
+                    <p>{{ message }}</p>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <form method="post" action="{% url 'registro' %}">
+            {% csrf_token %}
+            <div class="fila">
+                <input type="text" name="nombre" placeholder="Nombre" required>
+                <input type="text" name="apellido" placeholder="Apellido" required>
+            </div>
+            <div class="fila">
+                <input type="email" name="email" placeholder="Correo electrónico" required>
+            </div>
+
+            <div class="fila">
+                <input type="password" name="password" placeholder="Contraseña" required minlength="8">
+            </div>
+            <div class="fila">
+                <input type="text" name="direccion" placeholder="Dirección">
+                <input type="text" name="telefono" placeholder="Teléfono">
+            </div>
+            <div class="fila">
+                <select required name="tipo_documento">
+                    <option disabled selected>Tipo de doc...</option>
+                    <option value="cc">C.C.</option>
+                    <option value="ce">C.E.</option>
+                    <option value="ti">T.I.</option>
+                    <option value="pp">P.P.</option>
+                </select>
+                <input type="text" name="cedula" placeholder="Número de documento">
+            </div>
+            <div class="fila">
+                <input type="date" name="fechaNacimiento" required placeholder="Fecha de nacimiento">
+            </div>
+
+            <div class="fila">
+                <input type="password" name="confirmPassword" placeholder="Confirmar contraseña" required minlength="8">
+            </div>
+
+            <button type="submit">Registrarse</button>
+
+            <div class="terminos">
+                <input type="checkbox" id="terminos" required>
+                <label for="terminos">Acepta Términos y condiciones</label>
+            </div>
+        </form>
+        <p class="login-link">¿Ya tienes cuenta? <a href="{% url 'login' %}">Inicia sesión</a></p>
+    </div>
+
+    <div class="registro-imagen">
+        <img src="{% static 'img/Perro_viento.png' %}" alt="Perro feliz en auto">
+    </div>
+</section>
+{% endblock %}
