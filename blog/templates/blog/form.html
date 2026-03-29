@@ -16,7 +16,7 @@
             <form method="post" action="">
                 {% csrf_token %}
                 
-                <div style="margin-bottom: 20px;">
+                <div class="form-group">
                     <label style="display: block; font-weight: bold; margin-bottom: 8px;">Título *</label>
                     <input type="text" name="titulo" value="{{ blog.titulo|default:'' }}" required style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ccc; font-size: 16px;">
                 </div>
@@ -38,12 +38,12 @@
                     </div>
                 </div>
 
-                <div style="margin-bottom: 20px;">
+                <div class="form-group">
                     <label style="display: block; font-weight: bold; margin-bottom: 8px;">Resumen Breve (Para la tarjeta)</label>
                     <input type="text" name="resumen" value="{{ blog.resumen|default:'' }}" maxlength="255" placeholder="Una o dos frases gancho..." style="width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ccc;">
                 </div>
 
-                <div style="margin-bottom: 20px;">
+                <div class="form-group">
                     <label style="display: block; font-weight: bold; margin-bottom: 8px;">Contenido Completo *</label>
                     <textarea name="contenido" required style="width: 100%; height: 250px; padding: 10px; border-radius: 8px; border: 1px solid #ccc; font-family: inherit; resize: vertical;">{{ blog.contenido|default:'' }}</textarea>
                 </div>
