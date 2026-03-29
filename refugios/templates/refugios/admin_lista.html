@@ -1,0 +1,107 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Gestión de Refugios - AdoptPets{% endblock %}
+
+{% block extra_css %}
+    <link href="{% static 'css/admin_listas.css' %}" rel="stylesheet">
+    <style>
+        /* Estilos específicos para el Grid de Refugios que no están en el CSS global */
+        .refugios-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 25px; }
+        .refugio-card { background: white; border-radius: 15px; padding: 25px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); transition: all 0.3s; }
+        .refugio-card:hover { transform: translateY(-5px); box-shadow: 0 5px 20px rgba(0,0,0,0.1); }
+        .refugio-header { display: flex; justify-content: space-between; align-items: start; margin-bottom: 15px; }
+        .refugio-header h3 { color: #22C55E; font-size: 22px; margin: 0 0 5px 0; }
+        .refugio-info { margin: 15px 0; }
+        .refugio-info p { margin: 8px 0; color: #666; font-size: 14px; }
+        .refugio-info p strong { color: #333; }
+        .refugio-stats { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin: 20px 0; padding: 15px; background: #f8f9fa; border-radius: 10px; }
+        .stat-item { text-align: center; }
+        .stat-item .number { font-size: 24px; font-weight: bold; color: #22C55E; }
+        .stat-item .label { font-size: 12px; color: #666; }
+        .refugio-actions { display: flex; gap: 10px; margin-top: 20px; padding-top: 20px; border-top: 1px solid #f0f0f0; }
+    </style>
+{% endblock %}
+
+{% block content %}
+<div class="admin-layout">
+    <main class="main-content">
+        <div class="page-header">
+            <h1>Gestión de Refugios</h1>
+            <a href="{% url 'crear_refugio' %}" class="btn btn-primary">
+                ➕ Nuevo Refugio
+            </a>
+        </div>
+
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert {% if message.tags == 'success' %}alert-success{% else %}alert-warning{% endif %}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <div class="refugios-grid">
+            {% for refugio in refugios %}
+            <div class="refugio-card">
+                <div class="refugio-header">
+                    <div>
+                        <h3>{{ refugio.nombre_refugio }}</h3>
+                        <p style="color: #666; font-size: 14px;">
+                            📍 <span>{{ refugio.localidad }}</span>
+                        </p>
+                    </div>
+                    <span class="badge {% if refugio.activo %}badge-active{% else %}badge-inactive{% endif %}">
+                        {% if refugio.activo %}Activo{% else %}Inactivo{% endif %}
+                    </span>
+                </div>
+
+                <div class="refugio-info">
+                    <p><strong>📧 Email:</strong> <span>{{ refugio.email|default:"-" }}</span></p>
+                    <p><strong>📞 Teléfono:</strong> <span>{{ refugio.telefono|default:"-" }}</span></p>
+                    <p><strong>👤 Responsable:</strong> <span>{{ refugio.responsable }}</span></p>
+                    <p><strong>📍 Dirección:</strong> <span>{{ refugio.direccion }}</span></p>
+                    {% if refugio.capacidad_maxima %}
+                    <p>
+                        <strong>🏠 Capacidad:</strong>
+                        <span>{{ refugio.capacidad_maxima }} mascotas</span>
+                    </p>
+                    {% endif %}
+                </div>
+
+                <div class="refugio-stats">
+                    <div class="stat-item">
+                        <div class="number">{{ refugio.mascotas.count }}</div>
+                        <div class="label">Mascotas Totales</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="number">
+                            -
+                        </div>
+                        <div class="label">Disponibles</div>
+                    </div>
+                </div>
+
+                {% if refugio.descripcion %}
+                <p style="color: #666; font-size: 14px; line-height: 1.6;">
+                    {{ refugio.descripcion|truncatewords:20 }}
+                </p>
+                {% endif %}
+
+                <div class="refugio-actions">
+                    <a href="{% url 'editar_refugio' refugio.id_refugio %}" class="btn btn-secondary btn-sm" style="flex: 1; text-align: center;">
+                        ✏️ Editar
+                    </a>
+                    <a href="{% url 'eliminar_refugio' refugio.id_refugio %}" class="btn btn-danger btn-sm" style="flex: 1; text-align: center;"
+                       onclick="return confirm('¿Eliminar refugio? Esto dejará sin refugio a sus mascotas asociadas.')">
+                        🗑️ Eliminar
+                    </a>
+                </div>
+            </div>
+            {% empty %}
+                <p style="text-align: center; color: #999; width: 100%; grid-column: 1 / -1;">No hay refugios registrados.</p>
+            {% endfor %}
+        </div>
+    </main>
+</div>
+{% endblock %}

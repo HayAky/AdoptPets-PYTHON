@@ -15,21 +15,24 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
-
-from django.contrib import admin
 from django.urls import path, include
 from django.views.generic import TemplateView
-from django.contrib.auth import views as auth_views  # <-- Importamos las vistas de auth
+from django.contrib.auth import views as auth_views
 from usuarios import views as usuarios_views
+
 urlpatterns = [
-    path('admin/', admin.site.urls),
+    # CUIDADO: Django ya trae su propio panel en /admin/.
+    # Para evitar conflictos con tu panel personalizado, cambiaremos la ruta nativa de Django a /django-admin/
+    path('django-admin/', admin.site.urls),
+
+    # Tu nuevo Dashboard Administrativo personalizado
+    path('admin/', usuarios_views.admin_dashboard, name='admin_dashboard'),
 
     # Rutas de Autenticación
     path('login/', auth_views.LoginView.as_view(template_name='login.html'), name='login'),
-    # Al cerrar sesión, redirigimos al login enviando la variable ?logout=true
     path('logout/', auth_views.LogoutView.as_view(next_page='/login/?logout=true'), name='logout'),
     path('register/', usuarios_views.registro, name='registro'),
+
     # Ruta raíz
     path('', TemplateView.as_view(template_name='main.html'), name='inicio'),
 

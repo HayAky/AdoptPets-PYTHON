@@ -1,0 +1,85 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Gestión de Mascotas - AdoptPets{% endblock %}
+
+{% block extra_css %}
+    <link href="{% static 'css/admin_listas.css' %}" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+<div class="admin-layout">
+    <main class="main-content">
+        <div class="page-header">
+            <h1>Gestión de Mascotas</h1>
+            <a href="{% url 'crear_mascota' %}" class="btn btn-primary">
+                ➕ Nueva Mascota
+            </a>
+        </div>
+
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert {% if message.tags == 'success' %}alert-success{% else %}alert-warning{% endif %}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <div class="content-card">
+            <table class="table">
+                <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nombre</th>
+                    <th>Especie</th>
+                    <th>Raza</th>
+                    <th>Edad</th>
+                    <th>Sexo</th>
+                    <th>Refugio</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for mascota in mascotas %}
+                <tr>
+                    <td>{{ mascota.id_mascota }}</td>
+                    <td><strong>{{ mascota.nombre }}</strong></td>
+                    <td>{{ mascota.especie }}</td>
+                    <td>{{ mascota.raza|default:"-" }}</td>
+                    <td>{{ mascota.edad_aproximada|default:"-" }} años</td>
+                    <td>{{ mascota.sexo }}</td>
+                    <td>{{ mascota.refugio.nombre_refugio|default:"-" }}</td>
+                    <td>
+                        <span class="badge 
+                            {% if mascota.estado_adopcion == 'disponible' %}badge-available
+                            {% elif mascota.estado_adopcion == 'pendiente' %}badge-process
+                            {% else %}badge-adopted{% endif %}">
+                            {{ mascota.estado_adopcion }}
+                        </span>
+                    </td>
+                    <td>
+                        <div class="actions">
+                            <a href="{% url 'editar_mascota' mascota.id_mascota %}" class="btn btn-secondary btn-sm">
+                                ✏️ Editar
+                            </a>
+                            <a href="{% url 'eliminar_mascota' mascota.id_mascota %}" class="btn btn-danger btn-sm"
+                               onclick="return confirm('¿Está seguro de eliminar esta mascota?')">
+                                🗑️ Eliminar
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="9" style="text-align: center; padding: 40px; color: #999;">
+                        No hay mascotas registradas
+                    </td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </main>
+</div>
+{% endblock %}

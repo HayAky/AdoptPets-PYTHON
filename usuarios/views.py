@@ -2,6 +2,11 @@ from django.shortcuts import render, redirect
 from django.contrib.auth import login
 from django.contrib import messages
 from .models import Usuario, Rol
+from mascotas.models import Mascota
+from refugios.models import Refugio
+from adopciones.models import Adopcion
+from .decorators import roles_permitidos
+
 
 def lista_usuarios(request):
     usuarios = Usuario.objects.all()
@@ -53,3 +58,36 @@ def registro(request):
 
     # Si la petición es GET (solo entrar a la página), mostramos el formulario
     return render(request, 'register.html')
+
+@roles_permitidos(['ADMIN'])
+def admin_dashboard(request):
+    # --- 1. Estadísticas Generales (Contadores) ---
+    total_mascotas = Mascota.objects.count()
+    mascotas_disponibles = Mascota.objects.filter(estado_adopcion='disponible').count()
+
+    solicitudes_pendientes = Adopcion.objects.filter(estado_adopcion='pendiente').count()
+    adopciones_completadas = Adopcion.objects.filter(estado_adopcion='adoptado').count()
+
+    total_usuarios = Usuario.objects.count()
+    total_refugios = Refugio.objects.count()
+
+    # --- 2. Listas Recientes para las tablas pequeñas ---
+    # Traemos las adopciones pendientes, ordenadas de la más antigua a la más nueva
+    adopciones_pendientes_lista = Adopcion.objects.filter(estado_adopcion='pendiente').order_by('fecha_solicitud')[:5]
+
+    # Traemos las últimas 5 mascotas registradas que estén disponibles
+    ultimas_mascotas = Mascota.objects.filter(estado_adopcion='disponible').order_by('-fecha_registro')[:5]
+
+    # --- 3. Empaquetar el contexto ---
+    context = {
+        'totalMascotas': total_mascotas,
+        'mascotasDisponibles': mascotas_disponibles,
+        'solicitudesPendientes': solicitudes_pendientes,
+        'adopcionesCompletadas': adopciones_completadas,
+        'totalUsuarios': total_usuarios,
+        'totalRefugios': total_refugios,
+        'adopcionesPendientes': adopciones_pendientes_lista,
+        'ultimasMascotas': ultimas_mascotas
+    }
+
+    return render(request, 'admin/dashboard.html', context)

@@ -1,0 +1,118 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Dashboard Admin - AdoptPets{% endblock %}
+
+{% block extra_css %}
+    <link href="{% static 'css/dashboardadmin.css' %}" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <div class="admin-layout">
+        <main class="main-content">
+            <div class="top-bar">
+                <h1>Dashboard Administrativo</h1>
+                <div class="user-info">
+                    Hola, {{ request.user.nombre }}
+                </div>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h3>Total Mascotas</h3>
+                    <div class="number">{{ totalMascotas }}</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Disponibles</h3>
+                    <div class="number">{{ mascotasDisponibles }}</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Solicitudes Pendientes</h3>
+                    <div class="number">{{ solicitudesPendientes }}</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Adopciones Completadas</h3>
+                    <div class="number">{{ adopcionesCompletadas }}</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Total Usuarios</h3>
+                    <div class="number">{{ totalUsuarios }}</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Total Refugios</h3>
+                    <div class="number">{{ totalRefugios }}</div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>Solicitudes de Adopción Pendientes</h2>
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Adoptante</th>
+                        <th>Mascota</th>
+                        <th>Fecha</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for adopcion in adopcionesPendientes %}
+                    <tr>
+                        <td>{{ adopcion.id_adopcion }}</td>
+                        <td>{{ adopcion.adoptante.nombre }} {{ adopcion.adoptante.apellido }}</td>
+                        <td>{{ adopcion.mascota.nombre }}</td>
+                        <td>{{ adopcion.fecha_solicitud|date:"d/m/Y" }}</td>
+                        <td><span class="badge badge-pending">PENDIENTE</span></td>
+                        <td>
+                            <a href="/adopciones/admin/detalle/{{ adopcion.id_adopcion }}/" class="btn btn-primary">Ver</a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="6" style="text-align: center; padding: 20px; color: #999;">
+                            No hay solicitudes pendientes
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="section">
+                <h2>Últimas Mascotas Registradas</h2>
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Nombre</th>
+                        <th>Especie</th>
+                        <th>Refugio</th>
+                        <th>Estado</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for mascota in ultimasMascotas %}
+                    <tr>
+                        <td>{{ mascota.id_mascota }}</td>
+                        <td>{{ mascota.nombre }}</td>
+                        <td>{{ mascota.especie }}</td>
+                        <td>{{ mascota.refugio.nombre_refugio|default:"-" }}</td>
+                        <td><span class="badge badge-success">{{ mascota.estado_adopcion }}</span></td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" style="text-align: center; padding: 20px; color: #999;">
+                            No hay mascotas registradas recientemente
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,150 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{% if mascota %}Editar{% else %}Nueva{% endif %} Mascota - AdoptPets{% endblock %}
+
+{% block extra_css %}
+    <link href="{% static 'css/formulario.css' %}" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+<div class="admin-layout">
+    <main class="main-content">
+        <div class="page-header">
+            <h1>{% if mascota %}Editar Mascota{% else %}Nueva Mascota{% endif %}</h1>
+            <a href="{% url 'admin_lista_mascotas' %}" class="back-btn">← Volver</a>
+        </div>
+
+        <div class="form-container">
+            <form method="post" action="">
+                {% csrf_token %}
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="nombre">Nombre *</label>
+                        <input type="text" id="nombre" name="nombre" value="{{ mascota.nombre|default:'' }}" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="especie">Especie *</label>
+                        <select id="especie" name="especie" required>
+                            <option value="">Seleccionar</option>
+                            <option value="perro" {% if mascota.especie == 'perro' %}selected{% endif %}>Perro</option>
+                            <option value="gato" {% if mascota.especie == 'gato' %}selected{% endif %}>Gato</option>
+                            <option value="conejo" {% if mascota.especie == 'conejo' %}selected{% endif %}>Conejo</option>
+                            <option value="otro" {% if mascota.especie == 'otro' %}selected{% endif %}>Otro</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="raza">Raza</label>
+                        <input type="text" id="raza" name="raza" value="{{ mascota.raza|default:'' }}">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="edadAproximada">Edad Aproximada (años)</label>
+                        <input type="number" id="edadAproximada" name="edadAproximada" value="{{ mascota.edad_aproximada|default:'' }}" min="0">
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="sexo">Sexo *</label>
+                        <select id="sexo" name="sexo" required>
+                            <option value="">Seleccionar</option>
+                            <option value="macho" {% if mascota.sexo == 'macho' %}selected{% endif %}>Macho</option>
+                            <option value="hembra" {% if mascota.sexo == 'hembra' %}selected{% endif %}>Hembra</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="tamano">Tamaño *</label>
+                        <select id="tamano" name="tamano" required>
+                            <option value="">Seleccionar</option>
+                            <option value="pequeño" {% if mascota.tamano == 'pequeño' %}selected{% endif %}>Pequeño</option>
+                            <option value="mediano" {% if mascota.tamano == 'mediano' %}selected{% endif %}>Mediano</option>
+                            <option value="grande" {% if mascota.tamano == 'grande' %}selected{% endif %}>Grande</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="peso">Peso (kg)</label>
+                        <input type="number" step="0.1" id="peso" name="peso" value="{{ mascota.peso|default:'' }}" min="0">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="color">Color</label>
+                        <input type="text" id="color" name="color" value="{{ mascota.color|default:'' }}">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="refugio">Refugio *</label>
+                    <select id="refugio" name="refugio" required>
+                        <option value="">Seleccionar refugio</option>
+                        {% for refugio in refugios %}
+                            <option value="{{ refugio.id_refugio }}"
+                                    {% if mascota.refugio and mascota.refugio.id_refugio == refugio.id_refugio %}selected{% endif %}>
+                                {{ refugio.nombre_refugio }}
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="descripcion">Descripción</label>
+                    <textarea id="descripcion" name="descripcion" placeholder="Describe la personalidad...">{{ mascota.descripcion|default:'' }}</textarea>
+                </div>
+
+                <div class="form-group">
+                    <label for="estadoSalud">Estado de Salud</label>
+                    <textarea id="estadoSalud" name="estadoSalud">{{ mascota.estado_salud|default:'' }}</textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>Características</label>
+                    <div class="checkbox-group">
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="vacunado" name="vacunado" {% if mascota.vacunado %}checked{% endif %}>
+                            <label for="vacunado">Vacunado</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="esterilizado" name="esterilizado" {% if mascota.esterilizado %}checked{% endif %}>
+                            <label for="esterilizado">Esterilizado</label>
+                        </div>
+                        <div class="checkbox-item">
+                            <input type="checkbox" id="microchip" name="microchip" {% if mascota.microchip %}checked{% endif %}>
+                            <label for="microchip">Microchip</label>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="estadoAdopcion">Estado de Adopción</label>
+                        <select id="estadoAdopcion" name="estadoAdopcion">
+                            <option value="disponible" {% if mascota.estado_adopcion == 'disponible' %}selected{% endif %}>Disponible</option>
+                            <option value="pendiente" {% if mascota.estado_adopcion == 'pendiente' %}selected{% endif %}>Pendiente</option>
+                            <option value="adoptado" {% if mascota.estado_adopcion == 'adoptado' %}selected{% endif %}>Adoptado</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="fechaIngreso">Fecha de Ingreso</label>
+                        <input type="date" id="fechaIngreso" name="fechaIngreso" value="{{ mascota.fecha_ingreso|date:'Y-m-d' }}">
+                    </div>
+                </div>
+
+                <div class="form-buttons">
+                    <button type="submit" class="btn btn-primary">💾 Guardar Mascota</button>
+                    <a href="{% url 'admin_lista_mascotas' %}" class="btn btn-secondary">Cancelar</a>
+                </div>
+            </form>
+        </div>
+    </main>
+</div>
+{% endblock %}
