@@ -17,6 +17,14 @@ class Mascota(models.Model):
     tamano = models.CharField(max_length=255)
     peso = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
     color = models.CharField(max_length=255, null=True, blank=True)
+    # ...
+    color = models.CharField(max_length=50, null=True, blank=True)
+
+    # NUEVO CAMPO DE IMAGEN
+    foto = models.ImageField(upload_to='mascotas_fotos/', null=True, blank=True)
+
+    descripcion = models.TextField(null=True, blank=True)
+    # ...
     descripcion = models.TextField(null=True, blank=True)
     estado_salud = models.TextField(null=True, blank=True)
     vacunado = models.BooleanField(default=False)

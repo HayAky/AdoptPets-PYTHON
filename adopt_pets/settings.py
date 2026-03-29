@@ -136,3 +136,13 @@ AUTH_USER_MODEL = 'usuarios.Usuario'
 
 # Redirigir al inicio después de un login exitoso
 LOGIN_REDIRECT_URL = '/'
+
+# settings.py
+# ... (código anterior) ...
+
+STATIC_URL = 'static/'
+STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
+
+# --- NUEVA CONFIGURACIÓN PARA FOTOS SUBIDAS POR USUARIOS ---
+MEDIA_URL = '/media/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media')

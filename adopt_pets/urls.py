@@ -19,6 +19,8 @@ from django.urls import path, include
 from django.views.generic import TemplateView
 from django.contrib.auth import views as auth_views
 from usuarios import views as usuarios_views
+from django.conf import settings
+from django.conf.urls.static import static
 
 urlpatterns = [
     # CUIDADO: Django ya trae su propio panel en /admin/.
@@ -44,3 +46,5 @@ urlpatterns = [
     path('blog/', include('blog.urls')),
     path('reportes/', include('reportes.urls')),
 ]
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

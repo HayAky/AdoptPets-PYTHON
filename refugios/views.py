@@ -5,13 +5,21 @@ from usuarios.decorators import roles_permitidos
 from mascotas.models import Mascota
 from adopciones.models import Adopcion
 from usuarios.models import Usuario
+from django.db.models import Count, Q
 
 # --- VISTA PÚBLICA ---
+from django.db.models import Count, Q
+
+
+# --- VISTA PÚBLICA (Sin protección) ---
 def lista_refugios(request):
-    refugios = Refugio.objects.filter(activo=True)
+    # Traemos todos los refugios activos y contamos cuántas mascotas 'disponibles' tiene cada uno
+    refugios = Refugio.objects.filter(activo=True).annotate(
+        # Creamos una variable temporal llamada 'mascotas_disponibles_count'
+        mascotas_disponibles_count=Count('mascotas', filter=Q(mascotas__estado_adopcion='disponible'))
+    ).order_by('nombre_refugio')
+
     return render(request, 'refugios/lista.html', {'refugios': refugios})
-
-
 # =========================================================
 # VISTAS PROTEGIDAS (Solo Administradores)
 # =========================================================

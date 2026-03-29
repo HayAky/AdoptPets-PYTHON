@@ -1,0 +1,58 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Gestión de Blogs - AdoptPets{% endblock %}
+{% block extra_css %}<link href="{% static 'css/admin_listas.css' %}" rel="stylesheet">{% endblock %}
+
+{% block content %}
+<div class="admin-layout">
+    <main class="main-content">
+        <div class="page-header">
+            <h1>Mis Publicaciones (Blog)</h1>
+            <a href="{% url 'crear_blog' %}" class="btn btn-primary">✍️ Escribir Nuevo Blog</a>
+        </div>
+
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert {% if message.tags == 'success' %}alert-success{% else %}alert-warning{% endif %}">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+
+        <div class="content-card">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Fecha</th>
+                        <th>Título</th>
+                        <th>Categoría</th>
+                        <th>Autor</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for blog in blogs %}
+                    <tr>
+                        <td>{{ blog.fecha_publicacion|date:"d/m/Y" }}</td>
+                        <td><strong>{{ blog.titulo }}</strong></td>
+                        <td>{{ blog.categoria|default:"-" }}</td>
+                        <td>{{ blog.autor }}</td>
+                        <td>
+                            <span class="badge {% if blog.activo %}badge-active{% else %}badge-inactive{% endif %}">
+                                {% if blog.activo %}Visible{% else %}Oculto{% endif %}
+                            </span>
+                        </td>
+                        <td>
+                            <a href="{% url 'editar_blog' blog.id_blog %}" class="btn btn-primary btn-sm">Editar</a>
+                            <a href="{% url 'eliminar_blog' blog.id_blog %}" class="btn btn-danger btn-sm" onclick="return confirm('¿Borrar esta publicación?')">Eliminar</a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="6" style="text-align: center; padding: 20px;">No has publicado nada aún.</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </main>
+</div>
+{% endblock %}

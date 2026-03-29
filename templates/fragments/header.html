@@ -30,7 +30,8 @@
             <a href="{% url 'admin_lista_adopciones' %}">Adopciones</a>
             <a href="{% url 'admin_lista_refugios' %}">Refugios</a>
             <a href="{% url 'admin_lista_usuarios' %}">Usuarios</a>
-            <a href="#">Reportes</a>
+            <a href="{% url 'admin_lista_blogs' %}">Blogs</a>
+            <a href="{% url 'panel_reportes' %}">Reportes</a>
         </nav>
     </div>
     <div id="header-spacer"></div>
@@ -67,7 +68,7 @@
             <a href="{% url 'dashboard_refugio' %}">Dashboard</a>
             <a href="{% url 'admin_lista_mascotas' %}">Mis Mascotas</a>
             <a href="#">Solicitudes</a>
-            <a href="#">Contáctanos</a>
+            <a href="{% url 'admin_lista_blogs' %}">Blogs</a>
         </nav>
     </div>
     <div id="header-spacer"></div>

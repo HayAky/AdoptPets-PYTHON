@@ -1,9 +1,69 @@
 {% extends 'base.html' %}
-{% block title %}Refugios - AdoptPets{% endblock %}
+{% load static %}
+
+{% block title %}Nuestros Aliados - AdoptPets{% endblock %}
+
+{% block extra_css %}
+    <link href="{% static 'css/publicrefugio.css' %}" rel="stylesheet">
+{% endblock %}
 
 {% block content %}
-<div class="container" style="margin-top: 100px; text-align: center;">
-    <h1>Lista de Refugios</h1>
-    <p>Página en construcción...</p>
+<div class="refugios-container">
+    <div class="page-header" style="text-align: center; margin-bottom: 50px;">
+        <h1 class="page-title">🏠 Refugios Aliados</h1>
+        <p class="page-subtitle">Conoce a las increíbles organizaciones que trabajan día a día para salvar vidas.</p>
+    </div>
+
+    <div class="refugios-grid">
+        {% for refugio in refugios %}
+        <div class="refugio-card">
+
+            <div class="refugio-header">
+                <div>
+                    <h3>{{ refugio.nombre_refugio }}</h3>
+                    <p style="color: #666; font-size: 14px; margin: 0;">
+                        📍 <span>{{ refugio.localidad }}</span>
+                    </p>
+                </div>
+            </div>
+
+            <div class="refugio-info">
+                {% if refugio.email %}<p><strong>📧 Email:</strong> <span>{{ refugio.email }}</span></p>{% endif %}
+                {% if refugio.telefono %}<p><strong>📞 Teléfono:</strong> <span>{{ refugio.telefono }}</span></p>{% endif %}
+                <p><strong>📍 Dirección:</strong> <span>{{ refugio.direccion }}</span></p>
+
+                {% if refugio.descripcion %}
+                    <p style="margin-top: 15px; color: #555; font-style: italic;">
+                        "{{ refugio.descripcion|truncatewords:20 }}"
+                    </p>
+                {% endif %}
+            </div>
+
+            <div class="refugio-stats">
+                <div class="stat-item">
+                    <div class="number">{{ refugio.mascotas_disponibles_count }}</div>
+                    <div class="label">Mascotas Disponibles</div>
+                </div>
+                <div class="stat-item">
+                    <div class="number">{{ refugio.mascotas.count }}</div>
+                    <div class="label">Histórico Rescatados</div>
+                </div>
+            </div>
+
+            <div class="refugio-actions">
+                <a href="{% url 'lista_mascotas' %}" class="btn-secondary">
+                    🐶 Ver sus Mascotas
+                </a>
+            </div>
+
+        </div>
+        {% empty %}
+        <div style="grid-column: 1 / -1; text-align: center; padding: 50px; background: white; border-radius: 20px;">
+            <div style="font-size: 60px; margin-bottom: 20px;">🏢</div>
+            <h2>Aún no tenemos refugios registrados</h2>
+            <p style="color: #666;">Estamos trabajando para sumar aliados a nuestra red de adopción.</p>
+        </div>
+        {% endfor %}
+    </div>
 </div>
 {% endblock %}
