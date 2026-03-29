@@ -1,0 +1,422 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AdoptPets — Encuentra tu compañero ideal</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+        :root {
+            --green:      #22c55e;
+            --green-dark: #16a34a;
+            --green-light:#dcfce7;
+            --cream:      #fafaf7;
+            --dark:       #1a1a1a;
+            --gray:       #6b7280;
+        }
+
+        body { font-family: 'DM Sans', sans-serif; background: var(--cream); color: var(--dark); }
+
+        /* NAV */
+        nav {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 1.2rem 4rem;
+            background: #fff;
+            border-bottom: 1px solid #f0f0f0;
+            position: sticky; top: 0; z-index: 100;
+        }
+
+        .nav-logo {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.6rem; font-weight: 700;
+            color: var(--dark); text-decoration: none;
+        }
+        .nav-logo span { color: var(--green); }
+
+        .nav-links { display: flex; gap: 2rem; list-style: none; }
+        .nav-links a {
+            text-decoration: none; color: var(--gray);
+            font-size: 0.95rem; font-weight: 400;
+            transition: color 0.2s;
+        }
+        .nav-links a:hover { color: var(--green); }
+
+        .nav-actions { display: flex; gap: 0.75rem; }
+
+        .btn-nav {
+            padding: 0.55rem 1.2rem;
+            border-radius: 8px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 0.9rem; font-weight: 500;
+            text-decoration: none; cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-ghost {
+            background: transparent;
+            border: 1.5px solid var(--border, #e5e7eb);
+            color: var(--dark);
+        }
+        .btn-ghost:hover { border-color: var(--green); color: var(--green); }
+
+        .btn-primary {
+            background: var(--green); color: #fff; border: none;
+        }
+        .btn-primary:hover { background: var(--green-dark); }
+
+        /* HERO */
+        .hero {
+            display: grid; grid-template-columns: 1fr 1fr;
+            min-height: 90vh;
+            padding: 4rem;
+            gap: 4rem;
+            align-items: center;
+        }
+
+        .hero-text { animation: fadeUp 0.8s ease both; }
+
+        .hero-tag {
+            display: inline-block;
+            background: var(--green-light);
+            color: var(--green-dark);
+            padding: 0.35rem 1rem;
+            border-radius: 999px;
+            font-size: 0.8rem; font-weight: 500;
+            letter-spacing: 0.05em;
+            margin-bottom: 1.5rem;
+        }
+
+        .hero h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            line-height: 1.15;
+            margin-bottom: 1.5rem;
+            color: var(--dark);
+        }
+
+        .hero h1 em {
+            font-style: italic;
+            color: var(--green);
+        }
+
+        .hero p {
+            color: var(--gray);
+            font-size: 1.1rem;
+            line-height: 1.7;
+            max-width: 480px;
+            margin-bottom: 2.5rem;
+        }
+
+        .hero-actions { display: flex; gap: 1rem; flex-wrap: wrap; }
+
+        .btn-hero {
+            padding: 0.9rem 2rem;
+            border-radius: 12px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 1rem; font-weight: 500;
+            text-decoration: none;
+            transition: all 0.2s;
+            display: inline-block;
+        }
+
+        .btn-hero-primary {
+            background: var(--green); color: #fff; border: none;
+        }
+        .btn-hero-primary:hover { background: var(--green-dark); transform: translateY(-2px); }
+
+        .btn-hero-outline {
+            background: transparent;
+            border: 2px solid var(--dark);
+            color: var(--dark);
+        }
+        .btn-hero-outline:hover { border-color: var(--green); color: var(--green); }
+
+        /* Hero visual */
+       <div class="hero-visual">
+    {% for mascota in ultimas_mascotas %}
+        <div class="pet-card-uniform {% if forloop.first %}pet-card-featured{% endif %}">
+            
+            {% if mascota.foto_principal %}
+                <div class="pet-image-container">
+                    <img src="{{ mascota.foto_principal.url }}" 
+                         alt="{{ mascota.nombre }}" 
+                         class="pet-image-uniform">
+                </div>
+            {% else %}
+                <div class="pet-image-placeholder">
+                    <span class="pet-emoji">🐾</span>
+                </div>
+            {% endif %}
+            
+            <div class="pet-info-uniform">
+                <span class="pet-name-uniform">{{ mascota.nombre }}</span>
+                <span class="pet-badge-uniform">{{ mascota.especie }}</span>
+            </div>
+        </div>
+    {% empty %}
+        <div class="pet-card-uniform pet-card-empty">
+            <span class="pet-emoji">🏠</span>
+            <p>Aún no hay mascotas registradas.</p>
+        </div>
+    {% endfor %}
+</div>
+        }
+
+        .pet-card {
+            background: #fff;
+            border-radius: 20px;
+            padding: 1.5rem;
+            display: flex; flex-direction: column;
+            align-items: center; justify-content: center;
+            gap: 0.5rem;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.06);
+            transition: transform 0.3s;
+        }
+
+        .pet-card:hover { transform: translateY(-4px); }
+
+        .pet-card:first-child {
+            grid-row: span 2;
+            background: var(--dark);
+        }
+
+        .pet-emoji { font-size: 3.5rem; }
+        .pet-card:first-child .pet-emoji { font-size: 5rem; }
+
+        .pet-name {
+            font-family: 'Playfair Display', serif;
+            font-size: 1rem;
+            color: var(--dark);
+        }
+
+        .pet-card:first-child .pet-name { color: #fff; font-size: 1.2rem; }
+
+        .pet-badge {
+            background: var(--green-light);
+            color: var(--green-dark);
+            font-size: 0.7rem;
+            padding: 0.2rem 0.6rem;
+            border-radius: 999px;
+            font-weight: 500;
+        }
+
+        .pet-card:first-child .pet-badge {
+            background: rgba(34,197,94,0.2);
+            color: var(--green);
+        }
+
+        /* STATS */
+        .stats-bar {
+            background: var(--dark);
+            padding: 2.5rem 4rem;
+            display: flex; justify-content: space-around;
+        }
+
+        .stat { text-align: center; }
+        .stat-num {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5rem; color: var(--green); font-weight: 700;
+        }
+        .stat-label { color: #9ca3af; font-size: 0.85rem; margin-top: 0.25rem; }
+
+        /* FEATURES */
+        .features {
+            padding: 5rem 4rem;
+            display: grid; grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+        }
+
+        .feature-card {
+            background: #fff;
+            border-radius: 20px;
+            padding: 2rem;
+            border: 1px solid #f0f0f0;
+            transition: box-shadow 0.3s, transform 0.3s;
+        }
+
+        .feature-card:hover {
+            box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+            transform: translateY(-4px);
+        }
+
+        .feature-icon {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        .feature-card h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.3rem; margin-bottom: 0.75rem;
+        }
+
+        .feature-card p { color: var(--gray); line-height: 1.6; font-size: 0.95rem; }
+
+        /* CTA */
+        .cta {
+            background: var(--green);
+            padding: 5rem 4rem;
+            text-align: center;
+        }
+
+        .cta h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5rem; color: #fff; margin-bottom: 1rem;
+        }
+
+        .cta p { color: rgba(255,255,255,0.85); font-size: 1.05rem; margin-bottom: 2rem; }
+
+        .btn-cta {
+            display: inline-block;
+            padding: 1rem 2.5rem;
+            background: #fff;
+            color: var(--green-dark);
+            border-radius: 12px;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 1rem; font-weight: 600;
+            text-decoration: none;
+            transition: transform 0.2s;
+        }
+        .btn-cta:hover { transform: translateY(-3px); }
+
+        /* FOOTER */
+        footer {
+            background: var(--dark);
+            padding: 2rem 4rem;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+
+        .footer-logo {
+            font-family: 'Playfair Display', serif;
+            color: #fff; font-size: 1.3rem;
+        }
+        .footer-logo span { color: var(--green); }
+
+        footer p { color: #6b7280; font-size: 0.85rem; }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(24px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 900px) {
+            nav { padding: 1rem 1.5rem; }
+            .hero { grid-template-columns: 1fr; padding: 2rem 1.5rem; min-height: auto; }
+            .hero-visual { display: none; }
+            .features { grid-template-columns: 1fr; padding: 2rem 1.5rem; }
+            .stats-bar { flex-wrap: wrap; gap: 1.5rem; padding: 2rem; }
+        }
+    </style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+    <a href="{% url 'main' %}" class="nav-logo">Adopt<span>Pets</span></a>
+    <ul class="nav-links">
+        <li><a href="{% url 'adoptar' %}">Adoptar</a></li>
+        <li><a href="{% url 'refugios' %}">Refugios</a></li>
+        <li><a href="{% url 'noticias_lista' %}">Noticias</a></li>
+        <li><a href="{% url 'blog_lista' %}">Blog</a></li>
+        <li><a href="{% url 'contactenos' %}">Contacto</a></li>
+    </ul>
+    <div class="nav-actions">
+        <a href="{% url 'login' %}" class="btn-nav btn-ghost">Iniciar sesión</a>
+        <a href="{% url 'register' %}" class="btn-nav btn-primary">Registrarse</a>
+    </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+    <div class="hero-text">
+        <span class="hero-tag">🐾 Plataforma de adopción #1 en Colombia</span>
+        <h1>Dale un hogar a quien más lo <em>necesita</em></h1>
+        <p>Conectamos mascotas rescatadas con familias amorosas. Miles de animales esperan encontrar su hogar contigo.</p>
+        <div class="hero-actions">
+            <a href="{% url 'adoptar' %}" class="btn-hero btn-hero-primary">🐶 Quiero adoptar</a>
+            <a href="{% url 'register' %}?tipo=refugio" class="btn-hero btn-hero-outline">🏠 Soy un refugio</a>
+        </div>
+    </div>
+
+    <div class="hero-visual">
+    {% for mascota in ultimas_mascotas %}
+        <div class="pet-card" {% if forloop.first %}style="grid-row: span 2; background: var(--dark);"{% endif %}>
+            
+            {% if mascota.foto_principal %}
+                <img src="{{ mascota.foto_principal.url }}" 
+                     alt="{{ mascota.nombre }}" 
+                     style="width: 100%; height: {% if forloop.first %}260px{% else %}120px{% endif %}; object-fit: cover; border-radius: 15px; margin-bottom: 0.8rem;">
+            {% else %}
+                <span class="pet-emoji">🐾</span>
+            {% endif %}
+            
+            <span class="pet-name" {% if forloop.first %}style="color: #fff; font-size: 1.4rem;"{% endif %}>
+                {{ mascota.nombre }}
+            </span>
+            <span class="pet-badge">{{ mascota.especie }}</span>
+        </div>
+    {% empty %}
+        <div class="pet-card" style="grid-column: span 2;">
+            <span class="pet-emoji">🏠</span>
+            <p>Aún no hay mascotas registradas.</p>
+        </div>
+    {% endfor %}
+</div>
+</section>
+
+<!-- STATS -->
+<div class="stats-bar">
+    <div class="stat">
+        <div class="stat-num">{{ mascotasDisponibles }}+</div>
+        <div class="stat-label">Mascotas disponibles</div>
+    </div>
+    <div class="stat">
+        <div class="stat-num">500+</div>
+        <div class="stat-label">Adopciones exitosas</div>
+    </div>
+    <div class="stat">
+        <div class="stat-num">30+</div>
+        <div class="stat-label">Refugios aliados</div>
+    </div>
+    <div class="stat">
+        <div class="stat-num">1k+</div>
+        <div class="stat-label">Familias felices</div>
+    </div>
+</div>
+
+<!-- FEATURES -->
+<section class="features">
+    <div class="feature-card">
+        <span class="feature-icon">🔍</span>
+        <h3>Búsqueda inteligente</h3>
+        <p>Filtra por especie, tamaño, edad, refugio y más para encontrar tu compañero ideal.</p>
+    </div>
+    <div class="feature-card">
+        <span class="feature-icon">📋</span>
+        <h3>Proceso sencillo</h3>
+        <p>Solicita la adopción en minutos. Nuestro equipo te guía en cada paso del proceso.</p>
+    </div>
+    <div class="feature-card">
+        <span class="feature-icon">❤️</span>
+        <h3>Seguimiento post-adopción</h3>
+        <p>Hacemos seguimiento para asegurarnos que tanto tú como tu mascota estén felices.</p>
+    </div>
+</section>
+
+<!-- CTA -->
+<section class="cta">
+    <h2>¿Listo para cambiar una vida?</h2>
+    <p>Hay miles de mascotas esperando un hogar. La tuya podría ser la próxima historia de amor.</p>
+    <a href="{% url 'adoptar' %}" class="btn-cta">Ver mascotas disponibles →</a>
+</section>
+
+<!-- FOOTER -->
+<footer>
+    <div class="footer-logo">Adopt<span>Pets</span></div>
+    <p>© 2026 AdoptPets Colombia — Todos los derechos reservados</p>
+</footer>
+
+</body>
+</html>

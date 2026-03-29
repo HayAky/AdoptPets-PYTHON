@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AdoptPets — Mi Panel</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        :root {
+            --green: #22c55e; --green-dark: #16a34a; --green-light: #dcfce7;
+            --dark: #1a1a1a; --gray: #6b7280; --border: #e5e7eb; --cream: #f9fafb;
+        }
+        body { font-family: 'DM Sans', sans-serif; background: var(--cream); }
+
+        nav {
+            background: #fff; border-bottom: 1px solid var(--border);
+            padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center;
+            position: sticky; top: 0; z-index: 100;
+        }
+        .nav-logo { font-family: 'Playfair Display', serif; font-size: 1.4rem; color: var(--dark); text-decoration: none; }
+        .nav-logo span { color: var(--green); }
+        .nav-links { display: flex; gap: 1.5rem; list-style: none; }
+        .nav-links a { color: var(--gray); text-decoration: none; font-size: 0.9rem; transition: color 0.2s; }
+        .nav-links a:hover, .nav-links a.active { color: var(--green); font-weight: 500; }
+        .nav-actions { display: flex; gap: 0.75rem; align-items: center; }
+        .user-badge { background: var(--green-light); color: var(--green-dark); padding: 0.35rem 0.9rem; border-radius: 999px; font-size: 0.8rem; font-weight: 500; }
+        .btn-logout { color: var(--gray); text-decoration: none; font-size: 0.85rem; transition: color 0.2s; }
+        .btn-logout:hover { color: #ef4444; }
+
+        .main { max-width: 1100px; margin: 0 auto; padding: 2rem; }
+
+        .welcome { margin-bottom: 2rem; animation: fadeUp 0.6s ease both; }
+        .welcome h1 { font-family: 'Playfair Display', serif; font-size: 2rem; color: var(--dark); }
+        .welcome p { color: var(--gray); margin-top: 0.3rem; }
+
+        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 2rem; }
+        .stat-card {
+            background: #fff; border-radius: 16px; padding: 1.5rem;
+            border: 1px solid var(--border); text-align: center;
+            transition: box-shadow 0.2s, transform 0.2s;
+            animation: fadeUp 0.6s ease both;
+        }
+        .stat-card:hover { box-shadow: 0 4px 20px rgba(0,0,0,0.07); transform: translateY(-2px); }
+        .stat-icon { font-size: 2rem; margin-bottom: 0.5rem; }
+        .stat-value { font-family: 'Playfair Display', serif; font-size: 2rem; color: var(--dark); }
+        .stat-label { color: var(--gray); font-size: 0.85rem; margin-top: 0.2rem; }
+
+        .section-title { font-family: 'Playfair Display', serif; font-size: 1.3rem; color: var(--dark); margin-bottom: 1rem; }
+
+        .adopciones-list { display: flex; flex-direction: column; gap: 0.75rem; margin-bottom: 2rem; }
+        .adopcion-card {
+            background: #fff; border-radius: 12px; padding: 1.25rem 1.5rem;
+            border: 1px solid var(--border); display: flex; align-items: center;
+            justify-content: space-between; transition: box-shadow 0.2s;
+        }
+        .adopcion-card:hover { box-shadow: 0 4px 15px rgba(0,0,0,0.06); }
+        .adopcion-info { display: flex; align-items: center; gap: 1rem; }
+        .adopcion-emoji { font-size: 2rem; }
+        .adopcion-name { font-weight: 500; color: var(--dark); }
+        .adopcion-date { color: var(--gray); font-size: 0.85rem; }
+
+        .badge { display: inline-block; padding: 0.25rem 0.75rem; border-radius: 999px; font-size: 0.8rem; font-weight: 500; }
+        .badge-pending { background: #fef9c3; color: #854d0e; }
+        .badge-approved { background: var(--green-light); color: var(--green-dark); }
+        .badge-completed { background: #dbeafe; color: #1d4ed8; }
+        .badge-rejected { background: #fee2e2; color: #991b1b; }
+
+        .empty-state { text-align: center; padding: 3rem; background: #fff; border-radius: 16px; border: 1px solid var(--border); }
+        .empty-state .empty-icon { font-size: 3rem; margin-bottom: 1rem; }
+        .empty-state p { color: var(--gray); margin-bottom: 1.5rem; }
+        .btn-adopt { display: inline-block; padding: 0.8rem 2rem; background: var(--green); color: #fff; border-radius: 10px; text-decoration: none; font-weight: 500; transition: background 0.2s; }
+        .btn-adopt:hover { background: var(--green-dark); }
+
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+
+<nav>
+    <a href="{% url 'main' %}" class="nav-logo">Adopt<span>Pets</span></a>
+    <ul class="nav-links">
+        <li><a href="{% url 'adoptante_dashboard' %}" class="active">Mi Panel</a></li>
+        <li><a href="{% url 'adoptante_mascotas' %}">Buscar mascotas</a></li>
+        <li><a href="{% url 'adoptante_mis_adopciones' %}">Mis adopciones</a></li>
+        <li><a href="{% url 'adoptante_perfil' %}">Mi perfil</a></li>
+    </ul>
+    <div class="nav-actions">
+        <span class="user-badge">🐶 Adoptante</span>
+        <a href="{% url 'logout' %}" class="btn-logout">Salir</a>
+    </div>
+</nav>
+
+<main class="main">
+    <div class="welcome">
+        <h1>¡Hola, {{ usuario.nombre }}! 👋</h1>
+        <p>Bienvenido a tu panel de adopciones.</p>
+    </div>
+
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-icon">⏳</div>
+            <div class="stat-value">{{ solicitudesPendientes }}</div>
+            <div class="stat-label">Solicitudes pendientes</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">✅</div>
+            <div class="stat-value">{{ solicitudesAprobadas }}</div>
+            <div class="stat-label">Solicitudes aprobadas</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-icon">🎉</div>
+            <div class="stat-value">{{ adopcionesCompletadas }}</div>
+            <div class="stat-label">Adopciones completadas</div>
+        </div>
+    </div>
+
+    <h2 class="section-title">Mis solicitudes recientes</h2>
+
+    {% if misAdopciones %}
+        <div class="adopciones-list">
+            {% for adopcion in misAdopciones %}
+            <div class="adopcion-card">
+                <div class="adopcion-info">
+                    <span class="adopcion-emoji">🐾</span>
+                    <div>
+                        <div class="adopcion-name">{{ adopcion.mascota.nombre }}</div>
+                        <div class="adopcion-date">Solicitado: {{ adopcion.fecha_solicitud }}</div>
+                    </div>
+                </div>
+                <span class="badge
+                    {% if adopcion.estado_adopcion == 'pendiente' %}badge-pending
+                    {% elif adopcion.estado_adopcion == 'aprobada' %}badge-approved
+                    {% elif adopcion.estado_adopcion == 'completada' %}badge-completed
+                    {% else %}badge-rejected{% endif %}">
+                    {{ adopcion.estado_adopcion|capfirst }}
+                </span>
+            </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="empty-state">
+            <div class="empty-icon">🐾</div>
+            <p>Aún no tienes solicitudes de adopción.</p>
+            <a href="{% url 'adoptante_mascotas' %}" class="btn-adopt">Ver mascotas disponibles</a>
+        </div>
+    {% endif %}
+</main>
+
+</body>
+</html>

@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AdoptPets — Adopciones Pendientes</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        :root { --green: #22c55e; --green-dark: #16a34a; --green-light: #dcfce7; --dark: #1a1a1a; --gray: #6b7280; --border: #e5e7eb; --cream: #f9fafb; --sidebar: #111827; }
+        body { font-family: 'DM Sans', sans-serif; background: var(--cream); display: flex; min-height: 100vh; }
+
+        .sidebar { width: 260px; background: var(--sidebar); min-height: 100vh; padding: 1.5rem 0; position: fixed; top: 0; left: 0; }
+        .sidebar-logo { font-family: 'Playfair Display', serif; font-size: 1.5rem; color: #fff; padding: 0 1.5rem 1.5rem; border-bottom: 1px solid rgba(255,255,255,0.08); }
+        .sidebar-logo span { color: var(--green); }
+        .nav-section { padding: 1rem; }
+        .nav-label { color: #4b5563; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em; padding: 0 0.5rem; margin-bottom: 0.5rem; }
+        .nav-item { display: flex; align-items: center; gap: 0.75rem; padding: 0.65rem 0.75rem; border-radius: 10px; color: #9ca3af; text-decoration: none; font-size: 0.9rem; transition: all 0.2s; margin-bottom: 0.1rem; }
+        .nav-item:hover { background: rgba(255,255,255,0.06); color: #fff; }
+        .nav-item.active { background: var(--green); color: #fff; }
+        .sidebar-footer { position: absolute; bottom: 1rem; left: 0; right: 0; padding: 1rem; border-top: 1px solid rgba(255,255,255,0.08); }
+        .logout { display: flex; align-items: center; gap: 0.75rem; padding: 0.65rem 0.75rem; color: #9ca3af; text-decoration: none; font-size: 0.9rem; border-radius: 10px; transition: all 0.2s; }
+        .logout:hover { color: #ef4444; background: rgba(239,68,68,0.1); }
+
+        .main { margin-left: 260px; flex: 1; padding: 2rem; }
+        .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
+        .page-header h1 { font-family: 'Playfair Display', serif; font-size: 1.8rem; color: var(--dark); }
+        .page-header p { color: var(--gray); font-size: 0.88rem; margin-top: 0.2rem; }
+
+        .tab-links { display: flex; gap: 0.5rem; margin-bottom: 1.5rem; }
+        .tab-link { padding: 0.55rem 1.1rem; border-radius: 8px; font-size: 0.88rem; font-weight: 500; text-decoration: none; transition: all 0.2s; border: 1.5px solid var(--border); color: var(--gray); }
+        .tab-link:hover { border-color: var(--green); color: var(--green); }
+        .tab-link.active { background: var(--green); color: #fff; border-color: var(--green); }
+
+        .alert { padding: 0.85rem 1.25rem; border-radius: 10px; margin-bottom: 1.25rem; font-size: 0.9rem; }
+        .alert-success { background: var(--green-light); color: var(--green-dark); border: 1px solid #86efac; }
+        .alert-error { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; }
+
+        .cards-grid { display: flex; flex-direction: column; gap: 1rem; }
+        .adopcion-card { background: #fff; border-radius: 14px; border: 1px solid var(--border); padding: 1.5rem; display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: 1.5rem; align-items: center; transition: box-shadow 0.2s; }
+        .adopcion-card:hover { box-shadow: 0 4px 20px rgba(0,0,0,0.07); }
+
+        .info-label { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--gray); margin-bottom: 0.3rem; }
+        .info-value { font-size: 0.9rem; color: var(--dark); font-weight: 500; }
+        .info-sub { font-size: 0.78rem; color: var(--gray); margin-top: 0.1rem; }
+
+        .badge-pending { display: inline-block; background: #fef9c3; color: #854d0e; padding: 0.3rem 0.8rem; border-radius: 999px; font-size: 0.78rem; font-weight: 500; }
+
+        .actions { display: flex; flex-direction: column; gap: 0.5rem; min-width: 140px; }
+        .btn-approve { padding: 0.6rem 1rem; background: var(--green); color: #fff; border: none; border-radius: 8px; font-family: 'DM Sans', sans-serif; font-size: 0.82rem; font-weight: 500; cursor: pointer; transition: background 0.2s; width: 100%; }
+        .btn-approve:hover { background: var(--green-dark); }
+
+        .rechazar-form { display: flex; gap: 0.4rem; }
+        .rechazar-input { flex: 1; padding: 0.5rem 0.6rem; border: 1.5px solid var(--border); border-radius: 7px; font-family: 'DM Sans', sans-serif; font-size: 0.78rem; outline: none; }
+        .rechazar-input:focus { border-color: #ef4444; }
+        .btn-reject { padding: 0.5rem 0.7rem; background: #fef2f2; color: #dc2626; border: none; border-radius: 7px; font-family: 'DM Sans', sans-serif; font-size: 0.78rem; cursor: pointer; white-space: nowrap; transition: background 0.2s; }
+        .btn-reject:hover { background: #fee2e2; }
+
+        .empty { text-align: center; padding: 4rem; background: #fff; border-radius: 14px; border: 1px solid var(--border); }
+        .empty .icon { font-size: 3rem; margin-bottom: 1rem; }
+        .empty p { color: var(--gray); }
+    </style>
+</head>
+<body>
+
+<aside class="sidebar">
+    <div class="sidebar-logo">Adopt<span>Pets</span></div>
+    <div class="nav-section">
+        <div class="nav-label">Principal</div>
+        <a href="{% url 'admin_dashboard' %}" class="nav-item"><span>📊</span> Dashboard</a>
+    </div>
+    <div class="nav-section">
+        <div class="nav-label">Gestión</div>
+        <a href="{% url 'admin_mascotas' %}" class="nav-item"><span>🐾</span> Mascotas</a>
+        <a href="{% url 'admin_adopciones' %}" class="nav-item active"><span>❤️</span> Adopciones</a>
+        <a href="{% url 'admin_usuarios' %}" class="nav-item"><span>👥</span> Usuarios</a>
+        <a href="{% url 'admin_refugios' %}" class="nav-item"><span>🏠</span> Refugios</a>
+        <a href="{% url 'admin_reportes' %}" class="nav-item"><span>📄</span> Reportes</a>
+    </div>
+    <div class="sidebar-footer">
+        <a href="{% url 'logout' %}" class="logout"><span>🚪</span> Cerrar sesión</a>
+    </div>
+</aside>
+
+<main class="main">
+    <div class="page-header">
+        <div>
+            <h1>⏳ Adopciones Pendientes</h1>
+            <p>Solicitudes que requieren tu atención</p>
+        </div>
+    </div>
+
+    <div class="tab-links">
+        <a href="{% url 'admin_adopciones' %}" class="tab-link">Todas</a>
+        <a href="{% url 'admin_adopciones_pendientes' %}" class="tab-link active">⏳ Pendientes</a>
+    </div>
+
+    {% if messages %}
+        {% for message in messages %}
+        <div class="alert {% if message.tags == 'success' %}alert-success{% else %}alert-error{% endif %}">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+
+    <div class="cards-grid">
+        {% for adopcion in adopciones %}
+        <div class="adopcion-card">
+            <div>
+                <div class="info-label">Adoptante</div>
+                <div class="info-value">{{ adopcion.adoptante.nombre }} {{ adopcion.adoptante.apellido }}</div>
+                <div class="info-sub">{{ adopcion.adoptante.email }}</div>
+            </div>
+            <div>
+                <div class="info-label">Mascota</div>
+                <div class="info-value">{{ adopcion.mascota.nombre }}</div>
+                <div class="info-sub">{{ adopcion.mascota.especie }} · {{ adopcion.mascota.sexo }}</div>
+            </div>
+            <div>
+                <div class="info-label">Fecha solicitud</div>
+                <div class="info-value">{{ adopcion.fecha_solicitud }}</div>
+                <div class="info-sub"><span class="badge-pending">Pendiente</span></div>
+            </div>
+            <div class="actions">
+                <form method="POST" action="{% url 'admin_aprobar_adopcion' adopcion.id_adopcion %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn-approve">✅ Aprobar</button>
+                </form>
+                <form method="POST" action="{% url 'admin_rechazar_adopcion' adopcion.id_adopcion %}" class="rechazar-form">
+                    {% csrf_token %}
+                    <input type="text" name="motivo" class="rechazar-input" placeholder="Motivo..." required>
+                    <button type="submit" class="btn-reject">✗</button>
+                </form>
+            </div>
+        </div>
+        {% empty %}
+        <div class="empty">
+            <div class="icon">🎉</div>
+            <p>¡No hay solicitudes pendientes!<br>Todas las adopciones están al día.</p>
+        </div>
+        {% endfor %}
+    </div>
+</main>
+
+</body>
+</html>

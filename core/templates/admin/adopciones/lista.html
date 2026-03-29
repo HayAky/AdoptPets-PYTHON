@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AdoptPets — Adopciones</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        :root { --green: #22c55e; --green-dark: #16a34a; --green-light: #dcfce7; --dark: #1a1a1a; --gray: #6b7280; --border: #e5e7eb; --cream: #f9fafb; --sidebar: #111827; }
+        body { font-family: 'DM Sans', sans-serif; background: var(--cream); display: flex; min-height: 100vh; }
+
+        .sidebar { width: 260px; background: var(--sidebar); min-height: 100vh; padding: 1.5rem 0; position: fixed; top: 0; left: 0; }
+        .sidebar-logo { font-family: 'Playfair Display', serif; font-size: 1.5rem; color: #fff; padding: 0 1.5rem 1.5rem; border-bottom: 1px solid rgba(255,255,255,0.08); }
+        .sidebar-logo span { color: var(--green); }
+        .nav-section { padding: 1rem; }
+        .nav-label { color: #4b5563; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em; padding: 0 0.5rem; margin-bottom: 0.5rem; }
+        .nav-item { display: flex; align-items: center; gap: 0.75rem; padding: 0.65rem 0.75rem; border-radius: 10px; color: #9ca3af; text-decoration: none; font-size: 0.9rem; transition: all 0.2s; margin-bottom: 0.1rem; }
+        .nav-item:hover { background: rgba(255,255,255,0.06); color: #fff; }
+        .nav-item.active { background: var(--green); color: #fff; }
+        .sidebar-footer { position: absolute; bottom: 1rem; left: 0; right: 0; padding: 1rem; border-top: 1px solid rgba(255,255,255,0.08); }
+        .logout { display: flex; align-items: center; gap: 0.75rem; padding: 0.65rem 0.75rem; color: #9ca3af; text-decoration: none; font-size: 0.9rem; border-radius: 10px; transition: all 0.2s; }
+        .logout:hover { color: #ef4444; background: rgba(239,68,68,0.1); }
+
+        .main { margin-left: 260px; flex: 1; padding: 2rem; }
+
+        .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
+        .page-header h1 { font-family: 'Playfair Display', serif; font-size: 1.8rem; color: var(--dark); }
+        .page-header p { color: var(--gray); font-size: 0.88rem; margin-top: 0.2rem; }
+
+        .tab-links { display: flex; gap: 0.5rem; margin-bottom: 1.5rem; }
+        .tab-link { padding: 0.55rem 1.1rem; border-radius: 8px; font-size: 0.88rem; font-weight: 500; text-decoration: none; transition: all 0.2s; border: 1.5px solid var(--border); color: var(--gray); }
+        .tab-link:hover { border-color: var(--green); color: var(--green); }
+        .tab-link.active { background: var(--green); color: #fff; border-color: var(--green); }
+
+        .alert { padding: 0.85rem 1.25rem; border-radius: 10px; margin-bottom: 1.25rem; font-size: 0.9rem; }
+        .alert-success { background: var(--green-light); color: var(--green-dark); border: 1px solid #86efac; }
+        .alert-error { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; }
+
+        .table-card { background: #fff; border-radius: 16px; border: 1px solid var(--border); overflow: hidden; }
+        .table-toolbar { padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+        .table-toolbar h3 { font-family: 'Playfair Display', serif; font-size: 1.1rem; color: var(--dark); }
+        .count { background: var(--green-light); color: var(--green-dark); padding: 0.25rem 0.75rem; border-radius: 999px; font-size: 0.78rem; font-weight: 500; }
+
+        table { width: 100%; border-collapse: collapse; }
+        th { padding: 0.75rem 1.25rem; text-align: left; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--gray); background: #f9fafb; border-bottom: 1px solid var(--border); }
+        td { padding: 1rem 1.25rem; font-size: 0.88rem; color: var(--dark); border-top: 1px solid var(--border); vertical-align: middle; }
+        tr:hover td { background: #fafafa; }
+
+        .badge { display: inline-block; padding: 0.22rem 0.65rem; border-radius: 999px; font-size: 0.75rem; font-weight: 500; }
+        .badge-pending { background: #fef9c3; color: #854d0e; }
+        .badge-approved { background: var(--green-light); color: var(--green-dark); }
+        .badge-completed { background: #dbeafe; color: #1d4ed8; }
+        .badge-rejected { background: #fee2e2; color: #991b1b; }
+
+        .actions { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+        .btn-sm { padding: 0.35rem 0.75rem; border-radius: 7px; font-size: 0.78rem; font-family: 'DM Sans', sans-serif; font-weight: 500; text-decoration: none; cursor: pointer; border: none; transition: all 0.2s; display: inline-block; }
+        .btn-view { background: #f3f4f6; color: var(--dark); }
+        .btn-view:hover { background: #e5e7eb; }
+        .btn-approve { background: var(--green-light); color: var(--green-dark); }
+        .btn-approve:hover { background: #bbf7d0; }
+        .btn-complete { background: #dbeafe; color: #1d4ed8; }
+        .btn-complete:hover { background: #bfdbfe; }
+
+        .empty { text-align: center; padding: 4rem; }
+        .empty .icon { font-size: 3rem; margin-bottom: 1rem; }
+        .empty p { color: var(--gray); }
+    </style>
+</head>
+<body>
+
+<aside class="sidebar">
+    <div class="sidebar-logo">Adopt<span>Pets</span></div>
+    <div class="nav-section">
+        <div class="nav-label">Principal</div>
+        <a href="{% url 'admin_dashboard' %}" class="nav-item"><span>📊</span> Dashboard</a>
+    </div>
+    <div class="nav-section">
+        <div class="nav-label">Gestión</div>
+        <a href="{% url 'admin_mascotas' %}" class="nav-item"><span>🐾</span> Mascotas</a>
+        <a href="{% url 'admin_adopciones' %}" class="nav-item active"><span>❤️</span> Adopciones</a>
+        <a href="{% url 'admin_usuarios' %}" class="nav-item"><span>👥</span> Usuarios</a>
+        <a href="{% url 'admin_refugios' %}" class="nav-item"><span>🏠</span> Refugios</a>
+        <a href="{% url 'admin_reportes' %}" class="nav-item"><span>📄</span> Reportes</a>
+    </div>
+    <div class="sidebar-footer">
+        <a href="{% url 'logout' %}" class="logout"><span>🚪</span> Cerrar sesión</a>
+    </div>
+</aside>
+
+<main class="main">
+    <div class="page-header">
+        <div>
+            <h1>❤️ Adopciones</h1>
+            <p>Gestiona todas las solicitudes de adopción</p>
+        </div>
+    </div>
+
+    <div class="tab-links">
+        <a href="{% url 'admin_adopciones' %}" class="tab-link active">Todas</a>
+        <a href="{% url 'admin_adopciones_pendientes' %}" class="tab-link">⏳ Pendientes</a>
+    </div>
+
+    {% if messages %}
+        {% for message in messages %}
+        <div class="alert {% if message.tags == 'success' %}alert-success{% else %}alert-error{% endif %}">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+
+    <div class="table-card">
+        <div class="table-toolbar">
+            <h3>Listado de adopciones</h3>
+            <span class="count">{{ adopciones|length }} registradas</span>
+        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Adoptante</th>
+                    <th>Mascota</th>
+                    <th>Refugio</th>
+                    <th>Fecha</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for adopcion in adopciones %}
+                <tr>
+                    <td style="color:var(--gray)">#{{ adopcion.id_adopcion }}</td>
+                    <td>
+                        <div style="font-weight:500">{{ adopcion.adoptante.nombre }} {{ adopcion.adoptante.apellido }}</div>
+                        <div style="color:var(--gray);font-size:0.78rem">{{ adopcion.adoptante.email }}</div>
+                    </td>
+                    <td>{{ adopcion.mascota.nombre }}</td>
+                    <td>{% if adopcion.mascota.refugio %}{{ adopcion.mascota.refugio.nombre_refugio }}{% else %}-{% endif %}</td>
+                    <td style="color:var(--gray)">{{ adopcion.fecha_solicitud }}</td>
+                    <td>
+                        <span class="badge
+                            {% if adopcion.estado_adopcion == 'pendiente' %}badge-pending
+                            {% elif adopcion.estado_adopcion == 'aprobada' %}badge-approved
+                            {% elif adopcion.estado_adopcion == 'completada' %}badge-completed
+                            {% else %}badge-rejected{% endif %}">
+                            {{ adopcion.estado_adopcion|capfirst }}
+                        </span>
+                    </td>
+                    <td>
+                        <div class="actions">
+                            <a href="{% url 'admin_adopcion_detalle' adopcion.id_adopcion %}" class="btn-sm btn-view">👁️ Ver</a>
+                            {% if adopcion.estado_adopcion == 'pendiente' %}
+                            <form method="POST" action="{% url 'admin_aprobar_adopcion' adopcion.id_adopcion %}" style="display:inline">
+                                {% csrf_token %}
+                                <button type="submit" class="btn-sm btn-approve">✅ Aprobar</button>
+                            </form>
+                            {% endif %}
+                            {% if adopcion.estado_adopcion == 'aprobada' %}
+                            <form method="POST" action="{% url 'admin_completar_adopcion' adopcion.id_adopcion %}" style="display:inline">
+                                {% csrf_token %}
+                                <button type="submit" class="btn-sm btn-complete">🎉 Completar</button>
+                            </form>
+                            {% endif %}
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="7">
+                        <div class="empty">
+                            <div class="icon">❤️</div>
+                            <p>No hay adopciones registradas aún.</p>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</main>
+
+</body>
+</html>

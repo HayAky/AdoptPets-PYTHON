@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AdoptPets — Reportes</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        :root { --green: #22c55e; --green-dark: #16a34a; --green-light: #dcfce7; --dark: #1a1a1a; --gray: #6b7280; --border: #e5e7eb; --cream: #f9fafb; --sidebar: #111827; }
+        body { font-family: 'DM Sans', sans-serif; background: var(--cream); display: flex; min-height: 100vh; }
+
+        .sidebar { width: 260px; background: var(--sidebar); min-height: 100vh; padding: 1.5rem 0; position: fixed; top: 0; left: 0; }
+        .sidebar-logo { font-family: 'Playfair Display', serif; font-size: 1.5rem; color: #fff; padding: 0 1.5rem 1.5rem; border-bottom: 1px solid rgba(255,255,255,0.08); }
+        .sidebar-logo span { color: var(--green); }
+        .nav-section { padding: 1rem; }
+        .nav-label { color: #4b5563; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em; padding: 0 0.5rem; margin-bottom: 0.5rem; }
+        .nav-item { display: flex; align-items: center; gap: 0.75rem; padding: 0.65rem 0.75rem; border-radius: 10px; color: #9ca3af; text-decoration: none; font-size: 0.9rem; transition: all 0.2s; margin-bottom: 0.1rem; }
+        .nav-item:hover { background: rgba(255,255,255,0.06); color: #fff; }
+        .nav-item.active { background: var(--green); color: #fff; }
+        .sidebar-footer { position: absolute; bottom: 1rem; left: 0; right: 0; padding: 1rem; border-top: 1px solid rgba(255,255,255,0.08); }
+        .logout { display: flex; align-items: center; gap: 0.75rem; padding: 0.65rem 0.75rem; color: #9ca3af; text-decoration: none; font-size: 0.9rem; border-radius: 10px; transition: all 0.2s; }
+        .logout:hover { color: #ef4444; background: rgba(239,68,68,0.1); }
+
+        .main { margin-left: 260px; flex: 1; padding: 2rem; }
+
+        .page-header { margin-bottom: 2rem; }
+        .page-header h1 { font-family: 'Playfair Display', serif; font-size: 1.8rem; color: var(--dark); }
+        .page-header p { color: var(--gray); font-size: 0.88rem; margin-top: 0.2rem; }
+
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem; }
+
+        .reporte-card { background: #fff; border-radius: 16px; border: 1px solid var(--border); overflow: hidden; }
+        .reporte-header { padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 0.75rem; }
+        .reporte-icon { font-size: 1.5rem; }
+        .reporte-header h3 { font-family: 'Playfair Display', serif; font-size: 1.1rem; color: var(--dark); }
+        .reporte-header p { color: var(--gray); font-size: 0.8rem; margin-top: 0.1rem; }
+        .reporte-body { padding: 1.5rem; display: flex; flex-direction: column; gap: 0.75rem; }
+
+        .btn-reporte { display: flex; align-items: center; justify-content: space-between; padding: 0.85rem 1.1rem; border-radius: 10px; text-decoration: none; font-size: 0.88rem; font-weight: 500; transition: all 0.2s; border: none; cursor: pointer; font-family: 'DM Sans', sans-serif; width: 100%; }
+        .btn-pdf { background: #fef2f2; color: #dc2626; }
+        .btn-pdf:hover { background: #fee2e2; }
+        .btn-excel { background: var(--green-light); color: var(--green-dark); }
+        .btn-excel:hover { background: #bbf7d0; }
+
+        .btn-reporte .btn-label { display: flex; align-items: center; gap: 0.5rem; }
+        .btn-reporte .btn-arrow { font-size: 0.8rem; opacity: 0.6; }
+    </style>
+</head>
+<body>
+
+<aside class="sidebar">
+    <div class="sidebar-logo">Adopt<span>Pets</span></div>
+    <div class="nav-section">
+        <div class="nav-label">Principal</div>
+        <a href="{% url 'admin_dashboard' %}" class="nav-item"><span>📊</span> Dashboard</a>
+    </div>
+    <div class="nav-section">
+        <div class="nav-label">Gestión</div>
+        <a href="{% url 'admin_mascotas' %}" class="nav-item"><span>🐾</span> Mascotas</a>
+        <a href="{% url 'admin_adopciones' %}" class="nav-item"><span>❤️</span> Adopciones</a>
+        <a href="{% url 'admin_usuarios' %}" class="nav-item"><span>👥</span> Usuarios</a>
+        <a href="{% url 'admin_refugios' %}" class="nav-item"><span>🏠</span> Refugios</a>
+        <a href="{% url 'admin_reportes' %}" class="nav-item active"><span>📄</span> Reportes</a>
+    </div>
+    <div class="sidebar-footer">
+        <a href="{% url 'logout' %}" class="logout"><span>🚪</span> Cerrar sesión</a>
+    </div>
+</aside>
+
+<main class="main">
+    <div class="page-header">
+        <h1>📄 Reportes</h1>
+        <p>Descarga reportes en PDF o Excel</p>
+    </div>
+
+    <div class="grid-2">
+        <!-- Mascotas -->
+        <div class="reporte-card">
+            <div class="reporte-header">
+                <span class="reporte-icon">🐾</span>
+                <div>
+                    <h3>Reporte de Mascotas</h3>
+                    <p>Listado completo de mascotas registradas</p>
+                </div>
+            </div>
+            <div class="reporte-body">
+                <a href="{% url 'reporte_mascotas_pdf' %}" class="btn-reporte btn-pdf">
+                    <span class="btn-label">📄 Descargar PDF</span>
+                    <span class="btn-arrow">↓</span>
+                </a>
+                <a href="{% url 'reporte_mascotas_excel' %}" class="btn-reporte btn-excel">
+                    <span class="btn-label">📊 Descargar Excel</span>
+                    <span class="btn-arrow">↓</span>
+                </a>
+            </div>
+        </div>
+
+        <!-- Adopciones -->
+        <div class="reporte-card">
+            <div class="reporte-header">
+                <span class="reporte-icon">❤️</span>
+                <div>
+                    <h3>Reporte de Adopciones</h3>
+                    <p>Historial completo de adopciones</p>
+                </div>
+            </div>
+            <div class="reporte-body">
+                <a href="{% url 'reporte_adopciones_pdf' %}" class="btn-reporte btn-pdf">
+                    <span class="btn-label">📄 Descargar PDF</span>
+                    <span class="btn-arrow">↓</span>
+                </a>
+                <a href="{% url 'reporte_adopciones_excel' %}" class="btn-reporte btn-excel">
+                    <span class="btn-label">📊 Descargar Excel</span>
+                    <span class="btn-arrow">↓</span>
+                </a>
+            </div>
+        </div>
+    </div>
+</main>
+
+</body>
+</html>

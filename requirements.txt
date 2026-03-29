@@ -1,0 +1,30 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# AdoptPets - Python/Django Dependencies
+# Equivalente al pom.xml del proyecto Spring Boot
+# ─────────────────────────────────────────────────────────────────────────────
+
+# ── FRAMEWORK WEB (equivalente a spring-boot-starter-web + thymeleaf) ────────
+Django==5.0.4
+
+# ── BASE DE DATOS MySQL (equivalente a mysql-connector-j) ────────────────────
+mysqlclient==2.2.4
+
+# ── ENCRIPTACIÓN (equivalente a BCryptPasswordEncoder) ───────────────────────
+bcrypt==4.1.2
+django[bcrypt]
+
+# ── GENERACIÓN DE PDF (equivalente a OpenPDF / iText) ────────────────────────
+reportlab==4.1.0
+
+# ── GENERACIÓN DE EXCEL (equivalente a Apache POI) ───────────────────────────
+openpyxl==3.1.2
+
+# ── VARIABLES DE ENTORNO (buena práctica - equivalente a application.properties)
+python-decouple==3.8
+
+# ── HERRAMIENTAS DE DESARROLLO (equivalente a spring-boot-devtools) ───────────
+django-extensions==3.2.3   # extras útiles en desarrollo
+
+# ── TESTING (equivalente a spring-boot-starter-test) ─────────────────────────
+pytest==8.1.1
+pytest-django==4.8.0

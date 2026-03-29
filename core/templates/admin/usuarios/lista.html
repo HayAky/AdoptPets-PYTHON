@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AdoptPets — Usuarios</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        :root { --green: #22c55e; --green-dark: #16a34a; --green-light: #dcfce7; --dark: #1a1a1a; --gray: #6b7280; --border: #e5e7eb; --cream: #f9fafb; --sidebar: #111827; }
+        body { font-family: 'DM Sans', sans-serif; background: var(--cream); display: flex; min-height: 100vh; }
+
+        .sidebar { width: 260px; background: var(--sidebar); min-height: 100vh; padding: 1.5rem 0; position: fixed; top: 0; left: 0; }
+        .sidebar-logo { font-family: 'Playfair Display', serif; font-size: 1.5rem; color: #fff; padding: 0 1.5rem 1.5rem; border-bottom: 1px solid rgba(255,255,255,0.08); }
+        .sidebar-logo span { color: var(--green); }
+        .nav-section { padding: 1rem; }
+        .nav-label { color: #4b5563; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em; padding: 0 0.5rem; margin-bottom: 0.5rem; }
+        .nav-item { display: flex; align-items: center; gap: 0.75rem; padding: 0.65rem 0.75rem; border-radius: 10px; color: #9ca3af; text-decoration: none; font-size: 0.9rem; transition: all 0.2s; margin-bottom: 0.1rem; }
+        .nav-item:hover { background: rgba(255,255,255,0.06); color: #fff; }
+        .nav-item.active { background: var(--green); color: #fff; }
+        .sidebar-footer { position: absolute; bottom: 1rem; left: 0; right: 0; padding: 1rem; border-top: 1px solid rgba(255,255,255,0.08); }
+        .logout { display: flex; align-items: center; gap: 0.75rem; padding: 0.65rem 0.75rem; color: #9ca3af; text-decoration: none; font-size: 0.9rem; border-radius: 10px; transition: all 0.2s; }
+        .logout:hover { color: #ef4444; background: rgba(239,68,68,0.1); }
+
+        .main { margin-left: 260px; flex: 1; padding: 2rem; }
+
+        .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; }
+        .page-header h1 { font-family: 'Playfair Display', serif; font-size: 1.8rem; color: var(--dark); }
+        .page-header p { color: var(--gray); font-size: 0.88rem; margin-top: 0.2rem; }
+
+        .stats-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin-bottom: 1.5rem; }
+        .stat-mini { background: #fff; border-radius: 12px; border: 1px solid var(--border); padding: 1.1rem 1.25rem; display: flex; align-items: center; gap: 0.75rem; }
+        .stat-mini .icon { font-size: 1.5rem; }
+        .stat-mini .val { font-family: 'Playfair Display', serif; font-size: 1.5rem; color: var(--dark); }
+        .stat-mini .lbl { color: var(--gray); font-size: 0.78rem; }
+
+        .alert { padding: 0.85rem 1.25rem; border-radius: 10px; margin-bottom: 1.25rem; font-size: 0.9rem; }
+        .alert-success { background: var(--green-light); color: var(--green-dark); border: 1px solid #86efac; }
+        .alert-error { background: #fef2f2; color: #dc2626; border: 1px solid #fecaca; }
+
+        .table-card { background: #fff; border-radius: 16px; border: 1px solid var(--border); overflow: hidden; }
+        .table-toolbar { padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+        .table-toolbar h3 { font-family: 'Playfair Display', serif; font-size: 1.1rem; color: var(--dark); }
+        .count { background: var(--green-light); color: var(--green-dark); padding: 0.25rem 0.75rem; border-radius: 999px; font-size: 0.78rem; font-weight: 500; }
+
+        table { width: 100%; border-collapse: collapse; }
+        th { padding: 0.75rem 1.25rem; text-align: left; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--gray); background: #f9fafb; border-bottom: 1px solid var(--border); }
+        td { padding: 0.9rem 1.25rem; font-size: 0.88rem; color: var(--dark); border-top: 1px solid var(--border); vertical-align: middle; }
+        tr:hover td { background: #fafafa; }
+
+        .user-cell { display: flex; align-items: center; gap: 0.75rem; }
+        .user-avatar { width: 36px; height: 36px; border-radius: 50%; background: var(--green-light); display: flex; align-items: center; justify-content: center; font-size: 1rem; flex-shrink: 0; font-weight: 600; color: var(--green-dark); }
+        .user-name { font-weight: 500; }
+        .user-email { color: var(--gray); font-size: 0.78rem; }
+
+        .badge { display: inline-block; padding: 0.2rem 0.6rem; border-radius: 999px; font-size: 0.73rem; font-weight: 500; }
+        .badge-admin { background: #fce7f3; color: #9d174d; }
+        .badge-adoptante { background: var(--green-light); color: var(--green-dark); }
+        .badge-refugio { background: #dbeafe; color: #1d4ed8; }
+        .badge-active { background: var(--green-light); color: var(--green-dark); }
+        .badge-inactive { background: #f3f4f6; color: var(--gray); }
+
+        .actions { display: flex; gap: 0.4rem; flex-wrap: wrap; }
+        .btn-sm { padding: 0.3rem 0.65rem; border-radius: 6px; font-size: 0.75rem; font-family: 'DM Sans', sans-serif; font-weight: 500; text-decoration: none; cursor: pointer; border: none; transition: all 0.2s; display: inline-block; }
+        .btn-edit { background: #f3f4f6; color: var(--dark); }
+        .btn-edit:hover { background: #e5e7eb; }
+        .btn-toggle { background: #fef9c3; color: #854d0e; }
+        .btn-toggle:hover { background: #fef08a; }
+        .btn-reset { background: #fef2f2; color: #dc2626; }
+        .btn-reset:hover { background: #fee2e2; }
+
+        .empty { text-align: center; padding: 4rem; }
+        .empty .icon { font-size: 3rem; margin-bottom: 1rem; }
+        .empty p { color: var(--gray); }
+    </style>
+</head>
+<body>
+
+<aside class="sidebar">
+    <div class="sidebar-logo">Adopt<span>Pets</span></div>
+    <div class="nav-section">
+        <div class="nav-label">Principal</div>
+        <a href="{% url 'admin_dashboard' %}" class="nav-item"><span>📊</span> Dashboard</a>
+    </div>
+    <div class="nav-section">
+        <div class="nav-label">Gestión</div>
+        <a href="{% url 'admin_mascotas' %}" class="nav-item"><span>🐾</span> Mascotas</a>
+        <a href="{% url 'admin_adopciones' %}" class="nav-item"><span>❤️</span> Adopciones</a>
+        <a href="{% url 'admin_usuarios' %}" class="nav-item active"><span>👥</span> Usuarios</a>
+        <a href="{% url 'admin_refugios' %}" class="nav-item"><span>🏠</span> Refugios</a>
+        <a href="{% url 'admin_reportes' %}" class="nav-item"><span>📄</span> Reportes</a>
+    </div>
+    <div class="sidebar-footer">
+        <a href="{% url 'logout' %}" class="logout"><span>🚪</span> Cerrar sesión</a>
+    </div>
+</aside>
+
+<main class="main">
+    <div class="page-header">
+        <div>
+            <h1>👥 Usuarios</h1>
+            <p>Gestiona los usuarios del sistema</p>
+        </div>
+    </div>
+
+    <div class="stats-row">
+        <div class="stat-mini">
+            <span class="icon">👥</span>
+            <div><div class="val">{{ cantidadActivos }}</div><div class="lbl">Activos</div></div>
+        </div>
+        <div class="stat-mini">
+            <span class="icon">🐶</span>
+            <div><div class="val">{{ cantidadAdoptantes }}</div><div class="lbl">Adoptantes</div></div>
+        </div>
+        <div class="stat-mini">
+            <span class="icon">🏠</span>
+            <div><div class="val">{{ cantidadRefugios }}</div><div class="lbl">Refugios</div></div>
+        </div>
+    </div>
+
+    {% if messages %}
+        {% for message in messages %}
+        <div class="alert {% if message.tags == 'success' %}alert-success{% else %}alert-error{% endif %}">{{ message }}</div>
+        {% endfor %}
+    {% endif %}
+
+    <div class="table-card">
+        <div class="table-toolbar">
+            <h3>Listado de usuarios</h3>
+            <span class="count">{{ usuarios|length }} registrados</span>
+        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th>Usuario</th>
+                    <th>Teléfono</th>
+                    <th>Ciudad</th>
+                    <th>Rol</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for usuario in usuarios %}
+                <tr>
+                    <td>
+                        <div class="user-cell">
+                            <div class="user-avatar">{{ usuario.nombre|first }}</div>
+                            <div>
+                                <div class="user-name">{{ usuario.nombre }} {{ usuario.apellido }}</div>
+                                <div class="user-email">{{ usuario.email }}</div>
+                            </div>
+                        </div>
+                    </td>
+                    <td style="color:var(--gray)">{{ usuario.telefono|default:"-" }}</td>
+                    <td style="color:var(--gray)">{{ usuario.ciudad|default:"-"|capfirst }}</td>
+                    <td>
+                        {% for rol in usuario.roles.all %}
+                        <span class="badge
+                            {% if 'ADMIN' in rol.nombre_rol %}badge-admin
+                            {% elif 'REFUGIO' in rol.nombre_rol %}badge-refugio
+                            {% else %}badge-adoptante{% endif %}">
+                            {{ rol.nombre_rol|cut:"ROLE_"|capfirst }}
+                        </span>
+                        {% endfor %}
+                    </td>
+                    <td>
+                        <span class="badge {% if usuario.activo %}badge-active{% else %}badge-inactive{% endif %}">
+                            {% if usuario.activo %}Activo{% else %}Inactivo{% endif %}
+                        </span>
+                    </td>
+                    <td>
+                        <div class="actions">
+                            <a href="{% url 'admin_usuario_editar' usuario.id_usuario %}" class="btn-sm btn-edit">✏️</a>
+                            <form method="POST" action="{% url 'admin_usuario_toggle' usuario.id_usuario %}" style="display:inline">
+                                {% csrf_token %}
+                                <button type="submit" class="btn-sm btn-toggle">{% if usuario.activo %}⏸️{% else %}▶️{% endif %}</button>
+                            </form>
+                            <a href="{% url 'admin_usuario_resetear_password' usuario.id_usuario %}" class="btn-sm btn-reset" onclick="return confirm('¿Resetear contraseña a 123456?')">🔑</a>
+                        </div>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6">
+                        <div class="empty">
+                            <div class="icon">👥</div>
+                            <p>No hay usuarios registrados.</p>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</main>
+
+</body>
+</html>

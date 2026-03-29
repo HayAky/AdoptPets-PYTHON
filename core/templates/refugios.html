@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AdoptPets — Panel Refugio</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        :root {
+            --green: #22c55e; --green-dark: #16a34a; --green-light: #dcfce7;
+            --dark: #1a1a1a; --gray: #6b7280; --border: #e5e7eb; --cream: #f9fafb;
+            --sidebar: #0f172a;
+        }
+        body { font-family: 'DM Sans', sans-serif; background: var(--cream); display: flex; min-height: 100vh; }
+
+        .sidebar { width: 240px; background: var(--sidebar); min-height: 100vh; padding: 1.5rem 0; position: fixed; }
+        .sidebar-logo { font-family: 'Playfair Display', serif; font-size: 1.4rem; color: #fff; padding: 0 1.25rem 1.25rem; border-bottom: 1px solid rgba(255,255,255,0.08); }
+        .sidebar-logo span { color: var(--green); }
+        .sidebar-logo small { display: block; color: #4b5563; font-size: 0.7rem; font-family: 'DM Sans', sans-serif; margin-top: 0.2rem; }
+
+        .nav-section { padding: 1rem; }
+        .nav-label { color: #374151; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.08em; padding: 0 0.5rem; margin-bottom: 0.5rem; }
+        .nav-item { display: flex; align-items: center; gap: 0.75rem; padding: 0.6rem 0.75rem; border-radius: 8px; color: #9ca3af; text-decoration: none; font-size: 0.88rem; transition: all 0.2s; margin-bottom: 0.15rem; }
+        .nav-item:hover { background: rgba(255,255,255,0.05); color: #fff; }
+        .nav-item.active { background: var(--green); color: #fff; }
+
+        .sidebar-footer { position: absolute; bottom: 1rem; left: 0; right: 0; padding: 0 1rem; }
+        .logout { display: flex; align-items: center; gap: 0.75rem; padding: 0.6rem 0.75rem; color: #6b7280; text-decoration: none; font-size: 0.88rem; border-radius: 8px; transition: all 0.2s; }
+        .logout:hover { color: #ef4444; background: rgba(239,68,68,0.08); }
+
+        .main { margin-left: 240px; flex: 1; padding: 2rem; }
+
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
+        .header h1 { font-family: 'Playfair Display', serif; font-size: 1.7rem; color: var(--dark); }
+        .header p { color: var(--gray); font-size: 0.88rem; }
+        .refugio-badge { background: #eff6ff; color: #1d4ed8; padding: 0.35rem 0.9rem; border-radius: 999px; font-size: 0.8rem; font-weight: 500; }
+
+        .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem; margin-bottom: 2rem; }
+        .stat { background: #fff; border-radius: 14px; padding: 1.25rem; border: 1px solid var(--border); }
+        .stat-icon { font-size: 1.6rem; margin-bottom: 0.5rem; }
+        .stat-val { font-family: 'Playfair Display', serif; font-size: 1.8rem; color: var(--dark); }
+        .stat-lbl { color: var(--gray); font-size: 0.8rem; }
+
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; }
+        .card { background: #fff; border-radius: 14px; border: 1px solid var(--border); overflow: hidden; }
+        .card-header { padding: 1rem 1.25rem; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; }
+        .card-header h3 { font-family: 'Playfair Display', serif; font-size: 1.05rem; color: var(--dark); }
+        .view-all { color: var(--green); font-size: 0.82rem; text-decoration: none; font-weight: 500; }
+        .btn-add { background: var(--green); color: #fff; padding: 0.4rem 0.9rem; border-radius: 7px; text-decoration: none; font-size: 0.82rem; font-weight: 500; transition: background 0.2s; }
+        .btn-add:hover { background: var(--green-dark); }
+
+        table { width: 100%; border-collapse: collapse; }
+        th { padding: 0.65rem 1.25rem; text-align: left; font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--gray); background: #f9fafb; }
+        td { padding: 0.85rem 1.25rem; font-size: 0.88rem; color: var(--dark); border-top: 1px solid var(--border); }
+        tr:hover td { background: #fafafa; }
+
+        .badge { display: inline-block; padding: 0.2rem 0.6rem; border-radius: 999px; font-size: 0.75rem; font-weight: 500; }
+        .badge-avail { background: var(--green-light); color: var(--green-dark); }
+        .badge-pend { background: #fef9c3; color: #854d0e; }
+
+        .sin-refugio { background: #fff; border-radius: 14px; border: 1px solid var(--border); padding: 3rem; text-align: center; }
+        .sin-refugio .icon { font-size: 3rem; margin-bottom: 1rem; }
+        .sin-refugio p { color: var(--gray); margin-bottom: 1.5rem; }
+        .btn-config { display: inline-block; padding: 0.75rem 1.5rem; background: var(--green); color: #fff; border-radius: 10px; text-decoration: none; font-weight: 500; }
+    </style>
+</head>
+<body>
+
+<aside class="sidebar">
+    <div class="sidebar-logo">
+        Adopt<span>Pets</span>
+        <small>Panel Refugio</small>
+    </div>
+    <div class="nav-section">
+        <div class="nav-label">Principal</div>
+        <a href="{% url 'refugio_dashboard' %}" class="nav-item active"><span>📊</span> Dashboard</a>
+    </div>
+    <div class="nav-section">
+        <div class="nav-label">Gestión</div>
+        <a href="{% url 'refugio_mascotas' %}" class="nav-item"><span>🐾</span> Mis mascotas</a>
+        <a href="{% url 'refugio_adopciones' %}" class="nav-item"><span>❤️</span> Adopciones</a>
+        <a href="{% url 'refugio_perfil' %}" class="nav-item"><span>⚙️</span> Mi refugio</a>
+    </div>
+    <div class="sidebar-footer">
+        <a href="{% url 'logout' %}" class="logout"><span>🚪</span> Cerrar sesión</a>
+    </div>
+</aside>
+
+<main class="main">
+    <div class="header">
+        <div>
+            <h1>{% if refugio %}{{ refugio.nombre_refugio }}{% else %}Mi Refugio{% endif %}</h1>
+            <p>Bienvenido, {{ usuario.nombre }}</p>
+        </div>
+        <span class="refugio-badge">🏠 Refugio</span>
+    </div>
+
+    {% if sinRefugio %}
+    <div class="sin-refugio">
+        <div class="icon">🏠</div>
+        <p>Aún no tienes un refugio configurado. Completa tu perfil para empezar.</p>
+        <a href="{% url 'refugio_perfil' %}" class="btn-config">Configurar mi refugio</a>
+    </div>
+    {% else %}
+
+    <div class="stats">
+        <div class="stat">
+            <div class="stat-icon">🐾</div>
+            <div class="stat-val">{{ totalMascotas }}</div>
+            <div class="stat-lbl">Total mascotas</div>
+        </div>
+        <div class="stat">
+            <div class="stat-icon">✅</div>
+            <div class="stat-val">{{ mascotasDisponibles }}</div>
+            <div class="stat-lbl">Disponibles</div>
+        </div>
+        <div class="stat">
+            <div class="stat-icon">⏳</div>
+            <div class="stat-val">{{ solicitudesPendientes }}</div>
+            <div class="stat-lbl">Pendientes</div>
+        </div>
+        <div class="stat">
+            <div class="stat-icon">🎉</div>
+            <div class="stat-val">{{ adopcionesCompletadas }}</div>
+            <div class="stat-lbl">Completadas</div>
+        </div>
+    </div>
+
+    <div class="grid-2">
+        <div class="card">
+            <div class="card-header">
+                <h3>🐾 Últimas mascotas</h3>
+                <a href="{% url 'refugio_mascotas' %}" class="btn-add">+ Nueva</a>
+            </div>
+            <table>
+                <thead><tr><th>Nombre</th><th>Especie</th><th>Estado</th></tr></thead>
+                <tbody>
+                    {% for m in ultimasMascotas %}
+                    <tr>
+                        <td>{{ m.nombre }}</td>
+                        <td>{{ m.especie }}</td>
+                        <td><span class="badge badge-avail">Disponible</span></td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="3" style="text-align:center;color:#9ca3af">Sin mascotas aún</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="card">
+            <div class="card-header">
+                <h3>⏳ Adopciones pendientes</h3>
+                <a href="{% url 'refugio_adopciones' %}" class="view-all">Ver todas →</a>
+            </div>
+            <table>
+                <thead><tr><th>Adoptante</th><th>Mascota</th><th>Estado</th></tr></thead>
+                <tbody>
+                    {% for a in adopcionesPendientes %}
+                    <tr>
+                        <td>{{ a.adoptante.nombre }}</td>
+                        <td>{{ a.mascota.nombre }}</td>
+                        <td><span class="badge badge-pend">Pendiente</span></td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="3" style="text-align:center;color:#9ca3af">Sin solicitudes pendientes</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    {% endif %}
+</main>
+
+</body>
+</html>

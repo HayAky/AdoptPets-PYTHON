@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AdoptPets — Registro</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        :root {
+            --green: #22c55e; --green-dark: #16a34a; --green-light: #dcfce7;
+            --cream: #fafaf7; --dark: #1a1a1a; --gray: #6b7280; --border: #e5e7eb;
+        }
+        body { font-family: 'DM Sans', sans-serif; background: var(--cream); min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 2rem; }
+
+        .container { width: 100%; max-width: 560px; animation: fadeUp 0.6s ease both; }
+
+        .back { display: inline-flex; align-items: center; gap: 0.5rem; color: var(--gray); text-decoration: none; font-size: 0.9rem; margin-bottom: 2rem; transition: color 0.2s; }
+        .back:hover { color: var(--green); }
+
+        .card { background: #fff; border-radius: 24px; padding: 2.5rem; box-shadow: 0 4px 30px rgba(0,0,0,0.06); }
+
+        .logo { font-family: 'Playfair Display', serif; font-size: 1.5rem; font-weight: 700; color: var(--dark); margin-bottom: 0.25rem; }
+        .logo span { color: var(--green); }
+
+        h2 { font-family: 'Playfair Display', serif; font-size: 1.8rem; color: var(--dark); margin-bottom: 0.4rem; margin-top: 1.5rem; }
+        .subtitle { color: var(--gray); font-size: 0.95rem; margin-bottom: 1.5rem; }
+
+        /* Tipo selector */
+        .tipo-selector { display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 1.5rem; }
+        .tipo-btn {
+            padding: 1rem; border: 2px solid var(--border); border-radius: 12px;
+            background: #fff; cursor: pointer; text-align: center;
+            transition: all 0.2s; font-family: 'DM Sans', sans-serif;
+        }
+        .tipo-btn.active { border-color: var(--green); background: var(--green-light); }
+        .tipo-btn .tipo-icon { font-size: 1.8rem; display: block; margin-bottom: 0.3rem; }
+        .tipo-btn .tipo-label { font-size: 0.85rem; font-weight: 500; color: var(--dark); }
+
+        .alert { background: #fef2f2; border: 1px solid #fecaca; color: #dc2626; padding: 0.75rem 1rem; border-radius: 8px; margin-bottom: 1.25rem; font-size: 0.9rem; }
+
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+        .field { margin-bottom: 1rem; }
+        label { display: block; font-size: 0.85rem; font-weight: 500; color: var(--dark); margin-bottom: 0.4rem; }
+        input {
+            width: 100%; padding: 0.75rem 1rem; border: 1.5px solid var(--border);
+            border-radius: 10px; font-family: 'DM Sans', sans-serif; font-size: 0.95rem;
+            color: var(--dark); background: #fff; outline: none; transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        input:focus { border-color: var(--green); box-shadow: 0 0 0 3px rgba(34,197,94,0.15); }
+
+        .btn-submit {
+            width: 100%; padding: 0.9rem; background: var(--green); color: #fff;
+            border: none; border-radius: 10px; font-family: 'DM Sans', sans-serif;
+            font-size: 1rem; font-weight: 500; cursor: pointer; transition: background 0.2s, transform 0.1s;
+            margin-top: 0.5rem;
+        }
+        .btn-submit:hover { background: var(--green-dark); }
+        .btn-submit:active { transform: scale(0.98); }
+
+        .login-link { text-align: center; margin-top: 1.25rem; font-size: 0.9rem; color: var(--gray); }
+        .login-link a { color: var(--green); text-decoration: none; font-weight: 500; }
+
+        @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        @media (max-width: 500px) { .grid-2 { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+<div class="container">
+    <a href="{% url 'main' %}" class="back">← Volver al inicio</a>
+    <div class="card">
+        <div class="logo">Adopt<span>Pets</span></div>
+        <h2>Crear cuenta 🐾</h2>
+        <p class="subtitle">¿Cómo quieres registrarte?</p>
+
+        <div class="tipo-selector">
+            <button type="button" class="tipo-btn {% if tipo == 'adoptante' %}active{% endif %}" onclick="setTipo('adoptante')">
+                <span class="tipo-icon">🐶</span>
+                <span class="tipo-label">Quiero adoptar</span>
+            </button>
+            <button type="button" class="tipo-btn {% if tipo == 'refugio' %}active{% endif %}" onclick="setTipo('refugio')">
+                <span class="tipo-icon">🏠</span>
+                <span class="tipo-label">Soy un refugio</span>
+            </button>
+        </div>
+
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert">{{ message }}</div>
+            {% endfor %}
+        {% endif %}
+
+        <form method="POST" action="{% url 'register' %}">
+            {% csrf_token %}
+            <input type="hidden" name="tipoRegistro" id="tipoRegistro" value="{{ tipo }}">
+
+            <div class="grid-2">
+                <div class="field">
+                    <label>Nombre</label>
+                    <input type="text" name="nombre" placeholder="Tu nombre" required>
+                </div>
+                <div class="field">
+                    <label>Apellido</label>
+                    <input type="text" name="apellido" placeholder="Tu apellido" required>
+                </div>
+            </div>
+
+            <div class="field">
+                <label>Correo electrónico</label>
+                <input type="email" name="email" placeholder="correo@ejemplo.com" required>
+            </div>
+
+            <div class="grid-2">
+                <div class="field">
+                    <label>Contraseña</label>
+                    <input type="password" name="password" placeholder="Mínimo 6 caracteres" required>
+                </div>
+                <div class="field">
+                    <label>Confirmar contraseña</label>
+                    <input type="password" name="confirmPassword" placeholder="Repite la contraseña" required>
+                </div>
+            </div>
+
+            <div class="field">
+                <label>Teléfono</label>
+                <input type="text" name="telefono" placeholder="300 000 0000">
+            </div>
+
+            <button type="submit" class="btn-submit">Crear mi cuenta →</button>
+        </form>
+
+        <p class="login-link">¿Ya tienes cuenta? <a href="{% url 'login' %}">Inicia sesión</a></p>
+    </div>
+</div>
+
+<script>
+    function setTipo(tipo) {
+        document.getElementById('tipoRegistro').value = tipo;
+        document.querySelectorAll('.tipo-btn').forEach(b => b.classList.remove('active'));
+        event.currentTarget.classList.add('active');
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AdoptPets — Panel Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        :root {
+            --green: #22c55e; --green-dark: #16a34a; --green-light: #dcfce7;
+            --dark: #1a1a1a; --sidebar-bg: #111827; --gray: #6b7280; --border: #e5e7eb;
+            --cream: #f9fafb;
+        }
+        body { font-family: 'DM Sans', sans-serif; background: var(--cream); display: flex; min-height: 100vh; }
+
+        /* SIDEBAR */
+        .sidebar {
+            width: 260px; background: var(--sidebar-bg); min-height: 100vh;
+            display: flex; flex-direction: column; padding: 1.5rem 0;
+            position: fixed; top: 0; left: 0; z-index: 100;
+        }
+
+        .sidebar-logo {
+            font-family: 'Playfair Display', serif; font-size: 1.5rem;
+            color: #fff; padding: 0 1.5rem 1.5rem;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+        }
+        .sidebar-logo span { color: var(--green); }
+
+        .sidebar-section { padding: 1rem 1rem 0.5rem; }
+        .sidebar-section-label { color: #4b5563; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em; font-weight: 500; padding: 0 0.5rem; margin-bottom: 0.5rem; }
+
+        .nav-item {
+            display: flex; align-items: center; gap: 0.75rem;
+            padding: 0.65rem 0.75rem; border-radius: 10px;
+            color: #9ca3af; text-decoration: none;
+            font-size: 0.9rem; font-weight: 400;
+            transition: all 0.2s; margin-bottom: 0.1rem;
+        }
+        .nav-item:hover { background: rgba(255,255,255,0.06); color: #fff; }
+        .nav-item.active { background: var(--green); color: #fff; }
+        .nav-item .icon { font-size: 1.1rem; width: 24px; text-align: center; }
+
+        .sidebar-footer { margin-top: auto; padding: 1rem; border-top: 1px solid rgba(255,255,255,0.08); }
+        .logout-btn {
+            display: flex; align-items: center; gap: 0.75rem;
+            padding: 0.65rem 0.75rem; border-radius: 10px;
+            color: #9ca3af; text-decoration: none; font-size: 0.9rem;
+            transition: all 0.2s; width: 100%;
+        }
+        .logout-btn:hover { color: #ef4444; background: rgba(239,68,68,0.1); }
+
+        /* MAIN */
+        .main { margin-left: 260px; flex: 1; padding: 2rem; }
+
+        .top-bar {
+            display: flex; justify-content: space-between; align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .page-title h1 { font-family: 'Playfair Display', serif; font-size: 1.8rem; color: var(--dark); }
+        .page-title p { color: var(--gray); font-size: 0.9rem; margin-top: 0.2rem; }
+
+        .admin-badge {
+            background: var(--green-light); color: var(--green-dark);
+            padding: 0.4rem 1rem; border-radius: 999px;
+            font-size: 0.8rem; font-weight: 500;
+        }
+
+        /* STATS GRID */
+        .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.25rem; margin-bottom: 2rem; }
+
+        .stat-card {
+            background: #fff; border-radius: 16px; padding: 1.5rem;
+            border: 1px solid var(--border); transition: box-shadow 0.2s;
+        }
+        .stat-card:hover { box-shadow: 0 4px 20px rgba(0,0,0,0.07); }
+
+        .stat-card-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem; }
+        .stat-icon { font-size: 1.8rem; }
+        .stat-trend { font-size: 0.75rem; font-weight: 500; padding: 0.2rem 0.5rem; border-radius: 999px; }
+        .trend-up { background: var(--green-light); color: var(--green-dark); }
+        .trend-warn { background: #fef9c3; color: #854d0e; }
+
+        .stat-value { font-family: 'Playfair Display', serif; font-size: 2.2rem; font-weight: 700; color: var(--dark); }
+        .stat-label { color: var(--gray); font-size: 0.85rem; margin-top: 0.2rem; }
+
+        /* TABLES */
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.25rem; }
+
+        .table-card { background: #fff; border-radius: 16px; border: 1px solid var(--border); overflow: hidden; }
+        .table-header { padding: 1.25rem 1.5rem; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border); }
+        .table-header h3 { font-family: 'Playfair Display', serif; font-size: 1.1rem; color: var(--dark); }
+        .view-all { color: var(--green); font-size: 0.85rem; text-decoration: none; font-weight: 500; }
+
+        table { width: 100%; border-collapse: collapse; }
+        th { padding: 0.75rem 1.5rem; text-align: left; font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--gray); background: #f9fafb; }
+        td { padding: 0.9rem 1.5rem; font-size: 0.9rem; color: var(--dark); border-top: 1px solid var(--border); }
+        tr:hover td { background: #f9fafb; }
+
+        .badge {
+            display: inline-block; padding: 0.2rem 0.65rem;
+            border-radius: 999px; font-size: 0.75rem; font-weight: 500;
+        }
+        .badge-pending { background: #fef9c3; color: #854d0e; }
+        .badge-approved { background: var(--green-light); color: var(--green-dark); }
+        .badge-available { background: #dbeafe; color: #1d4ed8; }
+
+        .btn-sm {
+            padding: 0.35rem 0.75rem; border-radius: 6px; font-size: 0.8rem;
+            font-family: 'DM Sans', sans-serif; font-weight: 500;
+            text-decoration: none; display: inline-block; transition: all 0.2s;
+        }
+        .btn-green { background: var(--green); color: #fff; border: none; cursor: pointer; }
+        .btn-green:hover { background: var(--green-dark); }
+    </style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar">
+    <div class="sidebar-logo">Adopt<span>Pets</span></div>
+
+    <div class="sidebar-section">
+        <div class="sidebar-section-label">Principal</div>
+        <a href="{% url 'admin_dashboard' %}" class="nav-item active">
+            <span class="icon">📊</span> Dashboard
+        </a>
+    </div>
+
+    <div class="sidebar-section">
+        <div class="sidebar-section-label">Gestión</div>
+        <a href="{% url 'admin_mascotas' %}" class="nav-item">
+            <span class="icon">🐾</span> Mascotas
+        </a>
+        <a href="{% url 'admin_adopciones' %}" class="nav-item">
+            <span class="icon">❤️</span> Adopciones
+        </a>
+        <a href="{% url 'admin_usuarios' %}" class="nav-item">
+            <span class="icon">👥</span> Usuarios
+        </a>
+        <a href="{% url 'admin_refugios' %}" class="nav-item">
+            <span class="icon">🏠</span> Refugios
+        </a>
+    </div>
+
+    <div class="sidebar-section">
+        <div class="sidebar-section-label">Reportes</div>
+        <a href="{% url 'admin_reportes' %}" class="nav-item">
+            <span class="icon">📄</span> Reportes
+        </a>
+    </div>
+
+    <div class="sidebar-footer">
+        <a href="{% url 'logout' %}" class="logout-btn">
+            <span class="icon">🚪</span> Cerrar sesión
+        </a>
+    </div>
+</aside>
+
+<!-- MAIN -->
+<main class="main">
+    <div class="top-bar">
+        <div class="page-title">
+            <h1>Dashboard</h1>
+            <p>Resumen general del sistema AdoptPets</p>
+        </div>
+        <span class="admin-badge">👑 Administrador</span>
+    </div>
+
+    <!-- Stats -->
+    <div class="stats-grid">
+        <div class="stat-card">
+            <div class="stat-card-header">
+                <span class="stat-icon">🐾</span>
+                <span class="stat-trend trend-up">+12%</span>
+            </div>
+            <div class="stat-value">{{ totalMascotas }}</div>
+            <div class="stat-label">Total mascotas</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-card-header">
+                <span class="stat-icon">✅</span>
+                <span class="stat-trend trend-up">Disponibles</span>
+            </div>
+            <div class="stat-value">{{ mascotasDisponibles }}</div>
+            <div class="stat-label">Mascotas disponibles</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-card-header">
+                <span class="stat-icon">⏳</span>
+                <span class="stat-trend trend-warn">Pendientes</span>
+            </div>
+            <div class="stat-value">{{ solicitudesPendientes }}</div>
+            <div class="stat-label">Solicitudes pendientes</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-card-header">
+                <span class="stat-icon">🎉</span>
+                <span class="stat-trend trend-up">Completadas</span>
+            </div>
+            <div class="stat-value">{{ adopcionesCompletadas }}</div>
+            <div class="stat-label">Adopciones completadas</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-card-header">
+                <span class="stat-icon">👥</span>
+                <span class="stat-trend trend-up">Registrados</span>
+            </div>
+            <div class="stat-value">{{ totalUsuarios }}</div>
+            <div class="stat-label">Total usuarios</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-card-header">
+                <span class="stat-icon">🏠</span>
+                <span class="stat-trend trend-up">Activos</span>
+            </div>
+            <div class="stat-value">{{ totalRefugios }}</div>
+            <div class="stat-label">Refugios aliados</div>
+        </div>
+    </div>
+
+    <!-- Tables -->
+    <div class="grid-2">
+        <!-- Adopciones pendientes -->
+        <div class="table-card">
+            <div class="table-header">
+                <h3>⏳ Adopciones pendientes</h3>
+                <a href="{% url 'admin_adopciones' %}" class="view-all">Ver todas →</a>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Adoptante</th>
+                        <th>Mascota</th>
+                        <th>Estado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for adopcion in adopcionesPendientes %}
+                    <tr>
+                        <td>{{ adopcion.adoptante.nombre }}</td>
+                        <td>{{ adopcion.mascota.nombre }}</td>
+                        <td><span class="badge badge-pending">Pendiente</span></td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="3" style="text-align:center; color:#9ca3af;">Sin solicitudes pendientes</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Últimas mascotas -->
+        <div class="table-card">
+            <div class="table-header">
+                <h3>🐾 Últimas mascotas</h3>
+                <a href="{% url 'admin_mascotas' %}" class="view-all">Ver todas →</a>
+            </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Especie</th>
+                        <th>Estado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for mascota in ultimasMascotas %}
+                    <tr>
+                        <td>{{ mascota.nombre }}</td>
+                        <td>{{ mascota.especie }}</td>
+                        <td><span class="badge badge-available">Disponible</span></td>
+                    </tr>
+                    {% empty %}
+                    <tr><td colspan="3" style="text-align:center; color:#9ca3af;">Sin mascotas registradas</td></tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</main>
+
+</body>
+</html>

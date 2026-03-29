@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AdoptPets — Detalle Adopción</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+    <style>
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        :root { --green: #22c55e; --green-dark: #16a34a; --green-light: #dcfce7; --dark: #1a1a1a; --gray: #6b7280; --border: #e5e7eb; --cream: #f9fafb; --sidebar: #111827; }
+        body { font-family: 'DM Sans', sans-serif; background: var(--cream); display: flex; min-height: 100vh; }
+
+        .sidebar { width: 260px; background: var(--sidebar); min-height: 100vh; padding: 1.5rem 0; position: fixed; top: 0; left: 0; }
+        .sidebar-logo { font-family: 'Playfair Display', serif; font-size: 1.5rem; color: #fff; padding: 0 1.5rem 1.5rem; border-bottom: 1px solid rgba(255,255,255,0.08); }
+        .sidebar-logo span { color: var(--green); }
+        .nav-section { padding: 1rem; }
+        .nav-label { color: #4b5563; font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.1em; padding: 0 0.5rem; margin-bottom: 0.5rem; }
+        .nav-item { display: flex; align-items: center; gap: 0.75rem; padding: 0.65rem 0.75rem; border-radius: 10px; color: #9ca3af; text-decoration: none; font-size: 0.9rem; transition: all 0.2s; margin-bottom: 0.1rem; }
+        .nav-item:hover { background: rgba(255,255,255,0.06); color: #fff; }
+        .nav-item.active { background: var(--green); color: #fff; }
+        .sidebar-footer { position: absolute; bottom: 1rem; left: 0; right: 0; padding: 1rem; border-top: 1px solid rgba(255,255,255,0.08); }
+        .logout { display: flex; align-items: center; gap: 0.75rem; padding: 0.65rem 0.75rem; color: #9ca3af; text-decoration: none; font-size: 0.9rem; border-radius: 10px; transition: all 0.2s; }
+        .logout:hover { color: #ef4444; background: rgba(239,68,68,0.1); }
+
+        .main { margin-left: 260px; flex: 1; padding: 2rem; max-width: calc(100% - 260px); }
+        .page-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem; }
+        .page-header h1 { font-family: 'Playfair Display', serif; font-size: 1.8rem; color: var(--dark); }
+        .back-link { color: var(--gray); text-decoration: none; font-size: 0.88rem; transition: color 0.2s; }
+        .back-link:hover { color: var(--green); }
+
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+
+        .detail-card { background: #fff; border-radius: 16px; border: 1px solid var(--border); padding: 1.5rem; }
+        .detail-card h3 { font-family: 'Playfair Display', serif; font-size: 1.1rem; color: var(--dark); margin-bottom: 1.25rem; padding-bottom: 0.75rem; border-bottom: 1px solid var(--border); }
+
+        .detail-row { display: flex; justify-content: space-between; align-items: flex-start; padding: 0.65rem 0; border-bottom: 1px solid #f9fafb; }
+        .detail-row:last-child { border-bottom: none; }
+        .detail-key { color: var(--gray); font-size: 0.82rem; }
+        .detail-val { color: var(--dark); font-size: 0.88rem; font-weight: 500; text-align: right; max-width: 60%; }
+
+        .badge { display: inline-block; padding: 0.25rem 0.75rem; border-radius: 999px; font-size: 0.78rem; font-weight: 500; }
+        .badge-pending { background: #fef9c3; color: #854d0e; }
+        .badge-approved { background: var(--green-light); color: var(--green-dark); }
+        .badge-completed { background: #dbeafe; color: #1d4ed8; }
+        .badge-rejected { background: #fee2e2; color: #991b1b; }
+
+        .actions-card { background: #fff; border-radius: 16px; border: 1px solid var(--border); padding: 1.5rem; margin-top: 1.5rem; }
+        .actions-card h3 { font-family: 'Playfair Display', serif; font-size: 1.1rem; color: var(--dark); margin-bottom: 1.25rem; }
+        .btn-action { display: inline-flex; align-items: center; gap: 0.5rem; padding: 0.75rem 1.5rem; border-radius: 10px; font-family: 'DM Sans', sans-serif; font-size: 0.9rem; font-weight: 500; cursor: pointer; border: none; transition: all 0.2s; text-decoration: none; margin-right: 0.75rem; }
+        .btn-green { background: var(--green); color: #fff; }
+        .btn-green:hover { background: var(--green-dark); }
+        .btn-blue { background: #dbeafe; color: #1d4ed8; }
+        .btn-blue:hover { background: #bfdbfe; }
+    </style>
+</head>
+<body>
+
+<aside class="sidebar">
+    <div class="sidebar-logo">Adopt<span>Pets</span></div>
+    <div class="nav-section">
+        <div class="nav-label">Principal</div>
+        <a href="{% url 'admin_dashboard' %}" class="nav-item"><span>📊</span> Dashboard</a>
+    </div>
+    <div class="nav-section">
+        <div class="nav-label">Gestión</div>
+        <a href="{% url 'admin_mascotas' %}" class="nav-item"><span>🐾</span> Mascotas</a>
+        <a href="{% url 'admin_adopciones' %}" class="nav-item active"><span>❤️</span> Adopciones</a>
+        <a href="{% url 'admin_usuarios' %}" class="nav-item"><span>👥</span> Usuarios</a>
+        <a href="{% url 'admin_refugios' %}" class="nav-item"><span>🏠</span> Refugios</a>
+        <a href="{% url 'admin_reportes' %}" class="nav-item"><span>📄</span> Reportes</a>
+    </div>
+    <div class="sidebar-footer">
+        <a href="{% url 'logout' %}" class="logout"><span>🚪</span> Cerrar sesión</a>
+    </div>
+</aside>
+
+<main class="main">
+    <div class="page-header">
+        <h1>❤️ Detalle Adopción #{{ adopcion.id_adopcion }}</h1>
+        <a href="{% url 'admin_adopciones' %}" class="back-link">← Volver a adopciones</a>
+    </div>
+
+    <div class="grid-2">
+        <div class="detail-card">
+            <h3>👤 Información del adoptante</h3>
+            <div class="detail-row"><span class="detail-key">Nombre</span><span class="detail-val">{{ adopcion.adoptante.nombre }} {{ adopcion.adoptante.apellido }}</span></div>
+            <div class="detail-row"><span class="detail-key">Email</span><span class="detail-val">{{ adopcion.adoptante.email }}</span></div>
+            <div class="detail-row"><span class="detail-key">Teléfono</span><span class="detail-val">{{ adopcion.adoptante.telefono|default:"-" }}</span></div>
+            <div class="detail-row"><span class="detail-key">Ciudad</span><span class="detail-val">{{ adopcion.adoptante.ciudad|default:"-"|capfirst }}</span></div>
+            <div class="detail-row"><span class="detail-key">Cédula</span><span class="detail-val">{{ adopcion.adoptante.cedula|default:"-" }}</span></div>
+        </div>
+
+        <div class="detail-card">
+            <h3>🐾 Información de la mascota</h3>
+            <div class="detail-row"><span class="detail-key">Nombre</span><span class="detail-val">{{ adopcion.mascota.nombre }}</span></div>
+            <div class="detail-row"><span class="detail-key">Especie</span><span class="detail-val">{{ adopcion.mascota.especie }}</span></div>
+            <div class="detail-row"><span class="detail-key">Raza</span><span class="detail-val">{{ adopcion.mascota.raza|default:"-" }}</span></div>
+            <div class="detail-row"><span class="detail-key">Sexo</span><span class="detail-val">{{ adopcion.mascota.sexo }}</span></div>
+            <div class="detail-row"><span class="detail-key">Refugio</span><span class="detail-val">{% if adopcion.mascota.refugio %}{{ adopcion.mascota.refugio.nombre_refugio }}{% else %}-{% endif %}</span></div>
+        </div>
+    </div>
+
+    <div class="detail-card" style="margin-top:1.5rem">
+        <h3>📋 Información de la solicitud</h3>
+        <div class="detail-row"><span class="detail-key">Fecha solicitud</span><span class="detail-val">{{ adopcion.fecha_solicitud }}</span></div>
+        <div class="detail-row"><span class="detail-key">Fecha aprobación</span><span class="detail-val">{{ adopcion.fecha_aprobacion|default:"-" }}</span></div>
+        <div class="detail-row">
+            <span class="detail-key">Estado</span>
+            <span class="detail-val">
+                <span class="badge {% if adopcion.estado_adopcion == 'pendiente' %}badge-pending{% elif adopcion.estado_adopcion == 'aprobada' %}badge-approved{% elif adopcion.estado_adopcion == 'completada' %}badge-completed{% else %}badge-rejected{% endif %}">
+                    {{ adopcion.estado_adopcion|capfirst }}
+                </span>
+            </span>
+        </div>
+        {% if adopcion.observaciones %}
+        <div class="detail-row"><span class="detail-key">Observaciones</span><span class="detail-val">{{ adopcion.observaciones }}</span></div>
+        {% endif %}
+    </div>
+
+    {% if adopcion.estado_adopcion == 'pendiente' %}
+    <div class="actions-card">
+        <h3>⚡ Acciones</h3>
+        <form method="POST" action="{% url 'admin_aprobar_adopcion' adopcion.id_adopcion %}" style="display:inline">
+            {% csrf_token %}
+            <button type="submit" class="btn-action btn-green">✅ Aprobar adopción</button>
+        </form>
+    </div>
+    {% elif adopcion.estado_adopcion == 'aprobada' %}
+    <div class="actions-card">
+        <h3>⚡ Acciones</h3>
+        <form method="POST" action="{% url 'admin_completar_adopcion' adopcion.id_adopcion %}" style="display:inline">
+            {% csrf_token %}
+            <button type="submit" class="btn-action btn-blue">🎉 Marcar como completada</button>
+        </form>
+    </div>
+    {% endif %}
+</main>
+
+</body>
+</html>
