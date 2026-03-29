@@ -23,8 +23,6 @@ from django.conf import settings
 from django.conf.urls.static import static
 
 urlpatterns = [
-    # CUIDADO: Django ya trae su propio panel en /admin/.
-    # Para evitar conflictos con tu panel personalizado, cambiaremos la ruta nativa de Django a /django-admin/
     path('django-admin/', admin.site.urls),
 
     # Tu nuevo Dashboard Administrativo personalizado

@@ -128,8 +128,10 @@
         {% for mascota in mascotas %}
         <div class="pet-card">
 
-            {% if mascota.fotos.all %}
-                <img src="{{ mascota.fotos.first.url_foto }}" alt="Foto de {{ mascota.nombre }}">
+            {% if mascota.foto %}
+                <img src="{{ mascota.foto.url }}" alt="Foto de {{ mascota.nombre }}">
+            {% elif mascota.galeriafoto_set.all %}
+                <img src="{{ mascota.galeriafoto_set.first.url_foto }}" alt="Foto de {{ mascota.nombre }}">
             {% else %}
                 <img src="{% static 'img/default-pet.jpg' %}" alt="Imagen por defecto">
             {% endif %}

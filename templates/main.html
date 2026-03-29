@@ -1,13 +1,81 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Inicio - AdoptPets{% endblock %}
+{% block title %}AdoptPets - Adopta a tu alma gemela{% endblock %}
+
+{% block extra_css %}
+    <link href="{% static 'css/main.css' %}" rel="stylesheet">
+    <link href="{% static 'css/publicmasco.css' %}" rel="stylesheet">
+{% endblock %}
 
 {% block content %}
 <section id="adoptpets">
     <div class="img-contenedor">
         <h1>AdoptPets</h1>
         <p>Adopta a tu alma gemelea</p>
+    </div>
+</section>
+
+<section class="container" style="max-width: 1400px; margin: 60px auto; padding: 0 20px;">
+    <h2 style="text-align: center; color: #22C55E; font-size: 36px; margin-bottom: 40px;">🐾 Recién Llegados</h2>
+
+    <div class="pet-grid">
+        {% for mascota in mascotas %}
+            <div class="pet-card">
+
+                {% if mascota.foto %}
+                    <img src="{{ mascota.foto.url }}" alt="Foto de {{ mascota.nombre }}">
+                {% elif mascota.galeriafoto_set.all %}
+                    <img src="{{ mascota.galeriafoto_set.first.url_foto }}" alt="Foto de {{ mascota.nombre }}">
+                {% else %}
+                    <img src="{% static 'img/default-pet.jpg' %}" alt="Imagen por defecto">
+                {% endif %}
+
+                <div class="pet-info">
+                    <h3>{{ mascota.nombre }}</h3>
+                    <p><strong>Especie:</strong> <span>{{ mascota.especie|title }}</span></p>
+                    <p><strong>Raza:</strong> <span>{{ mascota.raza|default:"Mestizo" }}</span></p>
+
+                    <a href="{% url 'solicitar_adopcion' mascota.id_mascota %}" class="adopt-btn" style="display: block; text-align: center; margin-top: 15px;">
+                        💚 Quiero Adoptar
+                    </a>
+                </div>
+            </div>
+        {% empty %}
+            <p style="text-align: center; grid-column: 1/-1; color: #666;">No hay mascotas disponibles por el momento.</p>
+        {% endfor %}
+    </div>
+
+    <div style="text-align: center; margin-top: 40px;">
+        <a href="{% url 'lista_mascotas' %}" class="btn btn-primary" style="padding: 12px 30px; font-size: 18px; border-radius: 30px;">
+            Ver todas las mascotas ➔
+        </a>
+    </div>
+</section>
+
+<section style="background: #f8f9fa; padding: 60px 20px; margin-bottom: 40px;">
+    <div style="max-width: 1200px; margin: 0 auto;">
+        <h2 style="text-align: center; color: #333; font-size: 36px; margin-bottom: 40px;">📰 Últimas Historias</h2>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 30px;">
+            {% for blog in blogs %}
+                <div style="background: white; border-radius: 15px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.05); display: flex; flex-direction: column;">
+                    {% if blog.imagen_url %}
+                        <div style="height: 200px; overflow: hidden;">
+                            <img src="{{ blog.imagen_url }}" style="width: 100%; height: 100%; object-fit: cover;">
+                        </div>
+                    {% endif %}
+                    <div style="padding: 25px; flex-grow: 1;">
+                        <span style="background: #e0f2fe; color: #0369a1; padding: 5px 10px; border-radius: 8px; font-size: 12px; font-weight: bold;">{{ blog.categoria }}</span>
+                        <h3 style="color: #22C55E; margin: 15px 0 10px 0;">{{ blog.titulo }}</h3>
+                        <p style="color: #666; font-size: 14px; margin-bottom: 15px;">{{ blog.fecha_publicacion|date:"d de F, Y" }}</p>
+                        <p style="color: #555; line-height: 1.6;">{{ blog.resumen }}</p>
+                    </div>
+                </div>
+            {% empty %}
+                <p style="text-align: center; width: 100%;">Pronto publicaremos nuevas historias.</p>
+            {% endfor %}
+        </div>
     </div>
 </section>
 
@@ -20,16 +88,14 @@
                 cualquier pregunta que tengas,
                 encontraremos la forma de responderla.
             </p>
-
             <p class="texto2">Otras formas de contactarnos</p>
-
             <ul class="texto3">
                 <li>Telefono: 239812910010</li>
                 <li>Correo: adopttpetts@example.com</li>
             </ul>
         </div>
         <div class="error">
-            <a href="#" class="nav-link">Error de pagina</a>
+            <a href="/esta-ruta-no-existe" class="nav-link">Error de pagina</a>
         </div>
     </div>
 </section>

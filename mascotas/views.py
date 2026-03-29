@@ -2,10 +2,20 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from .models import Mascota
 from refugios.models import Refugio
+from blog.models import Blog
 from django.db.models import Q
 from usuarios.decorators import roles_permitidos
 
 
+def inicio(request):
+    mascotas_destacadas = Mascota.objects.filter(estado_adopcion='disponible').order_by('-fecha_registro')[:3]
+    blogs_destacados = Blog.objects.filter(activo=True).order_by('-fecha_publicacion')[:2]
+
+    # AQUÍ ESTÁ EL CAMBIO IMPORTANTE:
+    return render(request, 'main.html', {
+        'mascotas': mascotas_destacadas,
+        'blogs': blogs_destacados
+    })
 def lista_mascotas(request):
     mascotas = Mascota.objects.filter(estado_adopcion='disponible').order_by('-fecha_registro')
 
