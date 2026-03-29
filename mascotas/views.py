@@ -5,10 +5,11 @@ from refugios.models import Refugio
 
 
 from usuarios.decorators import roles_permitidos
+# --- VISTA PÚBLICA (Sin protección, todos pueden ver) ---
 def lista_mascotas(request):
-    # Traemos todas las mascotas (o puedes usar .filter() para traer solo las disponibles)
-    todas_las_mascotas = Mascota.objects.all()
-    return render(request, 'mascotas/lista.html', {'mascotas': todas_las_mascotas})
+    # Solo mostramos las mascotas que tienen estado 'disponible'
+    mascotas_disponibles = Mascota.objects.filter(estado_adopcion='disponible').order_by('-fecha_registro')
+    return render(request, 'mascotas/lista.html', {'mascotas': mascotas_disponibles})
 
 from django.contrib import messages
 # --- VISTA DE LISTA PARA EL ADMINISTRADOR ---

@@ -1,0 +1,158 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Editar Usuario - AdoptPets{% endblock %}
+
+{% block extra_css %}
+    <link href="{% static 'css/usuarioform.css' %}" rel="stylesheet">
+    <style>
+        .danger-zone { margin-top: 30px; border: 1px solid #fca5a5; border-radius: 12px; padding: 20px; background: #fef2f2; }
+        .danger-zone h3 { color: #dc2626; margin-bottom: 15px; }
+        .danger-actions { display: flex; gap: 20px; }
+        .action-card { flex: 1; background: white; padding: 15px; border-radius: 8px; border: 1px solid #fee2e2; }
+        .btn-warning { background: #f59e0b; color: white; }
+    </style>
+{% endblock %}
+
+{% block content %}
+<div class="content-area">
+    <div class="user-edit-container">
+        <div class="user-header">
+            <div class="user-avatar">{{ usuario.nombre.0|upper }}</div>
+            <div class="user-meta">
+                <h1>{{ usuario.nombre }} {{ usuario.apellido }}</h1>
+                <div class="user-email">{{ usuario.email }}</div>
+                <div style="margin-top: 0.75rem;">
+                    <span class="badge" style="background: #e0e7ff; color: #3730a3;">ID: {{ usuario.id_usuario }}</span>
+                    <span class="badge {% if usuario.is_active %}badge-active{% else %}badge-inactive{% endif %}">
+                        {% if usuario.is_active %}✓ Activo{% else %}✗ Inactivo{% endif %}
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert {% if message.tags == 'success' %}alert-success{% else %}alert-warning{% endif %}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <div class="card" style="background: white; padding: 25px; border-radius: 12px; margin-top: 20px;">
+            <h2 style="margin-bottom: 20px;">Información del Usuario</h2>
+
+            <form method="post" action="">
+                {% csrf_token %}
+
+                <div class="form-row" style="display: flex; gap: 15px; margin-bottom: 15px;">
+                    <div class="form-group" style="flex: 1;">
+                        <label>Nombre *</label>
+                        <input type="text" name="nombre" value="{{ usuario.nombre }}" required style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #ccc;">
+                    </div>
+                    <div class="form-group" style="flex: 1;">
+                        <label>Apellido *</label>
+                        <input type="text" name="apellido" value="{{ usuario.apellido }}" required style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #ccc;">
+                    </div>
+                </div>
+
+                <div class="form-row" style="display: flex; gap: 15px; margin-bottom: 15px;">
+                    <div class="form-group" style="flex: 1;">
+                        <label>Email *</label>
+                        {% if usuario %}
+                            <input type="email" value="{{ usuario.email }}" disabled style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #ccc; background: #f3f4f6;">
+                        {% else %}
+                            <input type="email" name="email" required placeholder="correo@ejemplo.com" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #ccc;">
+                        {% endif %}
+                    </div>
+
+                    {% if not usuario %}
+                    <div class="form-group" style="flex: 1;">
+                        <label>Contraseña Temporal *</label>
+                        <input type="password" name="password" required minlength="6" placeholder="Mínimo 6 caracteres" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #ccc;">
+                    </div>
+                    {% endif %}
+                </div>
+
+
+                <div class="form-row" style="display: flex; gap: 15px; margin-bottom: 15px;">
+                    <div class="form-group" style="flex: 1;">
+                        <label>Cédula</label>
+                        <input type="text" name="cedula" value="{{ usuario.cedula|default:'' }}" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #ccc;">
+                    </div>
+                    <div class="form-group" style="flex: 1;">
+                        <label>Fecha de Nacimiento</label>
+                        <input type="date" name="fechaNacimiento" value="{{ usuario.fecha_nacimiento|date:'Y-m-d' }}" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #ccc;">
+                    </div>
+                </div>
+
+                <div class="form-row" style="display: flex; gap: 15px; margin-bottom: 15px;">
+                    <div class="form-group" style="flex: 1;">
+                        <label>Teléfono</label>
+                        <input type="text" name="telefono" value="{{ usuario.telefono|default:'' }}" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #ccc;">
+                    </div>
+                    <div class="form-group" style="flex: 1;">
+                        <label>Ciudad</label>
+                        <input type="text" name="ciudad" value="{{ usuario.ciudad|default:'' }}" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #ccc;">
+                    </div>
+                </div>
+
+                <div class="form-group" style="margin-bottom: 15px;">
+                    <label>Dirección</label>
+                    <input type="text" name="direccion" value="{{ usuario.direccion|default:'' }}" style="width: 100%; padding: 8px; border-radius: 4px; border: 1px solid #ccc;">
+                </div>
+
+                <div class="form-group" style="margin-bottom: 25px;">
+                    <label style="display: flex; align-items: center; gap: 0.5rem; cursor: pointer;">
+                        <input type="checkbox" name="activo" {% if usuario.is_active %}checked{% endif %} style="width: 20px; height: 20px;">
+                        <span>Usuario Activo (Permite iniciar sesión)</span>
+                    </label>
+                </div>
+
+                <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
+                    <h3>🔑 Roles y Permisos</h3>
+                    <p style="color: #666; margin-bottom: 15px;">Selecciona los roles que tendrá este usuario en el sistema</p>
+
+                    <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+                        {% for rol in todosLosRoles %}
+                        <div style="background: white; padding: 10px 15px; border-radius: 6px; border: 1px solid #e5e7eb; display: flex; align-items: center; gap: 10px;">
+                            <input type="checkbox" id="rol-{{ rol.id_rol }}" name="rolesIds" value="{{ rol.id_rol }}"
+                                   {% if rol.id_rol in roles_usuario_ids %}checked{% endif %}>
+                            <label for="rol-{{ rol.id_rol }}" style="cursor: pointer; font-weight: bold;">
+                                {{ rol.nombre_rol }}
+                            </label>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div style="display: flex; gap: 15px;">
+                    <button type="submit" class="btn btn-primary" style="padding: 10px 20px; border-radius: 6px; border: none; cursor: pointer;">💾 Guardar Cambios</button>
+                    <a href="{% url 'admin_lista_usuarios' %}" class="btn btn-secondary" style="padding: 10px 20px; border-radius: 6px; text-decoration: none;">Cancelar</a>
+                </div>
+            </form>
+        </div>
+
+        {% if usuario %}
+        <div class="danger-zone">
+            <h3>⚠️ Zona de Peligro</h3>
+            <div class="danger-actions">
+                <div class="action-card">
+                    <h4 style="margin-bottom: 5px;">Resetear Contraseña</h4>
+                    <p style="color: #666; font-size: 14px; margin-bottom: 15px;">Se establecerá la contraseña por defecto: 123456</p>
+                    <a href="{% url 'resetear_password' usuario.id_usuario %}" class="btn btn-warning" style="padding: 6px 12px; border-radius: 4px; text-decoration: none;"
+                       onclick="return confirm('¿Resetear contraseña del usuario?')">🔑 Resetear</a>
+                </div>
+
+                <div class="action-card">
+                    <h4 style="margin-bottom: 5px;">Eliminar Usuario</h4>
+                    <p style="color: #666; font-size: 14px; margin-bottom: 15px;">Esta acción no se puede deshacer</p>
+                    <a href="{% url 'eliminar_usuario' usuario.id_usuario %}" class="btn btn-danger" style="padding: 6px 12px; border-radius: 4px; text-decoration: none;"
+                       onclick="return confirm('¿Está seguro de eliminar este usuario? Esta acción no se puede deshacer.')">🗑️ Eliminar</a>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

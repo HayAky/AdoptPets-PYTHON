@@ -1,0 +1,113 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Mi Perfil - AdoptPets{% endblock %}
+
+{% block extra_css %}
+    <link href="{% static 'css/admin_listas.css' %}" rel="stylesheet">
+    <style>
+        .perfil-container { max-width: 1200px; margin: 40px auto; padding: 0 20px; display: grid; grid-template-columns: 1fr 2fr; gap: 30px; }
+        @media (max-width: 768px) { .perfil-container { grid-template-columns: 1fr; } }
+        .perfil-card { background: white; padding: 30px; border-radius: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        .perfil-card h2 { color: #22C55E; margin-top: 0; margin-bottom: 25px; border-bottom: 2px solid #f0f0f0; padding-bottom: 10px; }
+        
+        /* Estilos del Formulario */
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; color: #666; font-weight: 600; font-size: 14px; }
+        .form-group input { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 8px; box-sizing: border-box; }
+        .form-group input:disabled { background: #f3f4f6; cursor: not-allowed; }
+        
+        /* Estilos de la tabla de adopciones */
+        .adopcion-item { border: 1px solid #e5e7eb; border-radius: 10px; padding: 15px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; }
+        .adopcion-info h4 { margin: 0 0 5px 0; color: #333; font-size: 18px; }
+        .adopcion-info p { margin: 0; color: #666; font-size: 14px; }
+        .empty-state { text-align: center; padding: 40px 20px; color: #999; }
+    </style>
+{% endblock %}
+
+{% block content %}
+<div class="perfil-container">
+    
+    <div class="perfil-card">
+        <h2>👤 Mis Datos Personales</h2>
+        
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert {% if message.tags == 'success' %}alert-success{% else %}alert-warning{% endif %}" style="padding: 10px; margin-bottom: 15px; border-radius: 8px;">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <form method="post" action="">
+            {% csrf_token %}
+            <div class="form-group">
+                <label>Correo Electrónico</label>
+                <input type="email" value="{{ request.user.email }}" disabled>
+            </div>
+            <div class="form-group">
+                <label>Nombre</label>
+                <input type="text" name="nombre" value="{{ request.user.nombre }}" required>
+            </div>
+            <div class="form-group">
+                <label>Apellido</label>
+                <input type="text" name="apellido" value="{{ request.user.apellido }}" required>
+            </div>
+            <div class="form-group">
+                <label>Cédula</label>
+                <input type="text" name="cedula" value="{{ request.user.cedula|default:'' }}">
+            </div>
+            <div class="form-group">
+                <label>Teléfono</label>
+                <input type="text" name="telefono" value="{{ request.user.telefono|default:'' }}">
+            </div>
+            <div class="form-group">
+                <label>Ciudad</label>
+                <input type="text" name="ciudad" value="{{ request.user.ciudad|default:'' }}">
+            </div>
+            <div class="form-group">
+                <label>Dirección</label>
+                <input type="text" name="direccion" value="{{ request.user.direccion|default:'' }}">
+            </div>
+            
+            <button type="submit" class="btn btn-primary" style="width: 100%; margin-top: 10px;">Actualizar Datos</button>
+        </form>
+    </div>
+
+    <div class="perfil-card">
+        <h2>🐾 Mis Solicitudes de Adopción</h2>
+        
+        <div class="adopciones-list">
+            {% for adopcion in mis_adopciones %}
+            <div class="adopcion-item">
+                <div class="adopcion-info">
+                    <h4>{{ adopcion.mascota.nombre }}</h4>
+                    <p>Enviada el: {{ adopcion.fecha_solicitud|date:"d M Y" }}</p>
+                    {% if adopcion.estado_adopcion == 'aprobada' %}
+                        <p style="color: #065f46; margin-top: 8px; font-weight: bold;">🎉 ¡Felicidades! Pronto nos contactaremos para la entrega.</p>
+                    {% endif %}
+                </div>
+                
+                <div class="adopcion-status">
+                    <span class="badge 
+                        {% if adopcion.estado_adopcion == 'pendiente' %}badge-process
+                        {% elif adopcion.estado_adopcion == 'aprobada' %}badge-available
+                        {% else %}badge-danger{% endif %}"
+                        {% if adopcion.estado_adopcion == 'rechazada' %}style="background: #fee2e2; color: #991b1b;"{% endif %}>
+                        {{ adopcion.estado_adopcion|upper }}
+                    </span>
+                </div>
+            </div>
+            {% empty %}
+            <div class="empty-state">
+                <div style="font-size: 40px; margin-bottom: 15px;">🐕</div>
+                <h3>Aún no has solicitado adoptar</h3>
+                <p>Anímate a darle un hogar a uno de nuestros peluditos.</p>
+                <a href="{% url 'lista_mascotas' %}" class="btn btn-primary" style="margin-top: 15px;">Ver Mascotas</a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+</div>
+{% endblock %}

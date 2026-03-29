@@ -23,6 +23,9 @@ header {
     position: sticky;
     top: 0;
     z-index: 1000;
+    background-color: white;
+    /* Una sombra suave para que todo el header resalte sobre el fondo */
+    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
 }
 
 
@@ -80,145 +83,26 @@ header a:hover {
 /* ========================================
    HEADER - ESTILOS ADMIN
    ======================================== */
-.header-fixed {
-    position: fixed;
-    left: 0;
-    right: 0;
-    transition: transform 0.3s ease;
-}
-
 #headerup {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    z-index: 1000;
     padding: 20px 100px 10px 100px;
     display: flex;
     justify-content: space-between;
-    background-color: rgba(255,255,255,1);
-    transition: transform 0.25s linear;
+    align-items: center;
+    background-color: #ffffff;
 }
 
 #headerup .logo img {
     padding-left: 10px;
 }
 
-.contenedor .derecha {
-    float: right;
-}
-
-.contenedor .izquierda {
-    float: left;
-}
-
-.contenedor {
-    overflow: visible;
-}
-
-#headadmin {
-    position: fixed;
-    top: var(--altura-header-up);
-    left: 0;
-    right: 0;
-    z-index: 900;
-    padding: 10px 100px 20px 100px;
-    display: flex;
-    justify-content: space-between;
-    background-color: rgba(255,255,255,1);
-    border-bottom: 1px solid rgba(0,0,0,0.1);
-    transition: top 0.25s linear;
-}
-
-#headadmin nav {
-    display: flex;
-    gap: 60px;
-    flex-direction: row;
-    text-align: center;
-    margin: auto;
-}
-
-#header-spacer {
-    height: var(--altura-header-total);
-    width: 100%;
-    visibility: hidden;
-}
-
-.user-menu {
-    position: relative;
-    display: inline-block;
-}
-
-.user-button {
-    background: transparent;
-    border: none;
-    padding: 6px 10px;
-    font-size: 18px;
-    font-weight: 600;
-    color: var(--color-primary);
-    cursor: pointer;
-}
-
-.user-button:hover {
-    color: var(--color-primary-dark);
-}
-
-/* ===== CONTENIDO DEL MENU USUARIO ===== */
-
-.user-dropdown {
-    display: none;
-    flex-direction: column;
-    gap: 10px;
-    min-width: 260px;
-    padding: 18px;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.18);
-}
-
-/* Enlaces dentro del menu (Mi perfil) */
-.user-dropdown .dropdown-link {
-    display: block;
-    padding: 10px 14px;
-    border-radius: 10px;
-    font-size: 15px;
-    font-weight: 500;
-    color: #051B0D;
-    text-decoration: none;
-}
-
-.user-dropdown .dropdown-link:hover {
-    background-color: #D3F3DC;
-}
-
-/* Separador visual */
-.user-dropdown .menu-separator {
-    height: 1px;
-    background-color: rgba(0,0,0,0.1);
-    margin: 6px 0;
-}
-
-/* Ajuste del formulario logout */
-.user-dropdown form {
-    margin: 0;
-}
-
-/* Boton logout dentro del menu */
-.user-dropdown .logout-btn {
-    margin-top: 2px;
-}
-
 #headadmin,
 #headrefugio {
-    position: fixed;
-    top: var(--altura-header-up);
-    left: 0;
-    right: 0;
-    z-index: 900;
-    padding: 10px 100px 20px 100px;
+    /* Aquí quitamos el position fixed para que fluya naturalmente debajo del headerup */
+    padding: 10px 100px 15px 100px;
     display: flex;
     justify-content: space-between;
-    background-color: rgba(255,255,255,1);
-    border-bottom: 1px solid rgba(0,0,0,0.1);
-    transition: transform 0.25s linear;
+    background-color: #ffffff;
+    border-bottom: 1px solid rgba(0,0,0,0.05);
 }
 
 #headadmin nav,
@@ -230,12 +114,85 @@ header a:hover {
     margin: auto;
 }
 
+#header-spacer {
+    display: none;
+}
 
+/* ========================================
+   MENÚ USUARIO (ADMIN/LOGOUT)
+   ======================================== */
+.user-menu {
+    position: relative;
+    display: inline-block;
+}
 
-body.scroll-hide-header #headerup,
-body.scroll-hide-header #headadmin,
-body.scroll-hide-header #headrefugio {
-    transform: translateY(calc(var(--altura-header-up) * -1));
+.user-button {
+    background: transparent;
+    border: none;
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--color-primary);
+    cursor: pointer;
+    padding: 6px 10px;
+}
+
+.user-button:hover {
+    color: var(--color-primary-dark);
+}
+
+.user-dropdown {
+    position: absolute;
+    right: 0;
+    top: 100%;
+    background-color: #ffffff;
+    border-radius: 14px;
+    box-shadow: 0px 4px 12px rgba(0,0,0,0.15);
+    padding: 10px;
+    min-width: 180px;
+    display: none;
+    z-index: 2000;
+}
+
+.user-menu:hover .user-dropdown {
+    display: block;
+}
+
+.user-dropdown form {
+    margin: 0;
+}
+
+.user-dropdown .dropdown-link {
+    display: block;
+    padding: 10px 14px;
+    border-radius: 10px;
+    font-size: 15px;
+    font-weight: 500;
+    color: #051B0D;
+    text-decoration: none;
+    margin-bottom: 5px;
+}
+
+.user-dropdown .dropdown-link:hover {
+    background-color: #D3F3DC;
+}
+
+.logout-btn {
+    background: #ef4444;
+    color: white;
+    padding: 8px 20px;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    font-weight: 600;
+    text-decoration: none;
+    display: block;
+    width: 100%;
+    text-align: center;
+    box-sizing: border-box;
+}
+
+.logout-btn:hover {
+    background: #dc2626;
 }
 
 

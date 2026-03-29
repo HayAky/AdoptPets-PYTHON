@@ -44,9 +44,15 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="edadAproximada">Edad Aproximada (años)</label>
-                        <input type="number" id="edadAproximada" name="edadAproximada" value="{{ mascota.edad_aproximada|default:'' }}" min="0">
+                        <label for="edadAproximada">Edad Aproximada</label>
+                        <div style="display: flex; align-items: center;">
+                            <input type="number" id="edadAproximada" name="edadAproximada"
+                                   value="{{ mascota.edad_aproximada|default:'' }}" min="0"
+                                   style="width: 100px;">
+                            <span style="margin-left: 10px; color: #666;">años</span>
+                        </div>
                     </div>
+
                 </div>
 
                 <div class="form-row">
@@ -135,9 +141,9 @@
 
                     <div class="form-group">
                         <label for="fechaIngreso">Fecha de Ingreso</label>
-                        <input type="date" id="fechaIngreso" name="fechaIngreso" value="{{ mascota.fecha_ingreso|date:'Y-m-d' }}">
+                        <input type="date" id="fechaIngreso" name="fechaIngreso" value="{% if mascota.fecha_ingreso %}{{ mascota.fecha_ingreso|date:'Y-m-d' }}{% else %}{% now 'Y-m-d' %}{% endif %}"
+                        max="{% now 'Y-m-d' %}">
                     </div>
-                </div>
 
                 <div class="form-buttons">
                     <button type="submit" class="btn btn-primary">💾 Guardar Mascota</button>

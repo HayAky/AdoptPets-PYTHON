@@ -1,23 +1,21 @@
 {% load static %}
 
-{% if request.user.is_authenticated and request.user.is_superuser %}
+{% if request.user.is_authenticated and request.user.es_admin %}
 <header>
     <div class="contenedor" id="headerup">
-        <a href="/" class="logo">
+        <a href="{% url 'inicio' %}" class="logo">
             <img src="{% static 'img/AdoptPets (1).png' %}" alt="logo de la pagina">
         </a>
         <nav>
             <div class="user-menu">
                 <button class="user-button" type="button">
-                    <span>{{ request.user.nombre|default:"Admin" }}</span>
+                    <span>{{ request.user.nombre }} (Admin)</span>
                 </button>
 
                 <div class="user-dropdown">
-                    <form action="/logout/" method="post">
+                    <form action="{% url 'logout' %}" method="post">
                         {% csrf_token %}
-                        <button type="submit" class="logout-btn">
-                            Cerrar sesión
-                        </button>
+                        <button type="submit" class="logout-btn">Cerrar sesión</button>
                     </form>
                 </div>
             </div>
@@ -26,39 +24,37 @@
 
     <div class="headadmin" id="headadmin">
         <nav>
-            <a href="/">Ir al sitio</a>
-            <a href="/admin/">Dashboard</a>
-            <a href="{% url 'lista_mascotas' %}">Mascotas</a>
-            <a href="{% url 'lista_adopciones' %}">Adopciones</a>
-            <a href="{% url 'lista_refugios' %}">Refugios</a>
-            <a href="{% url 'lista_usuarios' %}">Usuarios</a>
-            <a href="{% url 'panel_reportes' %}">Reportes</a>
+            <a href="{% url 'inicio' %}">Ir al sitio</a>
+            <a href="{% url 'admin_dashboard' %}">Dashboard</a>
+            <a href="{% url 'admin_lista_mascotas' %}">Mascotas</a>
+            <a href="{% url 'admin_lista_adopciones' %}">Adopciones</a>
+            <a href="{% url 'admin_lista_refugios' %}">Refugios</a>
+            <a href="{% url 'admin_lista_usuarios' %}">Usuarios</a>
+            <a href="#">Reportes</a>
         </nav>
     </div>
     <div id="header-spacer"></div>
 </header>
 
-{% elif request.user.is_authenticated and request.user.is_staff %}
+{% elif request.user.is_authenticated and request.user.es_refugio %}
 <header>
     <div class="contenedor" id="headerup">
-        <a href="/" class="logo">
+        <a href="{% url 'inicio' %}" class="logo">
             <img src="{% static 'img/AdoptPets (1).png' %}" alt="logo de la pagina">
         </a>
         <nav>
             <div class="user-menu">
                 <button class="user-button" type="button">
-                    <span>{{ request.user.nombre|default:"Refugio" }}</span>
+                    <span>{{ request.user.nombre }} (Refugio)</span>
                 </button>
 
                 <div class="user-dropdown">
-                    <a href="/refugio/perfil/" class="dropdown-link" style="display:block; padding: 10px 20px; color: #333; text-decoration: none;">
+                    <a href="#" class="dropdown-link" style="display:block; padding: 10px 20px; color: #333; text-decoration: none;">
                         Configurar Refugio
                     </a>
-                    <form action="/logout/" method="post">
+                    <form action="{% url 'logout' %}" method="post">
                         {% csrf_token %}
-                        <button type="submit" class="logout-btn">
-                            Cerrar sesión
-                        </button>
+                        <button type="submit" class="logout-btn">Cerrar sesión</button>
                     </form>
                 </div>
             </div>
@@ -67,10 +63,10 @@
 
     <div class="headadmin" id="headrefugio">
         <nav>
-            <a href="/">Ir al sitio</a>
-            <a href="/refugio/dashboard/">Dashboard</a>
-            <a href="{% url 'lista_mascotas' %}">Mis Mascotas</a>
-            <a href="{% url 'lista_adopciones' %}">Solicitudes</a>
+            <a href="{% url 'inicio' %}">Ir al sitio</a>
+            <a href="{% url 'dashboard_refugio' %}">Dashboard</a>
+            <a href="{% url 'admin_lista_mascotas' %}">Mis Mascotas</a>
+            <a href="#">Solicitudes</a>
             <a href="#">Contáctanos</a>
         </nav>
     </div>
@@ -80,7 +76,7 @@
 {% else %}
 <header>
     <div class="contenedor">
-        <a href="/" class="logo">
+        <a href="{% url 'inicio' %}" class="logo">
             <img src="{% static 'img/AdoptPets (1).png' %}" alt="logo de la pagina">
         </a>
 
@@ -90,25 +86,21 @@
             <a href="#">Contáctanos</a>
 
             {% if not request.user.is_authenticated %}
-            <a href="/login/" class="boton">
+            <a href="{% url 'login' %}" class="boton">
                 Iniciar sesión
             </a>
-            
+
             {% else %}
             <div class="user-menu">
                 <button class="user-button" type="button">
-                    <span>{{ request.user.nombre|default:"Usuario" }}</span>
+                    <span>{{ request.user.nombre }}</span>
                 </button>
 
                 <div class="user-dropdown">
-                    <a href="/adoptante/perfil/" class="dropdown-link">
-                        Mi perfil
-                    </a>
-                    <form action="/logout/" method="post">
+                    <a href="{% url 'perfil_adoptante' %}" class="dropdown-link">Mi perfil</a>
+                    <form action="{% url 'logout' %}" method="post">
                         {% csrf_token %}
-                        <button type="submit" class="logout-btn">
-                            Cerrar sesión
-                        </button>
+                        <button type="submit" class="logout-btn">Cerrar sesión</button>
                     </form>
                 </div>
             </div>

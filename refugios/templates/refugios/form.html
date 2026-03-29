@@ -76,6 +76,21 @@
                     <textarea id="descripcion" name="descripcion" placeholder="Describe las características...">{{ refugio.descripcion|default:'' }}</textarea>
                 </div>
 
+                <div class="form-group" style="background: #f8f9fa; padding: 15px; border-radius: 8px; border-left: 4px solid #0ea5e9;">
+                    <label for="usuarioEncargado" style="color: #0ea5e9;">👤 Vincular Cuenta de Usuario (Opcional)</label>
+                    <p style="font-size: 12px; color: #666; margin-top: 0; margin-bottom: 10px;">
+                        Selecciona qué cuenta de sistema administrará este refugio. Solo aparecen usuarios con rol "REFUGIO".
+                    </p>
+                    <select id="usuarioEncargado" name="usuarioEncargado">
+                        <option value="">-- Sin usuario digital asignado --</option>
+                        {% for usuario in usuarios_refugio %}
+                            <option value="{{ usuario.id_usuario }}"
+                                {% if refugio.usuario_encargado and refugio.usuario_encargado.id_usuario == usuario.id_usuario %}selected{% endif %}>
+                                {{ usuario.nombre }} {{ usuario.apellido }} ({{ usuario.email }})
+                            </option>
+                        {% endfor %}
+                    </select>
+                </div>
                 <div class="checkbox-item">
                     <input type="checkbox" id="activo" name="activo" {% if not refugio or refugio.activo %}checked{% endif %}>
                     <label for="activo">Refugio Activo</label>

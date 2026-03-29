@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Gestión de Adopciones - AdoptPets{% endblock %}
+
+{% block extra_css %}
+    <link href="{% static 'css/admin_listas.css' %}" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+<div class="admin-layout">
+    <main class="main-content">
+        <div class="page-header">
+            <h1>Gestión de Solicitudes de Adopción</h1>
+            </div>
+
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert {% if message.tags == 'success' %}alert-success{% elif message.tags == 'warning' %}alert-warning{% else %}alert-info{% endif %}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <div class="content-card">
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>Fecha</th>
+                        <th>Adoptante</th>
+                        <th>Mascota</th>
+                        <th>Refugio</th>
+                        <th>Estado</th>
+                        <th>Acciones</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for adopcion in adopciones %}
+                    <tr>
+                        <td>{{ adopcion.id_adopcion }}</td>
+                        <td>{{ adopcion.fecha_solicitud|date:"d/m/Y" }}</td>
+                        <td><strong>{{ adopcion.adoptante.nombre }} {{ adopcion.adoptante.apellido }}</strong></td>
+                        <td>{{ adopcion.mascota.nombre }} ({{ adopcion.mascota.especie }})</td>
+                        <td>{{ adopcion.mascota.refugio.nombre_refugio|default:"-" }}</td>
+                        <td>
+                            <span class="badge 
+                                {% if adopcion.estado_adopcion == 'pendiente' %}badge-process
+                                {% elif adopcion.estado_adopcion == 'aprobada' %}badge-available
+                                {% else %}badge-danger{% endif %}"
+                                {% if adopcion.estado_adopcion == 'rechazada' %}style="background: #fee2e2; color: #991b1b;"{% endif %}>
+                                {{ adopcion.estado_adopcion|upper }}
+                            </span>
+                        </td>
+                        <td>
+                            <a href="{% url 'admin_detalle_adopcion' adopcion.id_adopcion %}" class="btn btn-primary btn-sm">
+                                🔍 Revisar
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" style="text-align: center; padding: 40px; color: #999;">
+                            No hay solicitudes de adopción registradas aún.
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </main>
+</div>
+{% endblock %}

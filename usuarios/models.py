@@ -61,3 +61,16 @@ class Usuario(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self):
         return f"{self.nombre} {self.apellido}"
+
+    @property
+    def es_admin(self):
+        # Buscamos 'ADMIN' o 'ROLE_ADMIN' por si importaste datos antiguos de Java
+        return self.is_superuser or self.roles.filter(nombre_rol__in=['ADMIN', 'ROLE_ADMIN']).exists()
+
+    @property
+    def es_refugio(self):
+        return self.roles.filter(nombre_rol__in=['REFUGIO', 'ROLE_REFUGIO']).exists()
+
+    @property
+    def es_adoptante(self):
+        return self.roles.filter(nombre_rol__in=['ADOPTANTE', 'ROLE_ADOPTANTE']).exists()

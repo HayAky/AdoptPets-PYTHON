@@ -4,9 +4,11 @@ from django.contrib import messages
 from .models import Usuario, Rol
 from mascotas.models import Mascota
 from refugios.models import Refugio
+from django.contrib.auth import get_user_model
+from django.contrib.auth.hashers import make_password
 from adopciones.models import Adopcion
 from .decorators import roles_permitidos
-
+from django.shortcuts import render, redirect, get_object_or_404
 
 def lista_usuarios(request):
     usuarios = Usuario.objects.all()
@@ -91,3 +93,178 @@ def admin_dashboard(request):
     }
 
     return render(request, 'admin/dashboard.html', context)
+
+
+
+# =========================================================
+# GESTIÓN DE USUARIOS (Solo Admin)
+# =========================================================
+
+@roles_permitidos(['ADMIN'])
+def admin_lista_usuarios(request):
+    todos_los_usuarios = Usuario.objects.all().prefetch_related('roles')
+
+    # 1. Filtramos los usuarios por sus roles
+    # En Django, usamos filter(roles__nombre_rol='NOMBRE') para buscar en la tabla Muchos a Muchos
+    adoptantes = todos_los_usuarios.filter(roles__nombre_rol='ADOPTANTE').distinct()
+    refugios = todos_los_usuarios.filter(roles__nombre_rol='REFUGIO').distinct()
+
+    # 2. Calculamos estadísticas
+    cantidad_activos = todos_los_usuarios.filter(is_active=True).count()
+
+    context = {
+        'usuarios': todos_los_usuarios,
+        'adoptantes': adoptantes,
+        'listaRefugios': refugios,
+        'cantidadActivos': cantidad_activos,
+        'cantidadAdoptantes': adoptantes.count(),
+        'cantidadRefugios': refugios.count(),
+    }
+    return render(request, 'usuarios/admin_lista.html', context)
+
+
+@roles_permitidos(['ADMIN'])
+def crear_usuario(request):
+    todos_los_roles = Rol.objects.all()
+
+    if request.method == 'POST':
+        email = request.POST.get('email')
+        password = request.POST.get('password')  # Contraseña inicial
+        nombre = request.POST.get('nombre')
+        apellido = request.POST.get('apellido')
+        cedula = request.POST.get('cedula')
+        telefono = request.POST.get('telefono')
+        ciudad = request.POST.get('ciudad')
+        direccion = request.POST.get('direccion')
+
+        # 1. Verificar que el correo no esté en uso
+        if Usuario.objects.filter(email=email).exists():
+            messages.error(request, f'Error: El correo {email} ya está registrado.')
+            return redirect('crear_usuario')
+
+        # 2. Crear el usuario (create_user encripta la contraseña automáticamente)
+        usuario = Usuario.objects.create_user(
+            email=email,
+            nombre=nombre,
+            apellido=apellido,
+            password=password,
+            cedula=cedula,
+            telefono=telefono,
+            ciudad=ciudad,
+            direccion=direccion
+        )
+
+        # 3. Asignar los roles seleccionados (Ej: REFUGIO)
+        roles_ids = request.POST.getlist('rolesIds')
+        if roles_ids:
+            for rol_id in roles_ids:
+                rol = Rol.objects.get(id_rol=rol_id)
+                usuario.roles.add(rol)
+
+        messages.success(request, f'Usuario {nombre} {apellido} creado exitosamente.')
+        return redirect('admin_lista_usuarios')
+
+    context = {
+        'todosLosRoles': todos_los_roles,
+        'roles_usuario_ids': []  # Lista vacía porque es un usuario nuevo
+    }
+    return render(request, 'usuarios/form.html', context)
+@roles_permitidos(['ADMIN'])
+def editar_usuario(request, usuario_id):
+    usuario = get_object_or_404(Usuario, id_usuario=usuario_id)
+    todos_los_roles = Rol.objects.all()
+
+    if request.method == 'POST':
+        # Actualizamos datos básicos
+        usuario.nombre = request.POST.get('nombre')
+        usuario.apellido = request.POST.get('apellido')
+        usuario.cedula = request.POST.get('cedula')
+        usuario.fecha_nacimiento = request.POST.get('fechaNacimiento') or None
+        usuario.telefono = request.POST.get('telefono')
+        usuario.ciudad = request.POST.get('ciudad')
+        usuario.direccion = request.POST.get('direccion')
+
+        # Mapeamos 'activo' a 'is_active' de Django
+        usuario.is_active = request.POST.get('activo') == 'on'
+
+        usuario.save()
+
+        # Actualizamos roles (Se recibe una lista de IDs desde los checkboxes)
+        roles_ids = request.POST.getlist('rolesIds')
+        if roles_ids:
+            # Limpiamos los roles actuales y asignamos los nuevos
+            usuario.roles.clear()
+            for rol_id in roles_ids:
+                rol = Rol.objects.get(id_rol=rol_id)
+                usuario.roles.add(rol)
+
+        messages.success(request, 'Usuario actualizado exitosamente')
+        return redirect('admin_lista_usuarios')
+
+    context = {
+        'usuario': usuario,
+        'todosLosRoles': todos_los_roles,
+        # Pasamos una lista plana de IDs de roles para marcar los checkboxes en el HTML
+        'roles_usuario_ids': list(usuario.roles.values_list('id_rol', flat=True))
+    }
+    return render(request, 'usuarios/form.html', context)
+
+
+@roles_permitidos(['ADMIN'])
+def eliminar_usuario(request, usuario_id):
+    usuario = get_object_or_404(Usuario, id_usuario=usuario_id)
+    # Evitar que el admin se borre a sí mismo
+    if request.user.id_usuario == usuario.id_usuario:
+        messages.error(request, 'No puedes eliminar tu propia cuenta de administrador.')
+        return redirect('admin_lista_usuarios')
+
+    usuario.delete()
+    messages.success(request, 'Usuario eliminado correctamente.')
+    return redirect('admin_lista_usuarios')
+
+
+@roles_permitidos(['ADMIN'])
+def resetear_password(request, usuario_id):
+    usuario = get_object_or_404(Usuario, id_usuario=usuario_id)
+    # set_password encripta la contraseña automáticamente
+    usuario.set_password('123456')
+    usuario.save()
+    messages.success(request, f'Contraseña de {usuario.nombre} reseteada a: 123456')
+    return redirect(request.META.get('HTTP_REFERER', 'admin_lista_usuarios'))
+
+
+@roles_permitidos(['ADMIN'])
+def toggle_usuario(request, usuario_id):
+    if request.method == 'POST':
+        usuario = get_object_or_404(Usuario, id_usuario=usuario_id)
+        if request.user.id_usuario == usuario.id_usuario:
+            messages.error(request, 'No puedes desactivar tu propia cuenta.')
+        else:
+            usuario.is_active = not usuario.is_active
+            usuario.save()
+            estado = "activado" if usuario.is_active else "desactivado"
+            messages.success(request, f'Usuario {estado} exitosamente.')
+    return redirect('admin_lista_usuarios')
+
+
+@roles_permitidos(['ADOPTANTE'])
+def perfil_adoptante(request):
+    usuario = request.user
+
+    if request.method == 'POST':
+        usuario.nombre = request.POST.get('nombre')
+        usuario.apellido = request.POST.get('apellido')
+        usuario.telefono = request.POST.get('telefono')
+        usuario.direccion = request.POST.get('direccion')
+        usuario.ciudad = request.POST.get('ciudad')
+        # La cédula y fecha de nacimiento normalmente no se cambian tan fácil, pero las incluimos
+        usuario.cedula = request.POST.get('cedula') or usuario.cedula
+        usuario.save()
+
+        messages.success(request, 'Tus datos han sido actualizados correctamente.')
+        return redirect('perfil_adoptante')
+
+    # Traemos el historial de solicitudes de ESTE usuario específico
+    mis_adopciones = Adopcion.objects.filter(adoptante=usuario).order_by('-fecha_solicitud')
+
+    return render(request, 'usuarios/perfil_adoptante.html', {'mis_adopciones': mis_adopciones})

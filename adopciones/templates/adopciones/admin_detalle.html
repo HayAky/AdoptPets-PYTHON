@@ -1,0 +1,82 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Detalle de Adopción - AdoptPets{% endblock %}
+
+{% block extra_css %}
+    <link href="{% static 'css/admin_listas.css' %}" rel="stylesheet">
+    <style>
+        .detail-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; margin-bottom: 30px; }
+        .detail-card { background: white; padding: 25px; border-radius: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
+        .detail-card h3 { color: #22C55E; margin-top: 0; border-bottom: 2px solid #f0f0f0; padding-bottom: 10px; margin-bottom: 20px; }
+        .info-row { display: flex; margin-bottom: 15px; border-bottom: 1px dashed #f0f0f0; padding-bottom: 10px; }
+        .info-label { font-weight: 600; color: #666; width: 150px; flex-shrink: 0; }
+        .info-value { color: #333; font-weight: 500; }
+        .action-panel { background: white; padding: 30px; border-radius: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); text-align: center; }
+        .btn-large { padding: 15px 40px; font-size: 16px; margin: 0 10px; border-radius: 30px; }
+    </style>
+{% endblock %}
+
+{% block content %}
+<div class="admin-layout">
+    <main class="main-content">
+        <div class="page-header">
+            <h1>Revisión de Solicitud #{{ adopcion.id_adopcion }}</h1>
+            <a href="{% url 'admin_lista_adopciones' %}" class="btn btn-secondary">← Volver a la lista</a>
+        </div>
+
+        <div style="text-align: center; margin-bottom: 30px;">
+            <span style="font-size: 18px; color: #666;">Estado de la solicitud: </span>
+            <span class="badge" style="font-size: 18px; padding: 10px 20px; 
+                {% if adopcion.estado_adopcion == 'pendiente' %}background: #fef3c7; color: #92400e;
+                {% elif adopcion.estado_adopcion == 'aprobada' %}background: #d1fae5; color: #065f46;
+                {% else %}background: #fee2e2; color: #991b1b;{% endif %}">
+                {{ adopcion.estado_adopcion|upper }}
+            </span>
+        </div>
+
+        <div class="detail-grid">
+            <div class="detail-card">
+                <h3>👤 Datos del Adoptante</h3>
+                <div class="info-row"><div class="info-label">Nombre:</div><div class="info-value">{{ adopcion.adoptante.nombre }} {{ adopcion.adoptante.apellido }}</div></div>
+                <div class="info-row"><div class="info-label">Cédula/Doc:</div><div class="info-value">{{ adopcion.adoptante.cedula|default:"No registrado" }}</div></div>
+                <div class="info-row"><div class="info-label">Email:</div><div class="info-value">{{ adopcion.adoptante.email }}</div></div>
+                <div class="info-row"><div class="info-label">Teléfono:</div><div class="info-value">{{ adopcion.adoptante.telefono|default:"No registrado" }}</div></div>
+                <div class="info-row"><div class="info-label">Ciudad:</div><div class="info-value">{{ adopcion.adoptante.ciudad }}</div></div>
+                <div class="info-row"><div class="info-label">Dirección:</div><div class="info-value">{{ adopcion.adoptante.direccion|default:"No registrado" }}</div></div>
+            </div>
+
+            <div class="detail-card">
+                <h3>🐾 Datos de la Mascota</h3>
+                <div class="info-row"><div class="info-label">Nombre:</div><div class="info-value">{{ adopcion.mascota.nombre }}</div></div>
+                <div class="info-row"><div class="info-label">Especie y Raza:</div><div class="info-value">{{ adopcion.mascota.especie }} - {{ adopcion.mascota.raza|default:"Mestizo" }}</div></div>
+                <div class="info-row"><div class="info-label">Edad Aprox:</div><div class="info-value">{{ adopcion.mascota.edad_aproximada|default:"-" }} años</div></div>
+                <div class="info-row"><div class="info-label">Refugio:</div><div class="info-value">{{ adopcion.mascota.refugio.nombre_refugio|default:"Sin refugio asignado" }}</div></div>
+                <div class="info-row"><div class="info-label">Estado actual:</div><div class="info-value">{{ adopcion.mascota.estado_adopcion|upper }}</div></div>
+            </div>
+        </div>
+
+        {% if adopcion.estado_adopcion == 'pendiente' %}
+        <div class="action-panel">
+            <h3 style="margin-top: 0; color: #333;">Tomar una decisión</h3>
+            <p style="color: #666; margin-bottom: 25px;">Revisa cuidadosamente la información antes de aprobar o rechazar esta solicitud.</p>
+            
+            <form method="post" action="" style="display: flex; justify-content: center; gap: 20px;">
+                {% csrf_token %}
+                
+                <button type="submit" name="estado" value="aprobada" class="btn btn-primary btn-large" 
+                        onclick="return confirm('¿Estás seguro de APROBAR esta adopción? La mascota pasará a estado Adoptado.')">
+                    ✅ Aprobar Solicitud
+                </button>
+                
+                <button type="submit" name="estado" value="rechazada" class="btn btn-danger btn-large" style="background: #ef4444;"
+                        onclick="return confirm('¿Estás seguro de RECHAZAR esta adopción?')">
+                    ❌ Rechazar Solicitud
+                </button>
+            </form>
+        </div>
+        {% endif %}
+
+    </main>
+</div>
+{% endblock %}

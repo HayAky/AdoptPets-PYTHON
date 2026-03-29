@@ -1,4 +1,5 @@
 from django.db import models
+from usuarios.models import Usuario
 
 class Refugio(models.Model):
     id_refugio = models.BigAutoField(primary_key=True)
@@ -12,6 +13,9 @@ class Refugio(models.Model):
     descripcion = models.TextField(null=True, blank=True)
     activo = models.BooleanField(default=True)
     fecha_registro = models.DateTimeField(auto_now_add=True)
+    usuario_encargado = models.OneToOneField(Usuario, on_delete=models.SET_NULL, null=True, blank=True,
+                                             related_name='mi_refugio')
+
 
     class Meta:
         db_table = 'refugios'

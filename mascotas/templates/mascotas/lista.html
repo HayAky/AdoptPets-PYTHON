@@ -1,16 +1,106 @@
 {% extends 'base.html' %}
 {% load static %}
 
-{% block title %}Adoptar Mascota - AdoptPets{% endblock %}
+{% block title %}Adoptar - AdoptPets{% endblock %}
 
 {% block extra_css %}
-    <link href="{% static 'css/adoptlista.css' %}" rel="stylesheet">
+    <style>
+        .vitrina-container { max-width: 1200px; margin: 40px auto; padding: 0 20px; }
+        .vitrina-header { text-align: center; margin-bottom: 40px; }
+        .vitrina-header h1 { color: #22C55E; font-size: 36px; margin-bottom: 10px; }
+        .vitrina-header p { color: #666; font-size: 18px; }
+
+        .grid-mascotas { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 30px; }
+
+        .mascota-card { background: white; border-radius: 20px; overflow: hidden; box-shadow: 0 4px 15px rgba(0,0,0,0.05); transition: transform 0.3s ease, box-shadow 0.3s ease; display: flex; flex-direction: column; }
+        .mascota-card:hover { transform: translateY(-10px); box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+
+        /* Como aún no subimos imágenes reales, usamos un color de fondo dinámico según la especie */
+        .mascota-imagen { height: 200px; display: flex; align-items: center; justify-content: center; font-size: 80px; }
+        .bg-perro { background: #fee2e2; }
+        .bg-gato { background: #dbeafe; }
+        .bg-conejo { background: #d1fae5; }
+        .bg-otro { background: #fef3c7; }
+
+        .mascota-info { padding: 25px; flex-grow: 1; display: flex; flex-direction: column; }
+        .mascota-nombre { font-size: 24px; color: #333; margin: 0 0 10px 0; font-weight: bold; }
+        .mascota-tags { display: flex; gap: 10px; margin-bottom: 15px; flex-wrap: wrap; }
+        .tag { background: #f3f4f6; color: #4b5563; padding: 5px 12px; border-radius: 15px; font-size: 12px; font-weight: 600; }
+
+        .mascota-desc { color: #666; font-size: 14px; line-height: 1.6; margin-bottom: 20px; flex-grow: 1; }
+
+        .btn-adoptar { background: #22C55E; color: white; border: none; padding: 12px; width: 100%; border-radius: 10px; font-size: 16px; font-weight: bold; cursor: pointer; transition: background 0.3s; text-decoration: none; text-align: center; }
+        .btn-adoptar:hover { background: #1B9E4B; }
+
+        .alerta-container { margin-bottom: 30px; }
+        .alerta-mensaje { padding: 15px; border-radius: 10px; background: #d1fae5; color: #065f46; text-align: center; font-weight: bold; border: 1px solid #6ee7b7; margin-bottom: 10px; }
+        .alerta-error { background: #fee2e2; color: #991b1b; border: 1px solid #fca5a5; }
+        .alerta-warning { background: #fef3c7; color: #92400e; border: 1px solid #fcd34d; }
+    </style>
 {% endblock %}
 
 {% block content %}
-<div class="container">
-    <h1 class="page-title">🐾 Encuentra tu Compañero Perfecto</h1>
-    <p class="page-subtitle">Estas adorables mascotas están esperando por un hogar lleno de amor</p>
-
+<div class="vitrina-container">
+    <div class="vitrina-header">
+        <h1>🐾 Encuentra a tu Nuevo Mejor Amigo</h1>
+        <p>Estas hermosas mascotas están esperando una segunda oportunidad. ¡Adopta y salva una vida!</p>
     </div>
+
+    {% if messages %}
+        <div class="alerta-container">
+            {% for message in messages %}
+                <div class="alerta-mensaje {% if message.tags == 'error' %}alerta-error{% elif message.tags == 'warning' %}alerta-warning{% endif %}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+    <div class="grid-mascotas">
+        {% for mascota in mascotas %}
+        <div class="mascota-card">
+            <div class="mascota-imagen
+                {% if mascota.especie == 'perro' %}bg-perro{% elif mascota.especie == 'gato' %}bg-gato
+                {% elif mascota.especie == 'conejo' %}bg-conejo{% else %}bg-otro{% endif %}">
+                {% if mascota.especie == 'perro' %}🐶
+                {% elif mascota.especie == 'gato' %}🐱
+                {% elif mascota.especie == 'conejo' %}🐰
+                {% else %}🐾{% endif %}
+            </div>
+
+            <div class="mascota-info">
+                <h3 class="mascota-nombre">{{ mascota.nombre }}</h3>
+
+                <div class="mascota-tags">
+                    <span class="tag">🧬 {{ mascota.raza|default:"Mestizo" }}</span>
+                    <span class="tag">⚧️ {{ mascota.sexo|title }}</span>
+                    <span class="tag">📏 {{ mascota.tamano|title }}</span>
+                    {% if mascota.edad_aproximada %}
+                        <span class="tag">🎂 {{ mascota.edad_aproximada }} años</span>
+                    {% endif %}
+                </div>
+
+                <p class="mascota-desc">
+                    {{ mascota.descripcion|default:"Un alma dulce esperando ser parte de tu familia. ¡Anímate a conocerle!"|truncatewords:20 }}
+                </p>
+
+                {% if not request.user.is_authenticated %}
+                    <a href="{% url 'login' %}" class="btn-adoptar" style="background: #3b82f6;">Inicia Sesión para Adoptar</a>
+                {% elif request.user.es_adoptante %}
+                    <a href="{% url 'solicitar_adopcion' mascota.id_mascota %}" class="btn-adoptar" onclick="return confirm('¿Enviar solicitud de adopción para {{ mascota.nombre }}?')">
+                        ❤️ ¡Quiero Adoptarlo!
+                    </a>
+                {% else %}
+                    <button class="btn-adoptar" style="background: #9ca3af; cursor: not-allowed;" disabled>Eres Administrador/Refugio</button>
+                {% endif %}
+            </div>
+        </div>
+        {% empty %}
+        <div style="grid-column: 1 / -1; text-align: center; padding: 50px; background: white; border-radius: 20px;">
+            <h2>No hay mascotas disponibles en este momento 😢</h2>
+            <p style="color: #666;">Vuelve a revisar pronto, ¡siempre hay amiguitos necesitando hogar!</p>
+        </div>
+        {% endfor %}
+    </div>
+</div>
 {% endblock %}

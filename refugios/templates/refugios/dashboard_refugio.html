@@ -1,0 +1,91 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Mi Refugio - AdoptPets{% endblock %}
+
+{% block extra_css %}
+    <link href="{% static 'css/dashboardadmin.css' %}" rel="stylesheet">
+    <link href="{% static 'css/admin_listas.css' %}" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <div class="admin-layout">
+        <main class="main-content">
+            <div class="page-header" style="background: #e0f2fe; border-left: 5px solid #0ea5e9;">
+                <div>
+                    <h1 style="color: #0ea5e9; margin-bottom: 5px;">🏠 Panel de {{ refugio.nombre_refugio }}</h1>
+                    <p style="color: #666; margin: 0;">¡Hola, {{ request.user.nombre }}! Aquí está el resumen de tu sede.</p>
+                </div>
+                <a href="{% url 'crear_mascota' %}" class="btn" style="background: #0ea5e9; color: white;">
+                    ➕ Registrar Mascota
+                </a>
+            </div>
+
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert {% if message.tags == 'success' %}alert-success{% else %}alert-warning{% endif %}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <h3>Total Nuestras Mascotas</h3>
+                    <div class="number" style="color: #0ea5e9;">{{ totalMascotas }}</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Disponibles para Adopción</h3>
+                    <div class="number" style="color: #22c55e;">{{ mascotasDisponibles }}</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Nuevas Solicitudes</h3>
+                    <div class="number" style="color: #f59e0b;">{{ pendientesCount }}</div>
+                </div>
+                <div class="stat-card">
+                    <h3>Adopciones Exitosas</h3>
+                    <div class="number" style="color: #8b5cf6;">{{ aprobadasCount }}</div>
+                </div>
+            </div>
+
+            <div class="section" style="background: white; padding: 25px; border-radius: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-top: 30px;">
+                <h2 style="color: #333; margin-top: 0; margin-bottom: 20px;">Solicitudes Pendientes de Nuestras Mascotas</h2>
+                
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th>Fecha</th>
+                        <th>Mascota Solicitada</th>
+                        <th>Adoptante Interesado</th>
+                        <th>Estado</th>
+                        <th>Acción</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for adopcion in solicitudesPendientes %}
+                    <tr>
+                        <td>{{ adopcion.fecha_solicitud|date:"d/m/Y" }}</td>
+                        <td><strong>{{ adopcion.mascota.nombre }}</strong></td>
+                        <td>{{ adopcion.adoptante.nombre }} {{ adopcion.adoptante.apellido }}</td>
+                        <td><span class="badge badge-process">PENDIENTE</span></td>
+                        <td>
+                            <a href="{% url 'admin_detalle_adopcion' adopcion.id_adopcion %}" class="btn btn-sm" style="background: #0ea5e9; color: white;">
+                                🔍 Analizar
+                            </a>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" style="text-align: center; padding: 30px; color: #999;">
+                            No hay solicitudes pendientes en este momento. ¡Sigan promoviendo a sus mascotas!
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+</div>
+{% endblock %}

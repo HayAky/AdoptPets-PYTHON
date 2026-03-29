@@ -17,23 +17,10 @@
     {% include 'fragments/header.html' %}
 
     <main>
-        {% if messages %}
-            <div class="mensajes-globales" style="max-width: 800px; margin: 20px auto; text-align: center; padding: 0 20px;">
-                {% for message in messages %}
-                    <div style="padding: 15px; margin-bottom: 10px; border-radius: 8px; font-weight: bold;
-                                {% if message.tags == 'error' %}background-color: #fee2e2; color: #991b1b; border: 1px solid #f87171;
-                                {% elif message.tags == 'warning' %}background-color: #fef3c7; color: #92400e; border: 1px solid #fbbf24;
-                                {% elif message.tags == 'success' %}background-color: #d1fae5; color: #065f46; border: 1px solid #34d399;
-                                {% else %}background-color: #e0e7ff; color: #3730a3; border: 1px solid #818cf8;{% endif %}">
-                        {{ message }}
-                    </div>
-                {% endfor %}
-            </div>
-        {% endif %}
-
         {% block content %}
         {% endblock %}
     </main>
+
     {% include 'fragments/footer-old.html' %}
 
 </body>
