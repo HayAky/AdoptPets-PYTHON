@@ -5,29 +5,60 @@ from refugios.models import Refugio
 from django.db.models import Q
 from usuarios.decorators import roles_permitidos
 
+
 def lista_mascotas(request):
-    # Base: solo mascotas disponibles
     mascotas = Mascota.objects.filter(estado_adopcion='disponible').order_by('-fecha_registro')
 
-    # Capturamos los filtros de la URL (si existen)
+    # 1. Capturamos TODOS los posibles filtros de la URL
     busqueda = request.GET.get('busqueda', '')
     especie = request.GET.get('especie', '')
+    sexo = request.GET.get('sexo', '')
+    tamano = request.GET.get('tamano', '')
+    raza = request.GET.get('raza', '')
+    edad_min = request.GET.get('edadMin', '')
+    edad_max = request.GET.get('edadMax', '')
+    vacunado = request.GET.get('vacunado')
+    esterilizado = request.GET.get('esterilizado')
+    microchip = request.GET.get('microchip')
 
-    # Aplicamos los filtros a la base de datos
     if busqueda:
-        # Busca si el texto coincide con el nombre O con la raza
-        mascotas = mascotas.filter(
-            Q(nombre__icontains=busqueda) |
-            Q(raza__icontains=busqueda)
-        )
-
+        mascotas = mascotas.filter(Q(nombre__icontains=busqueda) | Q(raza__icontains=busqueda))
     if especie:
         mascotas = mascotas.filter(especie=especie)
+    if sexo:
+        mascotas = mascotas.filter(sexo=sexo)
+    if tamano:
+        mascotas = mascotas.filter(tamano=tamano)
+    if raza:
+        mascotas = mascotas.filter(raza__icontains=raza)  # icontains busca coincidencias parciales
 
+    # Filtros numéricos (Rango de edades)
+    if edad_min:
+        mascotas = mascotas.filter(edad_aproximada__gte=edad_min)  # gte = Mayor o igual que
+    if edad_max:
+        mascotas = mascotas.filter(edad_aproximada__lte=edad_max)  # lte = Menor o igual que
+
+    # Filtros booleanos (Casillas de verificación)
+    if vacunado:
+        mascotas = mascotas.filter(vacunado=True)
+    if esterilizado:
+        mascotas = mascotas.filter(esterilizado=True)
+    if microchip:
+        mascotas = mascotas.filter(microchip=True)
+
+    # 3. Enviamos todo al contexto para mantener los valores en el formulario HTML
     context = {
         'mascotas': mascotas,
         'busqueda': busqueda,
         'especie': especie,
+        'sexo': sexo,
+        'tamano': tamano,
+        'raza': raza,
+        'edadMin': edad_min,
+        'edadMax': edad_max,
+        'vacunado': vacunado,
+        'esterilizado': esterilizado,
+        'microchip': microchip,
     }
     return render(request, 'mascotas/lista.html', context)
 
@@ -48,26 +79,27 @@ def admin_lista_mascotas(request):
 @roles_permitidos(['ADMIN', 'REFUGIO'])
 def crear_mascota(request):
     refugios = Refugio.objects.filter(activo=True)
-    # Buscamos la sede física de este usuario (solo si es refugio)
     mi_refugio = getattr(request.user, 'mi_refugio', None) if not request.user.es_admin else None
 
     if request.method == 'POST':
-        mascota = Mascota()
-        guardar_datos_mascota(request, mascota)
+        try:  # <--- INICIA EL BLINDAJE
+            mascota = Mascota()
+            guardar_datos_mascota(request, mascota)
 
-        # CANDADO 2: Asignación automática de sede
-        if request.user.es_admin:
-            # Si es admin, dejamos que él elija de la lista
-            refugio_id = request.POST.get('refugio')
-            if refugio_id:
-                mascota.refugio_id = refugio_id
-        else:
-            # Si es refugio, ignoramos el formulario y forzamos su propia sede
-            mascota.refugio = mi_refugio
+            if request.user.es_admin:
+                refugio_id = request.POST.get('refugio')
+                if refugio_id:
+                    mascota.refugio_id = refugio_id
+            else:
+                mascota.refugio = mi_refugio
 
-        mascota.save()
-        messages.success(request, 'Mascota registrada correctamente.')
-        return redirect('admin_lista_mascotas')
+            mascota.save()
+            messages.success(request, 'Mascota registrada correctamente.')
+            return redirect('admin_lista_mascotas')
+
+        except Exception as e:  # <--- SI ALGO FALLA, LO ATRAPAMOS AQUÍ
+            messages.error(request, f'Error crítico al guardar la mascota: {str(e)}')
+            # No hacemos redirect, dejamos que se vuelva a renderizar el formulario
 
     return render(request, 'mascotas/form.html', {'refugios': refugios, 'mi_refugio': mi_refugio})
 
@@ -78,24 +110,27 @@ def editar_mascota(request, mascota_id):
     refugios = Refugio.objects.filter(activo=True)
     mi_refugio = getattr(request.user, 'mi_refugio', None) if not request.user.es_admin else None
 
-    # CANDADO 3: Bloquear intento de editar mascota ajena
     if not request.user.es_admin and mascota.refugio != mi_refugio:
         messages.error(request, 'Acceso Denegado: Esta mascota pertenece a otro refugio.')
         return redirect('admin_lista_mascotas')
 
     if request.method == 'POST':
-        guardar_datos_mascota(request, mascota)
+        try:  # <--- INICIA EL BLINDAJE
+            guardar_datos_mascota(request, mascota)
 
-        if request.user.es_admin:
-            refugio_id = request.POST.get('refugio')
-            if refugio_id:
-                mascota.refugio_id = refugio_id
-        else:
-            mascota.refugio = mi_refugio
+            if request.user.es_admin:
+                refugio_id = request.POST.get('refugio')
+                if refugio_id:
+                    mascota.refugio_id = refugio_id
+            else:
+                mascota.refugio = mi_refugio
 
-        mascota.save()
-        messages.success(request, 'Mascota actualizada correctamente.')
-        return redirect('admin_lista_mascotas')
+            mascota.save()
+            messages.success(request, 'Mascota actualizada correctamente.')
+            return redirect('admin_lista_mascotas')
+
+        except Exception as e:  # <--- ATRAPAMOS EL ERROR
+            messages.error(request, f'Error al intentar actualizar: {str(e)}')
 
     return render(request, 'mascotas/form.html', {'mascota': mascota, 'refugios': refugios, 'mi_refugio': mi_refugio})
 
@@ -105,13 +140,17 @@ def eliminar_mascota(request, mascota_id):
     mascota = get_object_or_404(Mascota, id_mascota=mascota_id)
     mi_refugio = getattr(request.user, 'mi_refugio', None) if not request.user.es_admin else None
 
-    # CANDADO 4: Bloquear borrado de mascota ajena
     if not request.user.es_admin and mascota.refugio != mi_refugio:
         messages.error(request, 'Acceso Denegado: No puedes eliminar mascotas de otros refugios.')
         return redirect('admin_lista_mascotas')
 
-    mascota.delete()
-    messages.success(request, 'Mascota eliminada.')
+    try:  # <--- INICIA EL BLINDAJE
+        mascota.delete()
+        messages.success(request, 'Mascota eliminada del sistema.')
+    except Exception as e:  # <--- ATRAPAMOS EL ERROR (ej: base de datos bloqueada)
+        messages.error(request,
+                       f'No se pudo eliminar la mascota. Es posible que tenga adopciones vinculadas. Detalle: {str(e)}')
+
     return redirect('admin_lista_mascotas')
 
 

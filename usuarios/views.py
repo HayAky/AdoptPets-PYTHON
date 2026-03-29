@@ -38,28 +38,30 @@ def registro(request):
             return redirect('registro')
 
         # 3. Crear el usuario (create_user se encarga de encriptar el password)
-        user = Usuario.objects.create_user(
-            email=email,
-            nombre=nombre,
-            apellido=apellido,
-            password=password,
-            direccion=direccion,
-            telefono=telefono,
-            cedula=cedula,
-            fecha_nacimiento=fecha_nacimiento
-        )
+        try:
+            user = Usuario.objects.create_user(
+                email=email,
+                nombre=nombre,
+                apellido=apellido,
+                password=password,
+                direccion=direccion,
+                telefono=telefono,
+                cedula=cedula,
+                fecha_nacimiento=fecha_nacimiento
+            )
 
-        # 4. Asignar rol por defecto (Adoptante)
-        # get_or_create asegura que si el rol no existe en MySQL, lo crea en ese momento
-        rol_adoptante, created = Rol.objects.get_or_create(nombre_rol='ADOPTANTE')
-        user.roles.add(rol_adoptante)
+            # 4. Asignar rol por defecto
+            rol_adoptante, created = Rol.objects.get_or_create(nombre_rol='ADOPTANTE')
+            user.roles.add(rol_adoptante)
 
-        # 5. Iniciar sesión automáticamente y redirigir al inicio
-        login(request, user)
-        return redirect('inicio')
+            # 5. Iniciar sesión automáticamente
+            login(request, user)
+            messages.success(request, '¡Bienvenido a AdoptPets! Tu cuenta ha sido creada.')
+            return redirect('inicio')
 
-    # Si la petición es GET (solo entrar a la página), mostramos el formulario
-    return render(request, 'register.html')
+        except Exception as e:
+            messages.error(request, f'Ocurrió un error inesperado al crear tu cuenta: {str(e)}')
+            return redirect('registro')
 
 @roles_permitidos(['ADMIN'])
 def admin_dashboard(request):
@@ -73,14 +75,12 @@ def admin_dashboard(request):
     total_usuarios = Usuario.objects.count()
     total_refugios = Refugio.objects.count()
 
-    # --- 2. Listas Recientes para las tablas pequeñas ---
-    # Traemos las adopciones pendientes, ordenadas de la más antigua a la más nueva
+
     adopciones_pendientes_lista = Adopcion.objects.filter(estado_adopcion='pendiente').order_by('fecha_solicitud')[:5]
 
-    # Traemos las últimas 5 mascotas registradas que estén disponibles
+
     ultimas_mascotas = Mascota.objects.filter(estado_adopcion='disponible').order_by('-fecha_registro')[:5]
 
-    # --- 3. Empaquetar el contexto ---
     context = {
         'totalMascotas': total_mascotas,
         'mascotasDisponibles': mascotas_disponibles,
@@ -96,16 +96,12 @@ def admin_dashboard(request):
 
 
 
-# =========================================================
 # GESTIÓN DE USUARIOS (Solo Admin)
-# =========================================================
 
 @roles_permitidos(['ADMIN'])
 def admin_lista_usuarios(request):
     todos_los_usuarios = Usuario.objects.all().prefetch_related('roles')
 
-    # 1. Filtramos los usuarios por sus roles
-    # En Django, usamos filter(roles__nombre_rol='NOMBRE') para buscar en la tabla Muchos a Muchos
     adoptantes = todos_los_usuarios.filter(roles__nombre_rol='ADOPTANTE').distinct()
     refugios = todos_los_usuarios.filter(roles__nombre_rol='REFUGIO').distinct()
 
@@ -129,7 +125,7 @@ def crear_usuario(request):
 
     if request.method == 'POST':
         email = request.POST.get('email')
-        password = request.POST.get('password')  # Contraseña inicial
+        password = request.POST.get('password')
         nombre = request.POST.get('nombre')
         apellido = request.POST.get('apellido')
         cedula = request.POST.get('cedula')
@@ -142,31 +138,34 @@ def crear_usuario(request):
             messages.error(request, f'Error: El correo {email} ya está registrado.')
             return redirect('crear_usuario')
 
-        # 2. Crear el usuario (create_user encripta la contraseña automáticamente)
-        usuario = Usuario.objects.create_user(
-            email=email,
-            nombre=nombre,
-            apellido=apellido,
-            password=password,
-            cedula=cedula,
-            telefono=telefono,
-            ciudad=ciudad,
-            direccion=direccion
-        )
+        # 2
+        try:
+            usuario = Usuario.objects.create_user(
+                email=email,
+                nombre=nombre,
+                apellido=apellido,
+                password=password,
+                cedula=cedula,
+                telefono=telefono,
+                ciudad=ciudad,
+                direccion=direccion
+            )
 
-        # 3. Asignar los roles seleccionados (Ej: REFUGIO)
-        roles_ids = request.POST.getlist('rolesIds')
-        if roles_ids:
-            for rol_id in roles_ids:
-                rol = Rol.objects.get(id_rol=rol_id)
-                usuario.roles.add(rol)
+            roles_ids = request.POST.getlist('rolesIds')
+            if roles_ids:
+                for rol_id in roles_ids:
+                    rol = Rol.objects.get(id_rol=rol_id)
+                    usuario.roles.add(rol)
 
-        messages.success(request, f'Usuario {nombre} {apellido} creado exitosamente.')
-        return redirect('admin_lista_usuarios')
+            messages.success(request, f'Usuario {nombre} {apellido} creado exitosamente.')
+            return redirect('admin_lista_usuarios')
+
+        except Exception as e:
+            messages.error(request, f'Error al intentar guardar el usuario en la base de datos: {str(e)}')
 
     context = {
         'todosLosRoles': todos_los_roles,
-        'roles_usuario_ids': []  # Lista vacía porque es un usuario nuevo
+        'roles_usuario_ids': []
     }
     return render(request, 'usuarios/form.html', context)
 @roles_permitidos(['ADMIN'])
