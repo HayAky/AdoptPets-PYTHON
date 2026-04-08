@@ -4,6 +4,7 @@
 {% block title %}Reportes - AdoptPets{% endblock %}
 
 {% block extra_css %}
+    {{ block.super }}
     <style>
         .page-header { background: white; padding: 25px 30px; border-radius: 15px; margin-bottom: 25px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); }
         .page-header h1 { color: #22C55E; font-size: 28px; margin-bottom: 10px; }
@@ -85,6 +86,8 @@
                         <p style="margin: 0; color: #666; font-size: 14px;">Historial de solicitudes</p>
                     </div>
                 </div>
+
+
                 
                 <p style="color: #666; font-size: 14px; margin: 15px 0;">Utiliza el rango de fechas superior para filtrar los resultados.</p>
 
@@ -92,6 +95,35 @@
                     <a href="#" class="btn btn-excel" onclick="descargarAdopcionesExcel()">📊 Generar Excel</a>
                 </div>
             </div>
+
+            <div class="report-card">
+                <div class="report-header">
+                    <div class="report-icon" style="background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);">🏢</div>
+                    <div class="report-title">
+                        <h3 style="margin-top: 0;">Reporte de Refugios</h3>
+                        <p style="margin: 0; color: #666; font-size: 14px;">Directorio de aliados</p>
+                    </div>
+                </div>
+                <p style="color: #666; font-size: 14px; margin: 15px 0;">Descarga el listado completo de refugios aliados, su información de contacto y capacidad actual.</p>
+                <div class="button-group">
+                    <a href="{% url 'reporte_refugios_excel' %}" class="btn btn-excel">📊 Generar Excel</a>
+                </div>
+            </div>
+
+            <div class="report-card">
+                <div class="report-header">
+                    <div class="report-icon" style="background: linear-gradient(135deg, #8b5cf6 0%, #6d28d9 100%);">👥</div>
+                    <div class="report-title">
+                        <h3 style="margin-top: 0;">Reporte de Usuarios</h3>
+                        <p style="margin: 0; color: #666; font-size: 14px;">Base de datos de cuentas</p>
+                    </div>
+                </div>
+                <p style="color: #666; font-size: 14px; margin: 15px 0;">Obtén el registro completo de usuarios del sistema, incluyendo sus roles de acceso (Administradores, Adoptantes, Refugios).</p>
+                <div class="button-group">
+                    <a href="{% url 'reporte_usuarios_excel' %}" class="btn btn-excel">📊 Generar Excel</a>
+                </div>
+            </div>
+
         </div>
     </main>
 </div>

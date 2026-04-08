@@ -76,15 +76,27 @@ from django.contrib import messages
 # --- VISTA DE LISTA PARA EL ADMINISTRADOR ---
 @roles_permitidos(['ADMIN', 'REFUGIO'])
 def admin_lista_mascotas(request):
+    # 1. Capturamos lo que el usuario escriba en el buscador
+    busqueda = request.GET.get('busqueda', '')
+
+    # 2. Base de datos según el rol
     if request.user.es_admin:
-        # El administrador ve absolutamente todas las mascotas
-        todas_las_mascotas = Mascota.objects.all().order_by('-fecha_registro')
+        mascotas = Mascota.objects.all().order_by('-fecha_registro')
     else:
-        # CANDADO 1: El refugio ve SOLO las mascotas de su sede
-        todas_las_mascotas = Mascota.objects.filter(refugio__usuario_encargado=request.user).order_by('-fecha_registro')
+        mascotas = Mascota.objects.filter(refugio__usuario_encargado=request.user).order_by('-fecha_registro')
 
-    return render(request, 'mascotas/admin_lista.html', {'mascotas': todas_las_mascotas})
+    # 3. Si hay búsqueda, aplicamos el filtro múltiple
+    if busqueda:
+        mascotas = mascotas.filter(
+            Q(nombre__icontains=busqueda) |
+            Q(estado_adopcion__icontains=busqueda) |
+            Q(especie__icontains=busqueda)
+        )
 
+    return render(request, 'mascotas/admin_lista.html', {
+        'mascotas': mascotas,
+        'busqueda': busqueda  # Lo enviamos para que la barra no se borre
+    })
 
 @roles_permitidos(['ADMIN', 'REFUGIO'])
 def crear_mascota(request):

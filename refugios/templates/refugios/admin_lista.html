@@ -4,6 +4,7 @@
 {% block title %}Gestión de Refugios - AdoptPets{% endblock %}
 
 {% block extra_css %}
+    {{ block.super }}
     <link href="{% static 'css/admin_listas.css' %}" rel="stylesheet">
     <style>
         /* Estilos específicos para el Grid de Refugios que no están en el CSS global */
@@ -31,6 +32,19 @@
             <a href="{% url 'crear_refugio' %}" class="btn btn-primary">
                 ➕ Nuevo Refugio
             </a>
+        </div>
+
+        <div style="background: white; padding: 15px 20px; border-radius: 10px; margin-bottom: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); display: flex; justify-content: space-between; align-items: center;">
+            <form method="get" action="" style="display: flex; gap: 10px; width: 100%; max-width: 500px;">
+                <input type="text" name="busqueda" value="{{ busqueda }}" placeholder="Buscar por nombre, especie o estado..." style="flex-grow: 1; padding: 10px; border-radius: 8px; border: 1px solid #ccc;">
+                <button type="submit" class="btn btn-primary" style="padding: 10px 20px;">🔍 Buscar</button>
+                {% if busqueda %}
+                    <a href="{% url 'admin_lista_refugios' %}" class="btn btn-secondary" style="padding: 10px 20px; background: #6b7280; color: white; text-decoration: none; border-radius: 8px;">Limpiar</a>
+                {% endif %}
+            </form>
+            <div style="color: #666; font-size: 14px;">
+                Total: <strong>{{ refugios.count }}</strong> refugios(s)
+            </div>
         </div>
 
         {% if messages %}
