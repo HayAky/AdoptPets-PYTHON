@@ -4,15 +4,12 @@
 {% block title %}Gestión de Refugios - AdoptPets{% endblock %}
 
 {% block extra_css %}
-    {{ block.super }}
     <link href="{% static 'css/admin_listas.css' %}" rel="stylesheet">
     <style>
         /* Estilos específicos para el Grid de Refugios que no están en el CSS global */
         .refugios-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(350px, 1fr)); gap: 25px; }
         .refugio-card { background: white; border-radius: 15px; padding: 25px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); transition: all 0.3s; }
         .refugio-card:hover { transform: translateY(-5px); box-shadow: 0 5px 20px rgba(0,0,0,0.1); }
-        .refugio-header { display: flex; justify-content: space-between; align-items: start; margin-bottom: 15px; }
-        .refugio-header h3 { color: #22C55E; font-size: 22px; margin: 0 0 5px 0; }
         .refugio-info { margin: 15px 0; }
         .refugio-info p { margin: 8px 0; color: #666; font-size: 14px; }
         .refugio-info p strong { color: #333; }
@@ -28,7 +25,6 @@
 <div class="admin-layout">
     <main class="main-content">
         <div class="page-header">
-            <h1>Gestión de Refugios</h1>
             <a href="{% url 'crear_refugio' %}" class="btn btn-primary">
                 ➕ Nuevo Refugio
             </a>

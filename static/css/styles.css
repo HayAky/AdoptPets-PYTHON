@@ -3,7 +3,7 @@
    ======================================== */
 :root {
     --altura-header-total: 0px;
-    --altura-header-up: 0px;
+    --altura-header-up: 80px;
     --color-primary: #22C55E;
     --color-primary-dark: #1B9E4B;
     --color-secondary: #2ecc71;
@@ -22,54 +22,25 @@ body {
 header {
     position: sticky;
     top: 0;
-    z-index: 1000;
-    background-color: white;
-    /* Una sombra suave para que todo el header resalte sobre el fondo */
-    box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+    padding: 0 !important;
+    margin: 0 !important;
+    z-index: 1000 !important;
+    background-color: transparent !important; /* El padre no debe tener color */
+    box-shadow: none !important; /* Sin sombra para evitar líneas divisorias en la unión */
 }
-
 
 /* ========================================
-   HEADER - ESTILOS PÚBLICOS (Adoptantes)
+   HEADER - ELEMENTOS COMUNES
    ======================================== */
-.header-base {
-    background-color: rgba(255, 255, 255, 0.1);
-    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-}
-
-.header-base .header-public{
-    backdrop-filter: blur(10px);
-}
-
 header .logo img {
-    width: 130px;
+    width: 140px;
     height: auto;
     display: flex;
     align-items: center;
-    text-transform: uppercase;
-}
-
-header .contenedor {
-    padding: 40px 100px;
-    align-items: center;
-    justify-content: space-between;
-    display: flex;
-    max-width: 100%;
-    backdrop-filter: blur(10px);
-}
-
-header nav {
-    margin: auto;
-    margin-right: 10px;
-    display: flex;
-    gap: 80px;
-    flex-direction: row;
-    text-align: center;
-    padding-right: 10px;
 }
 
 header a {
-    padding: 3px 5px;
+    padding: 50px 35px;
     font-weight: 600;
     font-size: 18px;
     color: var(--color-primary);
@@ -81,45 +52,125 @@ header a:hover {
 }
 
 /* ========================================
-   HEADER - ESTILOS ADMIN
+   HEADER PÚBLICO (VISTA ADOPTANTES)
+   ======================================== */
+.header-base {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+header .contenedor {
+    padding: 30px 100px;
+    align-items: center;
+    justify-content: space-between;
+    display: flex;
+    max-width: 100%;
+}
+
+header nav {
+    margin: auto;
+    margin-right: 10px;
+    display: flex;
+    gap: 80px;
+    flex-direction: row;
+}
+
+/* ========================================
+   HEADER ADMIN/REFUGIO (BARRA SUPERIOR)
    ======================================== */
 #headerup {
-    padding: 20px 100px 10px 100px;
+    padding: 40px 100px !important;
+    margin-left: 250px;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    background-color: #ffffff;
+    /* EL AJUSTE DEL BLUR */
+    background-color: rgba(255, 255, 255, 0.6) !important; /* 0.6 de opacidad es el punto dulce */
+    backdrop-filter: blur(10px) !important;
+    -webkit-backdrop-filter: blur(10px) !important; /* Obligatorio para Safari/iOS */
+
+    /* ESTO ES LO QUE FALTA PARA QUE FUNCIONE */
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 1000 !important; /* Esto lo pone por encima del contenido que se va a desenfocar */
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.titulo-modulo {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.titulo-modulo h1 {
+    color: #22C55E;
+    margin: 0;
 }
 
 #headerup .logo img {
     padding-left: 10px;
 }
 
+/* ========================================
+   MENÚ LATERAL (ADMIN/REFUGIO)
+   ======================================== */
 #headadmin,
 #headrefugio {
-    /* Aquí quitamos el position fixed para que fluya naturalmente debajo del headerup */
-    padding: 10px 100px 15px 100px;
-    display: flex;
-    justify-content: space-between;
-    background-color: #ffffff;
-    border-bottom: 1px solid rgba(0,0,0,0.05);
+    position: fixed !important;
+    left: 0 !important;
+    top: 0 !important;
+    height: 100vh !important;
+    width: 250px !important;
+    background-color: #ffffff !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: flex-start !important;
+    border-right: 2px solid rgba(34, 197, 94, 0.15) !important;
+    z-index: 990 !important;
 }
 
 #headadmin nav,
 #headrefugio nav {
-    display: flex;
-    gap: 60px;
-    flex-direction: row;
-    text-align: center;
-    margin: auto;
+    display: flex !important;
+    flex-direction: column !important;
+    width: 100% !important;
+    gap: 0 !important; /* Elimina huecos entre botones */
+    margin: 0 !important;
+    background: transparent !important;
 }
 
-#header-spacer {
-    display: none;
+#headadmin nav a,
+#headrefugio nav a {
+    display: block !important;
+    width: 100% !important;
+    padding: 20px 35px !important;
+    text-align: left !important;
+    color: #666; !important;
+    font-weight: 600 !important;
+    font-size: 20px !important;
+    border-left: 4px solid transparent !important;
+    margin: 0 !important;
+    box-sizing: border-box !important;
+    transition: all 0.2s ease !important;
+}
+
+#headadmin nav h2,
+#headrefugio nav h2 {
+    color: #22C55E !important;
+    font-weight: 600 !important;
+    font-size: 20px !important;
+    margin: 40px 35px 10px !important;
+    padding: 10px 0 !important;
+}
+
+#headadmin nav a:hover,
+#headrefugio nav a:hover {
+    background-color: #f0fdf4 !important;
+    color: #22C55E !important;
+    border-left: 4px solid #22C55E !important;
 }
 
 /* ========================================
-   MENÚ USUARIO (ADMIN/LOGOUT)
+   MENÚ DE USUARIO (DROPDOWN / LOGOUT)
    ======================================== */
 .user-menu {
     position: relative;
@@ -157,10 +208,6 @@ header a:hover {
     display: block;
 }
 
-.user-dropdown form {
-    margin: 0;
-}
-
 .user-dropdown .dropdown-link {
     display: block;
     padding: 10px 14px;
@@ -184,20 +231,30 @@ header a:hover {
     border-radius: 10px;
     cursor: pointer;
     font-weight: 600;
-    text-decoration: none;
-    display: block;
     width: 100%;
     text-align: center;
     box-sizing: border-box;
+    transition: background 0.3s;
 }
 
 .logout-btn:hover {
     background: #dc2626;
 }
 
+/* ========================================
+   LAYOUT GENERAL
+   ======================================== */
+.admin-layout {
+    margin-left: 250px !important;
+    padding: 20px !important;
+}
+
+#header-spacer {
+    display: none !important;
+}
 
 /* ========================================
-   FOOTER - ESTILOS PÚBLICOS (Adoptantes)
+   FOOTER
    ======================================== */
 .site-footer {
     background-color: #2c3e50;
@@ -231,9 +288,7 @@ header a:hover {
     text-decoration: none;
 }
 
-.footer-logo span {
-    color: var(--color-secondary);
-}
+.footer-logo span { color: var(--color-secondary); }
 
 .footer-col h3 {
     color: #fff;
@@ -259,9 +314,7 @@ header a:hover {
     padding: 0;
 }
 
-.footer-links li {
-    margin-bottom: 12px;
-}
+.footer-links li { margin-bottom: 12px; }
 
 .footer-links a {
     color: #bdc3c7;
@@ -286,7 +339,6 @@ header a:hover {
     border: none;
     outline: none;
     width: 100%;
-    box-sizing: border-box;
 }
 
 .newsletter-btn {
@@ -297,17 +349,10 @@ header a:hover {
     border-radius: 25px;
     cursor: pointer;
     font-weight: bold;
-    transition: background 0.3s;
     width: fit-content;
 }
 
-.newsletter-btn:hover {
-    background-color: var(--color-secondary-dark);
-}
-
-.social-links {
-    margin-top: 20px;
-}
+.social-links { margin-top: 20px; }
 
 .social-links a {
     display: inline-flex;
@@ -338,113 +383,18 @@ header a:hover {
 }
 
 /* ========================================
-   FOOTER - ESTILOS ADMIN (Simplificado)
-   ======================================== */
-.site-footer.admin-footer .footer-container {
-    justify-content: center;
-}
-
-.site-footer.admin-footer .footer-col {
-    min-width: auto;
-    flex: none;
-    text-align: center;
-}
-
-.site-footer.admin-footer .social-links,
-.site-footer.admin-footer .newsletter-form,
-.site-footer.admin-footer .footer-links {
-    display: none;
-}
-
-/* ========================================
-   MENÚ USUARIO (ADMIN/LOGOUT)
-   ======================================== */
-
-.user-menu {
-    position: relative;
-    display: inline-block;
-}
-
-.user-button {
-    background: transparent;
-    border: none;
-    font-size: 18px;
-    font-weight: 600;
-    color: var(--color-primary); /* Usando tu variable */
-    cursor: pointer;
-    padding: 6px 10px;
-}
-
-.user-button:hover {
-    color: var(--color-primary-dark);
-}
-
-.user-dropdown {
-    position: absolute;
-    right: 0;
-    /* Ajustado a 100% para que quede pegado al botón y no se cierre al bajar el mouse */
-    top: 100%;
-    background-color: #ffffff;
-    border-radius: 14px; /* Un poco menos redondeado para encajar mejor */
-    box-shadow: 0px 4px 12px rgba(0,0,0,0.15);
-    padding: 10px;
-    min-width: 180px;
-    display: none; /* Oculto por defecto */
-    z-index: 2000;
-}
-
-/* Esta regla hace que aparezca al pasar el mouse */
-.user-menu:hover .user-dropdown {
-    display: block;
-}
-
-.user-dropdown form {
-    margin: 0;
-}
-
-.logout-btn {
-    background: #ef4444;
-    color: white;
-    padding: 8px 20px;
-    border: none;
-    border-radius: 10px;
-    cursor: pointer;
-    font-weight: 600;
-    text-decoration: none;
-    display: block; /* Para que ocupe todo el ancho si es necesario */
-    width: 100%;
-    text-align: center;
-    box-sizing: border-box;
-}
-
-.logout-btn:hover {
-    background: #dc2626;
-}
-
-/* ========================================
-   RESPONSIVE - MÓVIL
+   RESPONSIVE
    ======================================== */
 @media (max-width: 768px) {
-    .footer-container {
-        flex-direction: column;
-    }
-
-    .footer-col {
-        margin-bottom: 20px;
-    }
+    .footer-container { flex-direction: column; }
+    .footer-col { margin-bottom: 20px; }
 }
 
 @media (max-width: 480px) {
-    header nav {
-        display: none;
-    }
-
+    header nav { display: none; }
     header .contenedor {
         padding: 20px 0px 10px 0px;
-        align-items: center;
-        display: flex;
         flex-direction: column;
-        max-width: 100%;
         gap: 8px;
     }
 }

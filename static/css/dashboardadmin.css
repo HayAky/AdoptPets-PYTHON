@@ -1,12 +1,10 @@
 * {
-    margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
 
 body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    background: #f5f7fa;
 }
 
 .admin-layout {
@@ -20,20 +18,7 @@ body {
     padding: 30px;
 }
 
-.top-bar {
-    background: white;
-    padding: 20px 30px;
-    border-radius: 15px;
-    margin-bottom: 30px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
 
-.top-bar h1 {
-    color: #22C55E;
-}
 
 .user-info {
     display: flex;
@@ -50,7 +35,7 @@ body {
 }
 
 .stat-card {
-    background: white;
+    background: #f8f9fa;
     padding: 25px;
     border-radius: 15px;
     box-shadow: 0 2px 10px rgba(0,0,0,0.05);

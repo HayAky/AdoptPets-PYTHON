@@ -3,9 +3,21 @@
 {% if request.user.is_authenticated and request.user.es_admin %}
 <header>
     <div class="contenedor" id="headerup">
-        <a href="{% url 'inicio' %}" class="logo">
-            <img src="{% static 'img/AdoptPets (1).png' %}" alt="logo de la pagina">
-        </a>
+        <div class="titulo-modulo">
+        <h1>
+            {% with url=request.resolver_match.url_name %}
+                {% if url == 'admin_dashboard' or url == 'dashboard_refugio' %} Dashboard
+                {% elif url == 'admin_lista_mascotas' %} Gestión de Mascotas
+                {% elif url == 'admin_lista_adopciones' %} Control de Adopciones
+                {% elif url == 'admin_lista_refugios' %} Red de Refugios
+                {% elif url == 'admin_lista_usuarios' %} Usuarios registrados
+                {% elif url == 'admin_lista_blogs' %} Blogs y Noticias
+                {% elif url == 'panel_reportes' %} Reportes y Estadísticas
+                {% else %} Inicio
+                {% endif %}
+            {% endwith %}
+        </h1>
+    </div>
         <nav>
             <div class="user-menu">
                 <button class="user-button" type="button">
@@ -23,9 +35,13 @@
     </div>
 
     <div class="headadmin" id="headadmin">
+        <a href="{% url 'inicio' %}" class="logo">
+            <img src="{% static 'img/AdoptPets (1).png' %}" alt="logo de la pagina">
+        </a>
         <nav>
             <a href="{% url 'inicio' %}">Ir al sitio</a>
             <a href="{% url 'admin_dashboard' %}">Dashboard</a>
+            <h2>Listas</h2>
             <a href="{% url 'admin_lista_mascotas' %}">Mascotas</a>
             <a href="{% url 'admin_lista_adopciones' %}">Adopciones</a>
             <a href="{% url 'admin_lista_refugios' %}">Refugios</a>

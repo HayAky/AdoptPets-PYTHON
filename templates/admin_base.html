@@ -1,0 +1,65 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div style="display: flex; min-height: calc(100vh - 70px); background-color: #f8f9fa;">
+
+    <aside style="width: 260px; background-color: #ffffff; border-right: 3px solid #22C55E; flex-shrink: 0; padding-top: 20px; box-shadow: 2px 0 10px rgba(0,0,0,0.02);">
+
+        <div style="padding: 0 20px 20px 20px; border-bottom: 1px solid #f3f4f6; margin-bottom: 10px;">
+            <p style="color: #9ca3af; font-size: 12px; margin: 0; text-transform: uppercase; letter-spacing: 1px;">Módulos de Gestión</p>
+            <h3 style="color: #333; margin: 5px 0 0 0; font-size: 18px;">
+                {% if request.user.es_admin %}Administrador{% else %}Refugio{% endif %}
+            </h3>
+        </div>
+
+        <nav style="display: flex; flex-direction: column;">
+
+            {% if request.user.es_admin %}
+                <a href="{% url 'admin_dashboard' %}" class="sidebar-btn">📊 Dashboard</a>
+                <a href="{% url 'admin_lista_mascotas' %}" class="sidebar-btn">🐾 Mascotas</a>
+                <a href="{% url 'admin_lista_adopciones' %}" class="sidebar-btn">📝 Adopciones</a>
+                <a href="{% url 'admin_lista_refugios' %}" class="sidebar-btn">🏢 Refugios</a>
+                <a href="{% url 'admin_lista_usuarios' %}" class="sidebar-btn">👥 Usuarios</a>
+                <a href="{% url 'admin_lista_blogs' %}" class="sidebar-btn">📰 Blogs</a>
+                <a href="{% url 'panel_reportes' %}" class="sidebar-btn">📑 Reportes</a>
+
+            {% elif request.user.es_refugio %}
+                <a href="{% url 'dashboard_refugio' %}" class="sidebar-btn">📊 Dashboard</a>
+                <a href="{% url 'admin_lista_mascotas' %}" class="sidebar-btn">🐾 Mis Mascotas</a>
+                <a href="#" class="sidebar-btn">📝 Solicitudes</a>
+                <a href="{% url 'admin_lista_blogs' %}" class="sidebar-btn">📰 Blogs</a>
+            {% endif %}
+
+        </nav>
+    </aside>
+
+    <main style="flex-grow: 1; padding: 40px; overflow-y: auto;">
+        {% block admin_content %}
+        {% endblock %}
+    </main>
+
+</div>
+
+<style>
+    /* Estilo base de los enlaces */
+    .sidebar-btn {
+        display: block;
+        padding: 14px 20px;
+        color: #4b5563; /* Gris oscuro elegante */
+        text-decoration: none;
+        font-weight: 600;
+        font-size: 15px;
+        border-left: 4px solid transparent; /* Preparado para el hover */
+        transition: all 0.2s ease-in-out;
+    }
+    /* Efecto al pasar el mouse (Se integra con el verde) */
+    .sidebar-btn:hover {
+        background-color: #f0fdf4; /* Verde muy clarito de fondo */
+        color: #22C55E; /* Texto verde AdoptPets */
+        border-left: 4px solid #22C55E; /* Barrita verde a la izquierda */
+    }
+    /* Ocultar el footer en el panel para aprovechar la pantalla */
+    footer { display: none !important; }
+</style>
+{% endblock %}
