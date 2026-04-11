@@ -168,42 +168,41 @@ def crear_usuario(request):
         'roles_usuario_ids': []
     }
     return render(request, 'usuarios/form.html', context)
+
+
 @roles_permitidos(['ADMIN'])
 def editar_usuario(request, usuario_id):
     usuario = get_object_or_404(Usuario, id_usuario=usuario_id)
     todos_los_roles = Rol.objects.all()
 
     if request.method == 'POST':
-        # Actualizamos datos básicos
-        usuario.nombre = request.POST.get('nombre')
-        usuario.apellido = request.POST.get('apellido')
-        usuario.cedula = request.POST.get('cedula')
-        usuario.fecha_nacimiento = request.POST.get('fechaNacimiento') or None
-        usuario.telefono = request.POST.get('telefono')
-        usuario.ciudad = request.POST.get('ciudad')
-        usuario.direccion = request.POST.get('direccion')
+        try:  # <--- BLINDAJE INICIA AQUÍ
+            usuario.nombre = request.POST.get('nombre')
+            usuario.apellido = request.POST.get('apellido')
+            usuario.cedula = request.POST.get('cedula')
+            usuario.fecha_nacimiento = request.POST.get('fechaNacimiento') or None
+            usuario.telefono = request.POST.get('telefono')
+            usuario.ciudad = request.POST.get('ciudad')
+            usuario.direccion = request.POST.get('direccion')
+            usuario.is_active = request.POST.get('activo') == 'on'
+            usuario.save()
 
-        # Mapeamos 'activo' a 'is_active' de Django
-        usuario.is_active = request.POST.get('activo') == 'on'
+            roles_ids = request.POST.getlist('rolesIds')
+            if roles_ids:
+                usuario.roles.clear()
+                for rol_id in roles_ids:
+                    rol = Rol.objects.get(id_rol=rol_id)
+                    usuario.roles.add(rol)
 
-        usuario.save()
+            messages.success(request, 'Usuario actualizado exitosamente')
+            return redirect('admin_lista_usuarios')
 
-        # Actualizamos roles (Se recibe una lista de IDs desde los checkboxes)
-        roles_ids = request.POST.getlist('rolesIds')
-        if roles_ids:
-            # Limpiamos los roles actuales y asignamos los nuevos
-            usuario.roles.clear()
-            for rol_id in roles_ids:
-                rol = Rol.objects.get(id_rol=rol_id)
-                usuario.roles.add(rol)
-
-        messages.success(request, 'Usuario actualizado exitosamente')
-        return redirect('admin_lista_usuarios')
+        except Exception as e:  # <--- ATRAPAMOS EL ERROR
+            messages.error(request, f'Error al actualizar los datos: {str(e)}')
 
     context = {
         'usuario': usuario,
         'todosLosRoles': todos_los_roles,
-        # Pasamos una lista plana de IDs de roles para marcar los checkboxes en el HTML
         'roles_usuario_ids': list(usuario.roles.values_list('id_rol', flat=True))
     }
     return render(request, 'usuarios/form.html', context)
@@ -212,15 +211,20 @@ def editar_usuario(request, usuario_id):
 @roles_permitidos(['ADMIN'])
 def eliminar_usuario(request, usuario_id):
     usuario = get_object_or_404(Usuario, id_usuario=usuario_id)
-    # Evitar que el admin se borre a sí mismo
+
     if request.user.id_usuario == usuario.id_usuario:
         messages.error(request, 'No puedes eliminar tu propia cuenta de administrador.')
         return redirect('admin_lista_usuarios')
 
-    usuario.delete()
-    messages.success(request, 'Usuario eliminado correctamente.')
-    return redirect('admin_lista_usuarios')
+    try:  # <--- BLINDAJE
+        usuario.delete()
+        messages.success(request, 'Usuario eliminado correctamente.')
+    except Exception as e:
+        # Aquí el error suele ser de "Integridad Referencial" (llaves foráneas)
+        messages.error(request,
+                       'No se puede eliminar este usuario porque tiene registros importantes vinculados (adopciones, mascotas a cargo, etc.).')
 
+    return redirect('admin_lista_usuarios')
 
 @roles_permitidos(['ADMIN'])
 def resetear_password(request, usuario_id):
@@ -251,19 +255,18 @@ def perfil_adoptante(request):
     usuario = request.user
 
     if request.method == 'POST':
-        usuario.nombre = request.POST.get('nombre')
-        usuario.apellido = request.POST.get('apellido')
-        usuario.telefono = request.POST.get('telefono')
-        usuario.direccion = request.POST.get('direccion')
-        usuario.ciudad = request.POST.get('ciudad')
-        # La cédula y fecha de nacimiento normalmente no se cambian tan fácil, pero las incluimos
-        usuario.cedula = request.POST.get('cedula') or usuario.cedula
-        usuario.save()
+        try: # <--- BLINDAJE
+            usuario.nombre = request.POST.get('nombre')
+            usuario.apellido = request.POST.get('apellido')
+            usuario.telefono = request.POST.get('telefono')
+            usuario.direccion = request.POST.get('direccion')
+            usuario.ciudad = request.POST.get('ciudad')
+            usuario.cedula = request.POST.get('cedula') or usuario.cedula
+            usuario.save()
+            messages.success(request, 'Tus datos han sido actualizados correctamente.')
+            return redirect('perfil_adoptante')
+        except Exception as e:
+            messages.error(request, f'Ocurrió un error al guardar tu perfil: {str(e)}')
 
-        messages.success(request, 'Tus datos han sido actualizados correctamente.')
-        return redirect('perfil_adoptante')
-
-    # Traemos el historial de solicitudes de ESTE usuario específico
     mis_adopciones = Adopcion.objects.filter(adoptante=usuario).order_by('-fecha_solicitud')
-
     return render(request, 'usuarios/perfil_adoptante.html', {'mis_adopciones': mis_adopciones})

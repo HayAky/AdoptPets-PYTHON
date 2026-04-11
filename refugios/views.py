@@ -7,11 +7,6 @@ from adopciones.models import Adopcion
 from usuarios.models import Usuario
 from django.db.models import Count, Q
 
-# --- VISTA PÚBLICA ---
-from django.db.models import Count, Q
-
-
-# --- VISTA PÚBLICA (Sin protección) ---
 def lista_refugios(request):
     # Traemos todos los refugios activos y contamos cuántas mascotas 'disponibles' tiene cada uno
     refugios = Refugio.objects.filter(activo=True).annotate(
@@ -32,13 +27,14 @@ def admin_lista_refugios(request):
 
 @roles_permitidos(['ADMIN'])
 def crear_refugio(request):
-    # Traemos solo a los usuarios que tienen el rol REFUGIO para no saturar la lista
     usuarios_refugio = Usuario.objects.filter(roles__nombre_rol='REFUGIO', is_active=True)
-
     if request.method == 'POST':
-        guardar_datos_refugio(request, Refugio())
-        messages.success(request, 'Refugio creado correctamente.')
-        return redirect('admin_lista_refugios')
+        try:  # <-- BLINDAJE
+            guardar_datos_refugio(request, Refugio())
+            messages.success(request, 'Refugio creado correctamente.')
+            return redirect('admin_lista_refugios')
+        except Exception as e:
+            messages.error(request, f'Error al crear el refugio: {str(e)}')
 
     return render(request, 'refugios/form.html', {'usuarios_refugio': usuarios_refugio})
 
@@ -47,19 +43,26 @@ def crear_refugio(request):
 def editar_refugio(request, refugio_id):
     refugio = get_object_or_404(Refugio, id_refugio=refugio_id)
     usuarios_refugio = Usuario.objects.filter(roles__nombre_rol='REFUGIO', is_active=True)
-
     if request.method == 'POST':
-        guardar_datos_refugio(request, refugio)
-        messages.success(request, 'Refugio actualizado correctamente.')
-        return redirect('admin_lista_refugios')
+        try:  # <-- BLINDAJE
+            guardar_datos_refugio(request, refugio)
+            messages.success(request, 'Refugio actualizado correctamente.')
+            return redirect('admin_lista_refugios')
+        except Exception as e:
+            messages.error(request, f'Error al actualizar el refugio: {str(e)}')
 
     return render(request, 'refugios/form.html', {'refugio': refugio, 'usuarios_refugio': usuarios_refugio})
+
 
 @roles_permitidos(['ADMIN'])
 def eliminar_refugio(request, refugio_id):
     refugio = get_object_or_404(Refugio, id_refugio=refugio_id)
-    refugio.delete()
-    messages.success(request, 'Refugio eliminado correctamente.')
+    try:  # <-- BLINDAJE CRÍTICO
+        refugio.delete()
+        messages.success(request, 'Refugio eliminado correctamente.')
+    except Exception as e:
+        messages.error(request, 'No puedes eliminar este refugio porque tiene mascotas o procesos vinculados a él.')
+
     return redirect('admin_lista_refugios')
 
 

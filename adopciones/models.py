@@ -54,40 +54,31 @@ class EstadoSaludMascota(models.TextChoices):
 
 
 class Seguimiento(models.Model):
-    id_seguimiento = models.BigAutoField(primary_key=True)
+    TIPO_CONTACTO_CHOICES = [
+        ('visita', 'Visita Presencial'),
+        ('llamada', 'Llamada Telefónica'),
+        ('whatsapp', 'Mensaje / WhatsApp'),
+        ('correo', 'Correo Electrónico'),
+    ]
 
-    adoptante = models.ForeignKey(
-        Usuario,
-        on_delete=models.CASCADE,
-        db_column='id_adoptante'
-    )
-    mascota = models.ForeignKey(
-        Mascota,
-        on_delete=models.CASCADE,
-        db_column='id_mascota'
-    )
+    ESTADO_BIENESTAR_CHOICES = [
+        ('excelente', 'Excelente'),
+        ('bueno', 'Bueno'),
+        ('regular', 'Regular (Requiere atención)'),
+        ('critico', 'Crítico / Peligro'),
+    ]
 
-    fecha_seguimiento = models.DateField()
+    # Relación principal: Un seguimiento pertenece a una adopción específica
+    adopcion = models.ForeignKey('Adopcion', on_delete=models.CASCADE, related_name='seguimientos', null=True,
+                                 blank=True)
+    # Datos de la bitácora
+    fecha_contacto = models.DateField(auto_now_add=True)
+    tipo_contacto = models.CharField(max_length=20, choices=TIPO_CONTACTO_CHOICES, default='llamada')
+    observaciones = models.TextField(null=True, blank=True, help_text="Detalles de la adaptación, comportamiento, etc.")
+    estado_bienestar = models.CharField(max_length=20, choices=ESTADO_BIENESTAR_CHOICES, default='bueno')
 
-    tipo_seguimiento = models.CharField(
-        max_length=50,
-        choices=TipoSeguimiento.choices
-    )
-
-    observaciones = models.TextField(null=True, blank=True)
-
-    estado_mascota = models.CharField(
-        max_length=50,
-        choices=EstadoSaludMascota.choices,
-        default=EstadoSaludMascota.BUENO
-    )
-
-    proximo_seguimiento = models.DateField(null=True, blank=True)
-    realizado_por = models.CharField(max_length=255, null=True, blank=True)
-    fecha_registro = models.DateTimeField(auto_now_add=True)
-
-    class Meta:
-        db_table = 'seguimientos'
+    # Planificación a futuro (Opcional)
+    proxima_fecha = models.DateField(null=True, blank=True, help_text="¿Cuándo se debe volver a contactar?")
 
     def __str__(self):
-        return f"Seguimiento {self.mascota.nombre} - {self.fecha_seguimiento}"
+        return f"Seguimiento {self.id} - {self.adopcion.mascota.nombre} ({self.fecha_contacto})"

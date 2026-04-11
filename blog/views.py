@@ -34,21 +34,22 @@ def admin_lista_blogs(request):
 @roles_permitidos(['ADMIN', 'REFUGIO'])
 def crear_blog(request):
     categorias = CategoriaBlog.choices
-
     if request.method == 'POST':
-        Blog.objects.create(
-            titulo=request.POST.get('titulo'),
-            resumen=request.POST.get('resumen'),
-            contenido=request.POST.get('contenido'),
-            categoria=request.POST.get('categoria') or None,
-            imagen_url=request.POST.get('imagen_url'),
-            # Guardamos el nombre del usuario logueado como autor
-            autor=f"{request.user.nombre} {request.user.apellido}",
-            fecha_publicacion=timezone.now().date(),
-            activo=request.POST.get('activo') == 'on'
-        )
-        messages.success(request, 'Blog publicado exitosamente.')
-        return redirect('admin_lista_blogs')
+        try:  # <-- BLINDAJE
+            Blog.objects.create(
+                titulo=request.POST.get('titulo'),
+                resumen=request.POST.get('resumen'),
+                contenido=request.POST.get('contenido'),
+                categoria=request.POST.get('categoria') or None,
+                imagen_url=request.POST.get('imagen_url'),
+                autor=f"{request.user.nombre} {request.user.apellido}",
+                fecha_publicacion=timezone.now().date(),
+                activo=request.POST.get('activo') == 'on'
+            )
+            messages.success(request, 'Blog publicado exitosamente.')
+            return redirect('admin_lista_blogs')
+        except Exception as e:
+            messages.error(request, f'Error al publicar el blog: {str(e)}')
 
     return render(request, 'blog/form.html', {'categorias': categorias})
 
@@ -59,22 +60,23 @@ def editar_blog(request, blog_id):
     categorias = CategoriaBlog.choices
     nombre_autor = f"{request.user.nombre} {request.user.apellido}"
 
-    # Candado: Un refugio no puede editar la publicación de otro refugio
     if not request.user.es_admin and blog.autor != nombre_autor:
         messages.error(request, 'No tienes permiso para editar esta publicación.')
         return redirect('admin_lista_blogs')
 
     if request.method == 'POST':
-        blog.titulo = request.POST.get('titulo')
-        blog.resumen = request.POST.get('resumen')
-        blog.contenido = request.POST.get('contenido')
-        blog.categoria = request.POST.get('categoria') or None
-        blog.imagen_url = request.POST.get('imagen_url')
-        blog.activo = request.POST.get('activo') == 'on'
-        blog.save()
-
-        messages.success(request, 'Blog actualizado correctamente.')
-        return redirect('admin_lista_blogs')
+        try:  # <-- BLINDAJE
+            blog.titulo = request.POST.get('titulo')
+            blog.resumen = request.POST.get('resumen')
+            blog.contenido = request.POST.get('contenido')
+            blog.categoria = request.POST.get('categoria') or None
+            blog.imagen_url = request.POST.get('imagen_url')
+            blog.activo = request.POST.get('activo') == 'on'
+            blog.save()
+            messages.success(request, 'Blog actualizado correctamente.')
+            return redirect('admin_lista_blogs')
+        except Exception as e:
+            messages.error(request, f'Error al guardar los cambios: {str(e)}')
 
     return render(request, 'blog/form.html', {'blog': blog, 'categorias': categorias})
 
@@ -88,6 +90,10 @@ def eliminar_blog(request, blog_id):
         messages.error(request, 'No tienes permiso para eliminar esta publicación.')
         return redirect('admin_lista_blogs')
 
-    blog.delete()
-    messages.success(request, 'Blog eliminado.')
+    try:  # <-- BLINDAJE
+        blog.delete()
+        messages.success(request, 'Blog eliminado.')
+    except Exception as e:
+        messages.error(request, 'Error al intentar eliminar la publicación.')
+
     return redirect('admin_lista_blogs')
