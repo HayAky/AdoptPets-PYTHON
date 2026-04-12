@@ -16,7 +16,6 @@ def lista_usuarios(request):
 
 def registro(request):
     if request.method == 'POST':
-        # Capturamos los datos del formulario
         nombre = request.POST.get('nombre')
         apellido = request.POST.get('apellido')
         email = request.POST.get('email')
@@ -27,17 +26,13 @@ def registro(request):
         cedula = request.POST.get('cedula')
         fecha_nacimiento = request.POST.get('fechaNacimiento')
 
-        # 1. Validar contraseñas
         if password != confirm_password:
             messages.error(request, 'Las contraseñas no coinciden.')
             return redirect('registro')
 
-        # 2. Validar que el correo no exista
         if Usuario.objects.filter(email=email).exists():
             messages.error(request, 'Este correo ya está registrado. Por favor, inicia sesión.')
             return redirect('registro')
-
-        # 3. Crear el usuario (create_user se encarga de encriptar el password)
         try:
             user = Usuario.objects.create_user(
                 email=email,
@@ -128,10 +123,10 @@ def crear_usuario(request):
         password = request.POST.get('password')
         nombre = request.POST.get('nombre')
         apellido = request.POST.get('apellido')
-        cedula = request.POST.get('cedula')
-        telefono = request.POST.get('telefono')
-        ciudad = request.POST.get('ciudad')
-        direccion = request.POST.get('direccion')
+        cedula = request.POST.get('cedula') or None
+        telefono = request.POST.get('telefono') or None
+        ciudad = request.POST.get('ciudad') or None
+        direccion = request.POST.get('direccion') or None
 
         # 1. Verificar que el correo no esté en uso
         if Usuario.objects.filter(email=email).exists():
@@ -176,14 +171,14 @@ def editar_usuario(request, usuario_id):
     todos_los_roles = Rol.objects.all()
 
     if request.method == 'POST':
-        try:  # <--- BLINDAJE INICIA AQUÍ
+        try:
             usuario.nombre = request.POST.get('nombre')
             usuario.apellido = request.POST.get('apellido')
-            usuario.cedula = request.POST.get('cedula')
+            usuario.cedula = request.POST.get('cedula') or None
             usuario.fecha_nacimiento = request.POST.get('fechaNacimiento') or None
-            usuario.telefono = request.POST.get('telefono')
-            usuario.ciudad = request.POST.get('ciudad')
-            usuario.direccion = request.POST.get('direccion')
+            usuario.telefono = request.POST.get('telefono') or None
+            usuario.ciudad = request.POST.get('ciudad') or None
+            usuario.direccion = request.POST.get('direccion') or None
             usuario.is_active = request.POST.get('activo') == 'on'
             usuario.save()
 
@@ -197,7 +192,7 @@ def editar_usuario(request, usuario_id):
             messages.success(request, 'Usuario actualizado exitosamente')
             return redirect('admin_lista_usuarios')
 
-        except Exception as e:  # <--- ATRAPAMOS EL ERROR
+        except Exception as e:
             messages.error(request, f'Error al actualizar los datos: {str(e)}')
 
     context = {

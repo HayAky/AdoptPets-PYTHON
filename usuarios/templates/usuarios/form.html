@@ -109,23 +109,29 @@
                     </label>
                 </div>
 
-                <div style="background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 20px;">
-                    <h3>🔑 Roles y Permisos</h3>
-                    <p style="color: #666; margin-bottom: 15px;">Selecciona los roles que tendrá este usuario en el sistema</p>
+                <div class="form-group" style="margin-bottom: 25px;">
+                    <label style="display: block; font-weight: bold; color: #4b5563; margin-bottom: 10px;">Asignar Roles (Requerido)</label>
 
-                    <div style="display: flex; gap: 15px; flex-wrap: wrap;">
+                    <div style="display: flex; gap: 20px; background: #f8f9fa; padding: 15px; border-radius: 8px; border: 1px solid #e5e7eb; flex-wrap: wrap;">
+
                         {% for rol in todosLosRoles %}
-                        <div style="background: white; padding: 10px 15px; border-radius: 6px; border: 1px solid #e5e7eb; display: flex; align-items: center; gap: 10px;">
-                            <input type="checkbox" id="rol-{{ rol.id_rol }}" name="rolesIds" value="{{ rol.id_rol }}"
-                                   {% if rol.id_rol in roles_usuario_ids %}checked{% endif %}>
-                            <label for="rol-{{ rol.id_rol }}" style="cursor: pointer; font-weight: bold;">
+                            <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; color: #374151; font-weight: 500;">
+
+                                <input type="checkbox"
+                                       name="rolesIds"
+                                       value="{{ rol.id_rol }}"
+                                       {% if rol.id_rol in roles_usuario_ids %}checked{% endif %}
+                                       style="width: 18px; height: 18px; accent-color: #22C55E; cursor: pointer;">
+
                                 {{ rol.nombre_rol }}
                             </label>
-                        </div>
+                        {% empty %}
+                            <span style="color: #ef4444; font-size: 14px;">⚠️ No hay roles en la base de datos. Contacta al administrador.</span>
                         {% endfor %}
+
                     </div>
                 </div>
-
+            
                 <div style="display: flex; gap: 15px;">
                     <button type="submit" class="btn btn-primary" style="padding: 10px 20px; border-radius: 6px; border: none; cursor: pointer;">💾 Guardar Cambios</button>
                     <a href="{% url 'admin_lista_usuarios' %}" class="btn btn-secondary" style="padding: 10px 20px; border-radius: 6px; text-decoration: none;">Cancelar</a>
