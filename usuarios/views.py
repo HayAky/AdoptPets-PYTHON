@@ -58,6 +58,8 @@ def registro(request):
             messages.error(request, f'Ocurrió un error inesperado al crear tu cuenta: {str(e)}')
             return redirect('registro')
 
+    return render(request, 'register.html')
+
 @roles_permitidos(['ADMIN'])
 def admin_dashboard(request):
     # --- 1. Estadísticas Generales (Contadores) ---

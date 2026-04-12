@@ -5,16 +5,9 @@ urlpatterns = [
     # Panel principal
     path('panel/', views.panel_reportes, name='panel_reportes'),
 
-    # Descargas Excel
-    path('mascotas/excel/', views.reporte_mascotas_excel, name='reporte_mascotas_excel'),
-    path('adopciones/excel/', views.reporte_adopciones_excel, name='reporte_adopciones_excel'),
-
     # Descargas PDF
-    path('mascotas/pdf/', views.reporte_mascotas_pdf, name='reporte_mascotas_pdf'),
-# ... debajo de las descargas que ya tenías ...
-    path('refugios/excel/', views.reporte_refugios_excel, name='reporte_refugios_excel'),
-    path('usuarios/excel/', views.reporte_usuarios_excel, name='reporte_usuarios_excel'),
-        path('adopciones/pdf/', views.reporte_adopciones_pdf, name='reporte_adopciones_pdf'),
-    path('refugios/pdf/', views.reporte_refugios_pdf, name='reporte_refugios_pdf'),
-    path('usuarios/pdf/', views.reporte_usuarios_pdf, name='reporte_usuarios_pdf'),
+    path('descargar/mascotas/', views.pdf_mascotas, name='pdf_mascotas'),
+    path('descargar/adopciones/', views.pdf_adopciones, name='pdf_adopciones'),
+    path('descargar/usuarios/', views.pdf_usuarios, name='pdf_usuarios'),
+    path('descargar/refugios/', views.pdf_refugios, name='pdf_refugios'),  # <-- NUEVO
 ]

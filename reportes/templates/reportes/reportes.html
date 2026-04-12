@@ -13,14 +13,11 @@
         .report-header { display: flex; align-items: center; gap: 15px; margin-bottom: 20px; padding-bottom: 20px; border-bottom: 2px solid #f0f0f0; }
         .report-icon { width: 60px; height: 60px; background: linear-gradient(135deg, #22C55E 0%, #1B9E4B 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 28px; }
         .report-title h3 { color: #333; font-size: 20px; margin-bottom: 5px; }
-        .form-group label { display: block; margin-bottom: 5px; font-weight: 600; color: #333; font-size: 14px; }
-        .form-group input, .form-group select { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #ccc; font-size: 14px; box-sizing: border-box; }
         .button-group { display: flex; gap: 10px; margin-top: 20px; }
         .btn { flex: 1; padding: 12px; border-radius: 8px; border: none; cursor: pointer; font-weight: 600; text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 14px; }
-        .btn-pdf { background: #ef4444; color: white; }
-        .btn-excel { background: #10b981; color: white; }
+        .btn-pdf { background: #ef4444; color: white; transition: background 0.2s; }
+        .btn-pdf:hover { background: #dc2626; }
         .info-box { background: #dbeafe; border-left: 4px solid #3b82f6; padding: 20px; border-radius: 12px; margin-bottom: 25px; }
-        .date-range-card { background: white; border-radius: 15px; padding: 25px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 25px; }
     </style>
 {% endblock %}
 
@@ -29,29 +26,16 @@
     <main class="main-content">
         <div class="page-header">
             <h1>📊 Centro de Reportes</h1>
-            <p>Genera reportes detallados en PDF o Excel sobre mascotas y adopciones</p>
+            <p>Genera reportes detallados en PDF sobre la actividad de AdoptPets</p>
         </div>
 
         <div class="info-box">
             <h3 style="color: #1e40af; margin-top: 0;">ℹ️ Información</h3>
-            <p style="margin: 0;">Los reportes se generan en tiempo real con la información más actualizada del sistema.</p>
-        </div>
-
-        <div class="date-range-card">
-            <h3 style="color: #22C55E; margin-top: 0; margin-bottom: 20px;">🗓️ Rango de Fechas (para adopciones)</h3>
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-                <div class="form-group">
-                    <label>Fecha Inicio:</label>
-                    <input type="date" id="fechaInicio" value="{{ fechaInicio }}">
-                </div>
-                <div class="form-group">
-                    <label>Fecha Fin:</label>
-                    <input type="date" id="fechaFin" value="{{ fechaFin }}">
-                </div>
-            </div>
+            <p style="margin: 0;">Los reportes se generan en tiempo real con la información más actualizada del sistema en formato PDF.</p>
         </div>
 
         <div class="reports-grid">
+
             <div class="report-card">
                 <div class="report-header">
                     <div class="report-icon">🐾</div>
@@ -60,38 +44,23 @@
                         <p style="margin: 0; color: #666; font-size: 14px;">Información de mascotas registradas</p>
                     </div>
                 </div>
-
-                <div class="form-group">
-                    <label>Filtrar por estado:</label>
-                    <select id="estadoMascota">
-                        <option value="">Todas</option>
-                        <option value="disponible">Disponibles</option>
-                        <option value="pendiente">En Proceso</option>
-                        <option value="adoptado">Adoptadas</option>
-                    </select>
-                </div>
-
+                <p style="color: #666; font-size: 14px; margin: 15px 0;">Descarga un listado general de todas las mascotas, su raza, estado actual y refugio asignado.</p>
                 <div class="button-group">
-                    <a href="#" class="btn btn-pdf" onclick="descargarMascotasPDF()">📄 Generar PDF</a>
-                    <a href="#" class="btn btn-excel" onclick="descargarMascotasExcel()">📊 Generar Excel</a>
+                    <a href="{% url 'pdf_mascotas' %}" class="btn btn-pdf">📄 Generar PDF</a>
                 </div>
             </div>
 
             <div class="report-card">
                 <div class="report-header">
-                    <div class="report-icon">❤️</div>
+                    <div class="report-icon" style="background: linear-gradient(135deg, #f43f5e 0%, #e11d48 100%);">❤️</div>
                     <div class="report-title">
                         <h3 style="margin-top: 0;">Reporte de Adopciones</h3>
                         <p style="margin: 0; color: #666; font-size: 14px;">Historial de solicitudes</p>
                     </div>
                 </div>
-
-
-                
-                <p style="color: #666; font-size: 14px; margin: 15px 0;">Utiliza el rango de fechas superior para filtrar los resultados.</p>
-
+                <p style="color: #666; font-size: 14px; margin: 15px 0;">Historial completo de las solicitudes de adopción generadas, con la fecha y su estado de aprobación.</p>
                 <div class="button-group">
-                    <a href="#" class="btn btn-excel" onclick="descargarAdopcionesExcel()">📊 Generar Excel</a>
+                    <a href="{% url 'pdf_adopciones' %}" class="btn btn-pdf">📄 Generar PDF</a>
                 </div>
             </div>
 
@@ -103,9 +72,9 @@
                         <p style="margin: 0; color: #666; font-size: 14px;">Directorio de aliados</p>
                     </div>
                 </div>
-                <p style="color: #666; font-size: 14px; margin: 15px 0;">Descarga el listado completo de refugios aliados, su información de contacto y capacidad actual.</p>
+                <p style="color: #666; font-size: 14px; margin: 15px 0;">Listado completo de refugios aliados, su información de contacto y estado operativo.</p>
                 <div class="button-group">
-                    <a href="{% url 'reporte_refugios_excel' %}" class="btn btn-excel">📊 Generar Excel</a>
+                    <a href="{% url 'pdf_refugios' %}" class="btn btn-pdf">📄 Generar PDF</a>
                 </div>
             </div>
 
@@ -117,34 +86,13 @@
                         <p style="margin: 0; color: #666; font-size: 14px;">Base de datos de cuentas</p>
                     </div>
                 </div>
-                <p style="color: #666; font-size: 14px; margin: 15px 0;">Obtén el registro completo de usuarios del sistema, incluyendo sus roles de acceso (Administradores, Adoptantes, Refugios).</p>
+                <p style="color: #666; font-size: 14px; margin: 15px 0;">Directorio global de usuarios registrados en el sistema, correos de contacto y estado de la cuenta.</p>
                 <div class="button-group">
-                    <a href="{% url 'reporte_usuarios_excel' %}" class="btn btn-excel">📊 Generar Excel</a>
+                    <a href="{% url 'pdf_usuarios' %}" class="btn btn-pdf">📄 Generar PDF</a>
                 </div>
             </div>
 
         </div>
     </main>
 </div>
-
-<script>
-    function descargarMascotasPDF() {
-        const estado = document.getElementById('estadoMascota').value;
-        const url = estado ? `{% url 'reporte_mascotas_pdf' %}?estado=${estado}` : `{% url 'reporte_mascotas_pdf' %}`;
-        window.open(url, '_blank');
-    }
-
-    function descargarMascotasExcel() {
-        const estado = document.getElementById('estadoMascota').value;
-        const url = estado ? `{% url 'reporte_mascotas_excel' %}?estado=${estado}` : `{% url 'reporte_mascotas_excel' %}`;
-        window.location.href = url;
-    }
-
-    function descargarAdopcionesExcel() {
-        const inicio = document.getElementById('fechaInicio').value;
-        const fin = document.getElementById('fechaFin').value;
-        const url = `{% url 'reporte_adopciones_excel' %}?fechaInicio=${inicio}&fechaFin=${fin}`;
-        window.location.href = url;
-    }
-</script>
 {% endblock %}

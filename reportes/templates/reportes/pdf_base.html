@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <style>
+        @page {
+            size: A4 portrait;
+            margin: 2cm;
+            margin-bottom: 2.5cm; /* Dejamos margen en la hoja para que el pie no pise la tabla */
+        }
+        body { font-family: Helvetica, Arial, sans-serif; color: #333; }
+        h1 { color: #22C55E; text-align: center; border-bottom: 2px solid #22C55E; padding-bottom: 10px; }
+        .info { font-size: 12px; color: #666; margin-bottom: 30px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th { background-color: #f3f4f6; padding: 10px; border: 1px solid #d1d5db; text-align: left; font-size: 13px; color: #1f2937; }
+        td { padding: 8px; border: 1px solid #d1d5db; font-size: 12px; }
+        .row-even { background-color: #fafafa; }
+
+        /* NUEVO PIE DE PÁGINA (CSS Estándar, sin errores en el editor) */
+        #footerContent {
+            position: fixed;
+            bottom: -1.5cm;
+            left: 0cm;
+            right: 0cm;
+            text-align: right;
+            font-size: 10px;
+            color: #9ca3af;
+        }
+    </style>
+</head>
+<body>
+    <div id="footerContent">
+        Página <pdf:pagenumber /> de <pdf:pagecount /> | Generado por AdoptPets
+    </div>
+
+    <h1>{{ titulo }}</h1>
+
+    <div class="info">
+        <p><strong>Generado el:</strong> {{ fecha }}</p>
+        <p><strong>Total de registros:</strong> {{ filas|length }}</p>
+    </div>
+
+    <table>
+        <thead>
+            <tr>
+                {% for col in columnas %}
+                    <th>{{ col }}</th>
+                {% endfor %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for fila in filas %}
+                <tr class="{% cycle 'row-odd' 'row-even' %}">
+                    {% for dato in fila %}
+                        <td>{{ dato }}</td>
+                    {% endfor %}
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</body>
+</html>
