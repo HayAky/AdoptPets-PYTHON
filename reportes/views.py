@@ -8,17 +8,12 @@ from refugios.models import Refugio
 from usuarios.decorators import roles_permitidos
 
 
-# ==========================================
-# 1. REPORTE DE MASCOTAS
-# ==========================================
 @roles_permitidos(['ADMIN'])
 def pdf_mascotas(request):
     mascotas = Mascota.objects.all().order_by('-fecha_registro')
 
-    # Definimos las columnas
     columnas = ['Nombre', 'Especie', 'Raza', 'Estado', 'Refugio']
 
-    # Extraemos los datos exactos que queremos en el PDF
     filas = [
         [
             m.nombre,
@@ -37,10 +32,6 @@ def pdf_mascotas(request):
     }
     return generar_pdf('reportes/pdf_base.html', data, 'AdoptPets_Mascotas.pdf')
 
-
-# ==========================================
-# 2. REPORTE DE ADOPCIONES
-# ==========================================
 @roles_permitidos(['ADMIN'])
 def pdf_adopciones(request):
     adopciones = Adopcion.objects.all().order_by('-fecha_solicitud')
@@ -65,9 +56,7 @@ def pdf_adopciones(request):
     return generar_pdf('reportes/pdf_base.html', data, 'AdoptPets_Adopciones.pdf')
 
 
-# ==========================================
-# 3. REPORTE DE USUARIOS
-# ==========================================
+
 @roles_permitidos(['ADMIN'])
 def pdf_usuarios(request):
     usuarios = Usuario.objects.all().order_by('nombre')
@@ -93,13 +82,8 @@ def pdf_usuarios(request):
 
 @roles_permitidos(['ADMIN'])
 def panel_reportes(request):
-    # Esta es la vista que carga tu página con los botones
     return render(request, 'reportes/reportes.html')
 
-
-# ==========================================
-# 4. REPORTE DE REFUGIOS
-# ==========================================
 @roles_permitidos(['ADMIN'])
 def pdf_refugios(request):
     refugios = Refugio.objects.all().order_by('nombre_refugio')

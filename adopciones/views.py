@@ -75,17 +75,15 @@ def admin_detalle_adopcion(request, adopcion_id):
 
 @roles_permitidos(['ADMIN', 'REFUGIO'])
 def crear_seguimiento(request, adopcion_id):
-    # 1. Buscamos la adopción o lanzamos 404
     adopcion = get_object_or_404(Adopcion, id_adopcion=adopcion_id)
 
-    # 2. Seguridad: Verificar que el refugio sea el dueño de la mascota
     mi_refugio = getattr(request.user, 'mi_refugio', None) if not request.user.es_admin else None
     if not request.user.es_admin and adopcion.mascota.refugio != mi_refugio:
         messages.error(request, 'Acceso denegado: Esta mascota no pertenece a tu refugio.')
         return redirect('admin_lista_adopciones')
 
     if request.method == 'POST':
-        try:  # <-- NUESTRO BLINDAJE
+        try:
             Seguimiento.objects.create(
                 adopcion=adopcion,
                 tipo_contacto=request.POST.get('tipo_contacto'),
@@ -100,7 +98,6 @@ def crear_seguimiento(request, adopcion_id):
         except Exception as e:
             messages.error(request, f'Error al guardar el seguimiento: {str(e)}')
 
-    # Pasamos las opciones del modelo para generar los <select> en el HTML
     context = {
         'adopcion': adopcion,
         'tipos_contacto': Seguimiento.TIPO_CONTACTO_CHOICES,

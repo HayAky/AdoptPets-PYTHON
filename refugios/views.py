@@ -8,16 +8,12 @@ from usuarios.models import Usuario
 from django.db.models import Count, Q
 
 def lista_refugios(request):
-    # Traemos todos los refugios activos y contamos cuántas mascotas 'disponibles' tiene cada uno
     refugios = Refugio.objects.filter(activo=True).annotate(
-        # Creamos una variable temporal llamada 'mascotas_disponibles_count'
         mascotas_disponibles_count=Count('mascotas', filter=Q(mascotas__estado_adopcion='disponible'))
     ).order_by('nombre_refugio')
 
     return render(request, 'refugios/lista.html', {'refugios': refugios})
-# =========================================================
-# VISTAS PROTEGIDAS (Solo Administradores)
-# =========================================================
+
 
 @roles_permitidos(['ADMIN'])
 def admin_lista_refugios(request):
@@ -78,34 +74,26 @@ def guardar_datos_refugio(request, refugio):
     refugio.descripcion = request.POST.get('descripcion')
     refugio.activo = request.POST.get('activo') == 'on'
 
-    # --- NUEVO: Capturar el usuario encargado ---
     usuario_id = request.POST.get('usuarioEncargado')
     if usuario_id:
-        refugio.usuario_encargado_id = usuario_id  # Asignamos por ID
+        refugio.usuario_encargado_id = usuario_id
     else:
-        refugio.usuario_encargado = None  # Por si lo dejan vacío
+        refugio.usuario_encargado = None
 
     refugio.save()
 
-# =========================================================
-# PANEL EXCLUSIVO PARA REFUGIOS
-# =========================================================
+
 
 @roles_permitidos(['REFUGIO'])
 def dashboard_refugio(request):
-    # 1. Buscamos cuál es el refugio de este usuario
     try:
         mi_refugio = request.user.mi_refugio
     except:
         messages.error(request, "Tu cuenta no tiene un refugio físico asignado. Contacta al administrador.")
         return redirect('inicio')
 
-    # 2. Buscamos SOLO las mascotas de ESTE refugio
     mis_mascotas = Mascota.objects.filter(refugio=mi_refugio)
     mascotas_disponibles = mis_mascotas.filter(estado_adopcion='disponible').count()
-
-    # 3. Buscamos SOLO las solicitudes de adopción de ESTAS mascotas
-    # Usamos la sintaxis de doble guion bajo (mascota__refugio) para navegar entre tablas
     mis_solicitudes = Adopcion.objects.filter(mascota__refugio=mi_refugio)
     solicitudes_pendientes = mis_solicitudes.filter(estado_adopcion='pendiente').order_by('-fecha_solicitud')
     adopciones_aprobadas = mis_solicitudes.filter(estado_adopcion='aprobada').count()
@@ -116,7 +104,7 @@ def dashboard_refugio(request):
         'mascotasDisponibles': mascotas_disponibles,
         'pendientesCount': solicitudes_pendientes.count(),
         'aprobadasCount': adopciones_aprobadas,
-        'solicitudesPendientes': solicitudes_pendientes[:5]  # Solo mostramos las últimas 5 en el panel
+        'solicitudesPendientes': solicitudes_pendientes[:5]
     }
 
     return render(request, 'refugios/dashboard_refugio.html', context)

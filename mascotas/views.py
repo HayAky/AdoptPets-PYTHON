@@ -19,7 +19,6 @@ def inicio(request):
 def lista_mascotas(request):
     mascotas = Mascota.objects.filter(estado_adopcion='disponible').order_by('-fecha_registro')
 
-    # 1. Capturamos TODOS los posibles filtros de la URL
     busqueda = request.GET.get('busqueda', '')
     especie = request.GET.get('especie', '')
     sexo = request.GET.get('sexo', '')
@@ -40,15 +39,13 @@ def lista_mascotas(request):
     if tamano:
         mascotas = mascotas.filter(tamano=tamano)
     if raza:
-        mascotas = mascotas.filter(raza__icontains=raza)  # icontains busca coincidencias parciales
+        mascotas = mascotas.filter(raza__icontains=raza)
 
-    # Filtros numéricos (Rango de edades)
     if edad_min:
-        mascotas = mascotas.filter(edad_aproximada__gte=edad_min)  # gte = Mayor o igual que
+        mascotas = mascotas.filter(edad_aproximada__gte=edad_min)
     if edad_max:
-        mascotas = mascotas.filter(edad_aproximada__lte=edad_max)  # lte = Menor o igual que
+        mascotas = mascotas.filter(edad_aproximada__lte=edad_max)
 
-    # Filtros booleanos (Casillas de verificación)
     if vacunado:
         mascotas = mascotas.filter(vacunado=True)
     if esterilizado:
@@ -104,7 +101,7 @@ def crear_mascota(request):
     mi_refugio = getattr(request.user, 'mi_refugio', None) if not request.user.es_admin else None
 
     if request.method == 'POST':
-        try:  # <--- INICIA EL BLINDAJE
+        try:
             mascota = Mascota()
             guardar_datos_mascota(request, mascota)
 
@@ -166,17 +163,16 @@ def eliminar_mascota(request, mascota_id):
         messages.error(request, 'Acceso Denegado: No puedes eliminar mascotas de otros refugios.')
         return redirect('admin_lista_mascotas')
 
-    try:  # <--- INICIA EL BLINDAJE
+    try:
         mascota.delete()
         messages.success(request, 'Mascota eliminada del sistema.')
-    except Exception as e:  # <--- ATRAPAMOS EL ERROR (ej: base de datos bloqueada)
+    except Exception as e:
         messages.error(request,
                        f'No se pudo eliminar la mascota. Es posible que tenga adopciones vinculadas. Detalle: {str(e)}')
 
     return redirect('admin_lista_mascotas')
 
 
-# --- FUNCIÓN AUXILIAR PARA GUARDAR DATOS (Se queda igual, EXCEPTO el refugio) ---
 def guardar_datos_mascota(request, mascota):
     mascota.nombre = request.POST.get('nombre')
     mascota.especie = request.POST.get('especie')

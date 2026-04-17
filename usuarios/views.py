@@ -45,11 +45,10 @@ def registro(request):
                 fecha_nacimiento=fecha_nacimiento
             )
 
-            # 4. Asignar rol por defecto
             rol_adoptante, created = Rol.objects.get_or_create(nombre_rol='ADOPTANTE')
             user.roles.add(rol_adoptante)
 
-            # 5. Iniciar sesión automáticamente
+
             login(request, user)
             messages.success(request, '¡Bienvenido a AdoptPets! Tu cuenta ha sido creada.')
             return redirect('inicio')
@@ -92,9 +91,6 @@ def admin_dashboard(request):
     return render(request, 'admin/dashboard.html', context)
 
 
-
-# GESTIÓN DE USUARIOS (Solo Admin)
-
 @roles_permitidos(['ADMIN'])
 def admin_lista_usuarios(request):
     todos_los_usuarios = Usuario.objects.all().prefetch_related('roles')
@@ -102,7 +98,7 @@ def admin_lista_usuarios(request):
     adoptantes = todos_los_usuarios.filter(roles__nombre_rol='ADOPTANTE').distinct()
     refugios = todos_los_usuarios.filter(roles__nombre_rol='REFUGIO').distinct()
 
-    # 2. Calculamos estadísticas
+
     cantidad_activos = todos_los_usuarios.filter(is_active=True).count()
 
     context = {
@@ -130,7 +126,6 @@ def crear_usuario(request):
         ciudad = request.POST.get('ciudad') or None
         direccion = request.POST.get('direccion') or None
 
-        # 1. Verificar que el correo no esté en uso
         if Usuario.objects.filter(email=email).exists():
             messages.error(request, f'Error: El correo {email} ya está registrado.')
             return redirect('crear_usuario')
@@ -226,7 +221,6 @@ def eliminar_usuario(request, usuario_id):
 @roles_permitidos(['ADMIN'])
 def resetear_password(request, usuario_id):
     usuario = get_object_or_404(Usuario, id_usuario=usuario_id)
-    # set_password encripta la contraseña automáticamente
     usuario.set_password('123456')
     usuario.save()
     messages.success(request, f'Contraseña de {usuario.nombre} reseteada a: 123456')
@@ -252,7 +246,7 @@ def perfil_adoptante(request):
     usuario = request.user
 
     if request.method == 'POST':
-        try: # <--- BLINDAJE
+        try:
             usuario.nombre = request.POST.get('nombre')
             usuario.apellido = request.POST.get('apellido')
             usuario.telefono = request.POST.get('telefono')

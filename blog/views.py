@@ -4,28 +4,17 @@ from django.utils import timezone
 from .models import Blog, CategoriaBlog
 from usuarios.decorators import roles_permitidos
 
-
-# =========================================================
-# VISTA PÚBLICA (Cualquier visitante)
-# =========================================================
 def lista_blogs(request):
-    # Solo traemos los activos, ordenados del más reciente al más antiguo
     blogs = Blog.objects.filter(activo=True).order_by('-fecha_publicacion')
     return render(request, 'blog/lista.html', {'blogs': blogs})
 
-
-# =========================================================
-# PANEL DE GESTIÓN (Admins y Refugios)
-# =========================================================
 @roles_permitidos(['ADMIN', 'REFUGIO'])
 def admin_lista_blogs(request):
     nombre_autor = f"{request.user.nombre} {request.user.apellido}"
 
     if request.user.es_admin:
-        # El administrador ve TODO
         blogs = Blog.objects.all().order_by('-fecha_publicacion')
     else:
-        # El refugio ve SOLO lo que él publicó (coincidencia de texto)
         blogs = Blog.objects.filter(autor=nombre_autor).order_by('-fecha_publicacion')
 
     return render(request, 'blog/admin_lista.html', {'blogs': blogs})
@@ -90,7 +79,7 @@ def eliminar_blog(request, blog_id):
         messages.error(request, 'No tienes permiso para eliminar esta publicación.')
         return redirect('admin_lista_blogs')
 
-    try:  # <-- BLINDAJE
+    try:
         blog.delete()
         messages.success(request, 'Blog eliminado.')
     except Exception as e:
