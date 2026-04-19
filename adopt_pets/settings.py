@@ -83,7 +83,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'adopcion_mascotas',
         'USER': 'root',
-        'PASSWORD': 'andres',
+        'PASSWORD': '',
         'HOST': 'localhost',
         'PORT': '3306',
     }
