@@ -174,29 +174,38 @@ def eliminar_mascota(request, mascota_id):
 
 
 def guardar_datos_mascota(request, mascota):
+    # 1. Campos de texto básicos que ya coincidían
     mascota.nombre = request.POST.get('nombre')
     mascota.especie = request.POST.get('especie')
     mascota.raza = request.POST.get('raza') or None
-    mascota.fecha_nacimiento = request.POST.get('fechaNacimiento') or None
     mascota.sexo = request.POST.get('sexo')
     mascota.tamano = request.POST.get('tamano')
     mascota.peso = request.POST.get('peso') or None
     mascota.color = request.POST.get('color') or None
     mascota.descripcion = request.POST.get('descripcion') or None
-    mascota.historial_medico = request.POST.get('historialMedico') or None
-    mascota.fecha_ingreso = request.POST.get('fechaIngreso')
+
+    # 2. CORREGIDO: Emparejamos 'edadAproximada' del HTML con el modelo
+    edad_aprox = request.POST.get('edadAproximada')
+    mascota.edad_aproximada = edad_aprox if edad_aprox else None
+
+    # 3. CORREGIDO: Emparejamos 'estadoSalud' del HTML con el modelo
+    mascota.estado_salud = request.POST.get('estadoSalud') or None
+
+    # 4. NUEVO: Ahora sí guardamos los checkboxes médicos
+    mascota.vacunado = request.POST.get('vacunado') == 'on'
+    mascota.esterilizado = request.POST.get('esterilizado') == 'on'
+    mascota.microchip = request.POST.get('microchip') == 'on'
+
+    # 5. Estado y Fechas
     mascota.estado_adopcion = request.POST.get('estadoAdopcion')
 
+    fecha_ingreso = request.POST.get('fechaIngreso')
+    if fecha_ingreso:
+        mascota.fecha_ingreso = fecha_ingreso
+
+    # 6. Guardar la fotografía si el usuario subió una nueva
     if 'foto' in request.FILES:
         mascota.foto = request.FILES['foto']
 
-    mascota.descripcion = request.POST.get('descripcion') or None
-
-    if request.POST.get('fechaIngreso'):
-        mascota.fecha_ingreso = request.POST.get('fechaIngreso')
-
-    refugio_id = request.POST.get('refugio')
-    if refugio_id:
-        mascota.refugio = Refugio.objects.get(id_refugio=refugio_id)
-
-    mascota.save()
+    # El mascota.save() se ejecuta de forma segura desde las funciones
+    # crear_mascota y editar_mascota, no aquí.

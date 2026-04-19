@@ -40,7 +40,13 @@
         {% endif %}
 
         <p class="registro-link">¿No tienes cuenta? <a href="{% url 'registro' %}">Regístrate</a></p>
+        <div style="text-align: center; margin-top: 15px;">
+            <a href="{% url 'password_reset' %}" style="color: #22C55E; text-decoration: none; font-weight: 500;">
+                ¿Olvidaste tu contraseña?
+            </a>
+        </div>
     </div>
+
 
     <div class="login-imagen">
         <img src="{% static 'img/Perro_viento.png' %}" alt="Perro feliz">

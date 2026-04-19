@@ -25,7 +25,10 @@ SECRET_KEY = 'django-insecure--5qs*iwgzrj(_74tr^@bpa7_lsu&55_1j39@zno7cu4n0sr)(6
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
+CSRF_TRUSTED_ORIGINS = [
+'https://c88bedb0b4647d.lhr.life'
+]
 
 
 # Application definition
@@ -146,3 +149,7 @@ STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 # --- NUEVA CONFIGURACIÓN PARA FOTOS SUBIDAS POR USUARIOS ---
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+#recuperar contraseña
+EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+DEFAULT_FROM_EMAIL = 'soporte@adoptpets.com'
