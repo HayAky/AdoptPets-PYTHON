@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AdoptPets — Encuentra tu compañero ideal</title>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
         *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
@@ -56,7 +56,7 @@
 
         .btn-ghost {
             background: transparent;
-            border: 1.5px solid var(--border, #e5e7eb);
+            border: 1.5px solid #e5e7eb;
             color: var(--dark);
         }
         .btn-ghost:hover { border-color: var(--green); color: var(--green); }
@@ -118,7 +118,9 @@
             font-size: 1rem; font-weight: 500;
             text-decoration: none;
             transition: all 0.2s;
-            display: inline-block;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
         }
 
         .btn-hero-primary {
@@ -133,78 +135,133 @@
         }
         .btn-hero-outline:hover { border-color: var(--green); color: var(--green); }
 
-        /* Hero visual */
-       <div class="hero-visual">
-    {% for mascota in ultimas_mascotas %}
-        <div class="pet-card-uniform {% if forloop.first %}pet-card-featured{% endif %}">
-            
-            {% if mascota.foto_principal %}
-                <div class="pet-image-container">
-                    <img src="{{ mascota.foto_principal.url }}" 
-                         alt="{{ mascota.nombre }}" 
-                         class="pet-image-uniform">
-                </div>
-            {% else %}
-                <div class="pet-image-placeholder">
-                    <span class="pet-emoji">🐾</span>
-                </div>
-            {% endif %}
-            
-            <div class="pet-info-uniform">
-                <span class="pet-name-uniform">{{ mascota.nombre }}</span>
-                <span class="pet-badge-uniform">{{ mascota.especie }}</span>
-            </div>
-        </div>
-    {% empty %}
-        <div class="pet-card-uniform pet-card-empty">
-            <span class="pet-emoji">🏠</span>
-            <p>Aún no hay mascotas registradas.</p>
-        </div>
-    {% endfor %}
-</div>
+        /* Hero visual - GRID DE MASCOTAS MEJORADO */
+        .hero-visual {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: 1fr 1fr;
+            gap: 1.5rem;
+            height: 450px;
+            animation: fadeUp 0.8s 0.2s ease both;
         }
 
         .pet-card {
             background: #fff;
             border-radius: 20px;
-            padding: 1.5rem;
-            display: flex; flex-direction: column;
-            align-items: center; justify-content: center;
-            gap: 0.5rem;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.06);
-            transition: transform 0.3s;
+            overflow: hidden;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            transition: all 0.3s;
+            display: flex;
+            flex-direction: column;
         }
 
-        .pet-card:hover { transform: translateY(-4px); }
+        .pet-card:hover { 
+            transform: translateY(-8px); 
+            box-shadow: 0 12px 40px rgba(0,0,0,0.15);
+        }
 
+        /* Card destacada (primera) */
         .pet-card:first-child {
             grid-row: span 2;
             background: var(--dark);
         }
 
-        .pet-emoji { font-size: 3.5rem; }
-        .pet-card:first-child .pet-emoji { font-size: 5rem; }
+        /* Contenedor de imagen - TAMAÑO FIJO Y PROPORCIONADO */
+        .pet-image-container {
+            position: relative;
+            width: 100%;
+            height: 140px;
+            overflow: hidden;
+        }
 
-        .pet-name {
+        .pet-card:first-child .pet-image-container {
+            height: 280px;
+        }
+
+        .pet-image-uniform {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.3s;
+        }
+
+        .pet-card:hover .pet-image-uniform {
+            transform: scale(1.05);
+        }
+
+        /* Placeholder cuando no hay foto */
+        .pet-image-placeholder {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #f0fdf4 0%, #dcfce7 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .pet-emoji { 
+            font-size: 3rem; 
+        }
+
+        .pet-card:first-child .pet-emoji { 
+            font-size: 4rem; 
+        }
+
+        /* Info de la mascota */
+        .pet-info-uniform {
+            padding: 1rem 1.2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
+            flex: 1;
+            justify-content: center;
+        }
+
+        .pet-card:first-child .pet-info-uniform {
+            background: var(--dark);
+        }
+
+        .pet-name-uniform {
             font-family: 'Playfair Display', serif;
-            font-size: 1rem;
+            font-size: 1.1rem;
+            font-weight: 600;
             color: var(--dark);
         }
 
-        .pet-card:first-child .pet-name { color: #fff; font-size: 1.2rem; }
-
-        .pet-badge {
-            background: var(--green-light);
-            color: var(--green-dark);
-            font-size: 0.7rem;
-            padding: 0.2rem 0.6rem;
-            border-radius: 999px;
-            font-weight: 500;
+        .pet-card:first-child .pet-name-uniform {
+            color: #fff;
+            font-size: 1.3rem;
         }
 
-        .pet-card:first-child .pet-badge {
+        .pet-badge-uniform {
+            background: var(--green-light);
+            color: var(--green-dark);
+            font-size: 0.75rem;
+            padding: 0.3rem 0.8rem;
+            border-radius: 999px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            width: fit-content;
+        }
+
+        .pet-card:first-child .pet-badge-uniform {
             background: rgba(34,197,94,0.2);
             color: var(--green);
+        }
+
+        /* Card vacía */
+        .pet-card-empty {
+            grid-column: span 2;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .pet-card-empty p {
+            color: var(--gray);
+            margin-top: 1rem;
         }
 
         /* STATS */
@@ -304,7 +361,9 @@
         @media (max-width: 900px) {
             nav { padding: 1rem 1.5rem; }
             .hero { grid-template-columns: 1fr; padding: 2rem 1.5rem; min-height: auto; }
-            .hero-visual { display: none; }
+            .hero-visual { height: 350px; gap: 1rem; }
+            .pet-image-container { height: 100px; }
+            .pet-card:first-child .pet-image-container { height: 220px; }
             .features { grid-template-columns: 1fr; padding: 2rem 1.5rem; }
             .stats-bar { flex-wrap: wrap; gap: 1.5rem; padding: 2rem; }
         }
@@ -323,8 +382,13 @@
         <li><a href="{% url 'contactenos' %}">Contacto</a></li>
     </ul>
     <div class="nav-actions">
-        <a href="{% url 'login' %}" class="btn-nav btn-ghost">Iniciar sesión</a>
-        <a href="{% url 'register' %}" class="btn-nav btn-primary">Registrarse</a>
+        {% if user.is_authenticated %}
+            <a href="{% url 'perfil' %}" class="btn-nav btn-ghost">Mi Perfil</a>
+            <a href="{% url 'logout' %}" class="btn-nav btn-primary">Salir</a>
+        {% else %}
+            <a href="{% url 'login' %}" class="btn-nav btn-ghost">Iniciar sesión</a>
+            <a href="{% url 'register' %}" class="btn-nav btn-primary">Registrarse</a>
+        {% endif %}
     </div>
 </nav>
 
@@ -340,36 +404,40 @@
         </div>
     </div>
 
+    <!-- HERO VISUAL - MASCOTAS CON FOTOS CORREGIDAS -->
     <div class="hero-visual">
-    {% for mascota in ultimas_mascotas %}
-        <div class="pet-card" {% if forloop.first %}style="grid-row: span 2; background: var(--dark);"{% endif %}>
-            
-            {% if mascota.foto_principal %}
-                <img src="{{ mascota.foto_principal.url }}" 
-                     alt="{{ mascota.nombre }}" 
-                     style="width: 100%; height: {% if forloop.first %}260px{% else %}120px{% endif %}; object-fit: cover; border-radius: 15px; margin-bottom: 0.8rem;">
+        {% for mascota in ultimas_mascotas|slice:":3" %}
+        <div class="pet-card">
+            {% if mascota.get_foto_url %}
+                <div class="pet-image-container">
+                    <img src="{{ mascota.get_foto_url }}" 
+                         alt="{{ mascota.nombre }}" 
+                         class="pet-image-uniform">
+                </div>
             {% else %}
-                <span class="pet-emoji">🐾</span>
+                <div class="pet-image-placeholder">
+                    <span class="pet-emoji">🐾</span>
+                </div>
             {% endif %}
             
-            <span class="pet-name" {% if forloop.first %}style="color: #fff; font-size: 1.4rem;"{% endif %}>
-                {{ mascota.nombre }}
-            </span>
-            <span class="pet-badge">{{ mascota.especie }}</span>
+            <div class="pet-info-uniform">
+                <span class="pet-name-uniform">{{ mascota.nombre|title }}</span>
+                <span class="pet-badge-uniform">{{ mascota.especie }}</span>
+            </div>
         </div>
-    {% empty %}
-        <div class="pet-card" style="grid-column: span 2;">
+        {% empty %}
+        <div class="pet-card pet-card-empty">
             <span class="pet-emoji">🏠</span>
             <p>Aún no hay mascotas registradas.</p>
         </div>
-    {% endfor %}
-</div>
+        {% endfor %}
+    </div>
 </section>
 
 <!-- STATS -->
 <div class="stats-bar">
     <div class="stat">
-        <div class="stat-num">{{ mascotasDisponibles }}+</div>
+        <div class="stat-num">{{ mascotasDisponibles|default:"0" }}+</div>
         <div class="stat-label">Mascotas disponibles</div>
     </div>
     <div class="stat">

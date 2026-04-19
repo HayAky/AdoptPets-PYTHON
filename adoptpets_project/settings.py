@@ -1,8 +1,12 @@
+"""
+Django settings for adoptpets_project project.
+"""
+
 import os
 from pathlib import Path
+import pymysql
 
 # Configuración para usar MySQL con pymysql
-import pymysql
 pymysql.install_as_MySQLdb()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -46,7 +50,7 @@ TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [BASE_DIR / 'templates'],
-        'APP_DIRS': True,   # ← esto hace que busque en core/templates automáticamente
+        'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
                 'django.template.context_processors.debug',
@@ -57,21 +61,20 @@ TEMPLATES = [
         },
     },
 ]
+
 WSGI_APPLICATION = 'adoptpets_project.wsgi.application'
 
 # Database (MySQL)
-# Asegúrate de que la base de datos 'adoptpets' esté creada en XAMPP/MySQL
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'adoptpets_db',  # <--- ¡Agrega el _db aquí!
+        'NAME': 'adoptpets_db',
         'USER': 'root',
         'PASSWORD': '',
         'HOST': 'localhost',
         'PORT': '3306',
     }
 }
-
 
 # Password validation
 AUTH_PASSWORD_VALIDATORS = [
@@ -82,13 +85,13 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 # Internationalization
-LANGUAGE_CODE = 'es-co' # Configurado para Colombia
+LANGUAGE_CODE = 'es-co'
 TIME_ZONE = 'America/Bogota'
 USE_I18N = True
-USE_TZ = True
+USE_TZ = False
 
-# Static files (CSS, JavaScript, Images de diseño)
-STATIC_URL = 'static/'
+# Static files (CSS, JavaScript, Images)
+STATIC_URL = '/static/'
 STATICFILES_DIRS = [BASE_DIR / 'static']
 
 # Media files (Fotos subidas por usuarios/mascotas)
@@ -98,13 +101,6 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 # Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-# URL a la que se envía al usuario tras un login exitoso
+# URLs de redirección
 LOGIN_REDIRECT_URL = 'redirect_by_role'
-
-# URL a la que se envía si intenta entrar a algo privado sin estar logueado
 LOGIN_URL = 'login'
-# Al final de tu settings.py
-import os
-
-MEDIA_URL = '/media/'
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
