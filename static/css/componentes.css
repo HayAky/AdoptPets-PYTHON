@@ -45,8 +45,11 @@
 .alert-success { background: #d1fae5; color: #065f46; border: 1px solid #6ee7b7; }
 .alert-warning { background: #fef3c7; color: #92400e; border: 1px solid #fcd34d; }
 
+/* ==========================================
+   TARJETAS DE AUTENTICACIÓN (Versión Limpia)
+   ========================================== */
 .auth-wrapper {
-    min-height: 100vh;
+    min-height: 80vh;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -56,50 +59,68 @@
 
 .auth-card {
     background: white;
-    max-width: 450px;
+    max-width: 420px;
     width: 100%;
-    padding: 35px;
+    padding: 40px;
     border-radius: 16px;
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.05);
+    text-align: center;
 }
 
-/* Forzamos que cada bloque (Label + Input) tenga aire */
-.auth-card p {
-    display: block !important;
-    margin-bottom: 25px !important;
-    text-align: left !important;
-}
-
-/* ESTO CREA EL ESPACIO PARA ESCRIBIR */
-.auth-card input {
-    display: block !important;
-    width: 100% !important;
-    height: 50px !important; /* Altura generosa para escribir */
-    margin-top: 10px !important;
-    padding: 10px 15px !important;
-    border: 2px solid #e5e7eb !important; /* Borde más grueso para verlo bien */
-    border-radius: 10px !important;
-    font-size: 16px !important;
-    box-sizing: border-box !important;
-    background-color: #ffffff !important;
-}
-
-.auth-card input:focus {
-    border-color: #22C55E !important;
-    outline: none !important;
-    box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.1) !important;
-}
-
-/* OCULTAMOS EL TEXTO DE AYUDA LARGO QUE ESTORBA */
-.auth-card .helptext,
-.auth-card ul.helptext {
-    display: none !important; /* Esto quita la lista gigante de requisitos */
+/* Forzamos que los campos de Django se vean bien */
+.auth-card form p {
+    text-align: left;
+    margin-bottom: 20px;
+    width: 100%;
 }
 
 .auth-card label {
-    font-weight: 700;
+    display: block;
+    font-weight: 600;
     color: #374151;
     font-size: 14px;
-    text-transform: uppercase;
-    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+    text-align: left;
+}
+
+.auth-card input {
+    display: block;
+    width: 100%;
+    height: 45px;
+    padding: 10px 15px;
+    border: 1px solid #d1d5db;
+    border-radius: 8px;
+    font-size: 15px;
+    box-sizing: border-box;
+    transition: border-color 0.2s;
+}
+
+.auth-card input:focus {
+    border-color: #22C55E;
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.15);
+}
+
+/* Ocultar el texto gigante de requisitos de clave */
+.auth-card .helptext,
+.auth-card ul {
+    display: none;
+}
+
+.btn-submit {
+    background: #22C55E;
+    color: white;
+    padding: 14px 20px;
+    border: none;
+    border-radius: 8px;
+    width: 100%;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: background 0.3s;
+}
+
+.btn-submit:hover {
+    background: #16a34a;
 }

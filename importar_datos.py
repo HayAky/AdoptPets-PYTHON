@@ -1,10 +1,14 @@
 import os
 import django
 from datetime import datetime
+import shutil
 
 # Configurar el entorno de Django para poder usar los modelos desde este archivo
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'adopt_pets.settings')
 django.setup()
+
+
+
 
 # Importar los modelos
 from refugios.models import Refugio
@@ -150,5 +154,33 @@ def poblar_base_de_datos():
 
     print("🎉 ¡BASE DE DATOS POBLADA CON ÉXITO!")
 
+
+def restaurar_imagenes_media():
+    from django.conf import settings
+    print("📸 Restaurando imágenes para el entorno de desarrollo...")
+
+    ruta_static = os.path.join(settings.BASE_DIR, 'static', 'img')
+    ruta_mascotas = os.path.join(settings.BASE_DIR, 'media', 'mascotas_fotos')
+
+    os.makedirs(ruta_mascotas, exist_ok=True)
+
+    if os.path.exists(ruta_static):
+        for archivo in os.listdir(ruta_static):
+            if archivo.endswith(('.jpg', '.jpeg', '.png')):
+                origen = os.path.join(ruta_static, archivo)
+                destino = os.path.join(ruta_mascotas, archivo)
+                shutil.copy2(origen, destino)
+        print("✅ Todas las imágenes fueron clonadas a la carpeta media.")
+    else:
+        print("⚠️ No se encontró la carpeta static/img.")
+
+
 if __name__ == '__main__':
-    poblar_base_de_datos()
+    print("Iniciando la carga de datos...")
+
+    restaurar_imagenes_media()  # <--- 3. AÑADE ESTA LÍNEA AQUÍ
+
+    # Aquí ya siguen tus funciones normales:
+    # insertar_roles()
+    # insertar_refugios()
+    # ...
