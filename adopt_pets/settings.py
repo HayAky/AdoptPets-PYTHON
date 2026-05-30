@@ -84,11 +84,11 @@ WSGI_APPLICATION = 'adopt_pets.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'adopcion_mascotas',
-        'USER': 'root',
-        'PASSWORD': 'andres',
-        'HOST': 'localhost',
-        'PORT': '3306',
+        'NAME': os.environ.get('MYSQL_DATABASE', 'adopcion_mascotas'),
+        'USER': os.environ.get('MYSQL_USER', 'root'),
+        'PASSWORD': os.environ.get('MYSQL_PASSWORD', 'andres'),
+        'HOST': os.environ.get('MYSQL_HOST', 'localhost'),
+        'PORT': os.environ.get('MYSQL_PORT', '3306'),
     }
 }
 
