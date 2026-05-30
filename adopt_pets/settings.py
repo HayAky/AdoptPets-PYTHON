@@ -9,7 +9,6 @@ DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 ALLOWED_HOSTS = ['*']
 
 ALLOWED_HOSTS = ['*']
-
 CSRF_TRUSTED_ORIGINS = ['https://c88bedb0b4647d.lhr.life']
 
 # Application definition
