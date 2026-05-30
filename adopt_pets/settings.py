@@ -9,6 +9,9 @@ DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 ALLOWED_HOSTS = ['*']
 
 ALLOWED_HOSTS = ['*']
+CSRF_TRUSTED_ORIGINS = [
+    'https://adoptpets-python-production.up.railway.app',
+]
 CSRF_TRUSTED_ORIGINS = ['https://c88bedb0b4647d.lhr.life']
 
 # Application definition
@@ -63,7 +66,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'adopcion_mascotas',
         'USER': 'root',
-        'PASSWORD': 'andres',
+        'PASSWORD': 'fabian123456',
         'HOST': 'localhost',
         'PORT': '3306',
     }
