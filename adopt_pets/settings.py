@@ -8,24 +8,10 @@ SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure--5qs*iwgzrj(_74tr^@bp
 DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 ALLOWED_HOSTS = ['*']
 
-ALLOWED_HOSTS = [
-    'localhost',
-    '127.0.0.1',
-    'adoptpets-python-production.up.railway.app',
-    '.railway.app'  # El punto al inicio funciona como comodín para cualquier subdominio
-]
-CSRF_TRUSTED_ORIGINS = [
-    'https://adoptpets-python-production.up.railway.app',
-    'https://*.railway.app',
-]
+ALLOWED_HOSTS = ['*']
 
-# 2. Permitir que Django reconozca HTTPS a través del proxy de Railway
-SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+CSRF_TRUSTED_ORIGINS = ['https://c88bedb0b4647d.lhr.life']
 
-# 3. Forzar a que las cookies de CSRF viajen solo por conexiones seguras (HTTPS)
-CSRF_COOKIE_SECURE = True
-SESSION_COOKIE_SECURE = True
-CSRF_COOKIE_HTTPONLY = False
 # Application definition
 INSTALLED_APPS = [
     'usuarios',
@@ -107,9 +93,6 @@ USE_TZ = True
 
 # Static & Media files
 STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
-# Reemplaza la línea anterior por esta:
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedStaticFilesStorage'
 STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
