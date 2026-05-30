@@ -6,10 +6,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure--5qs*iwgzrj(_74tr^@bpa7_lsu&55_1j39@zno7cu4n0sr)(6')
 DEBUG = os.environ.get('DEBUG', 'False') == 'True'
-ALLOWED_HOSTS = ['*']
 
 ALLOWED_HOSTS = ['*']
-CSRF_TRUSTED_ORIGINS = ['https://c88bedb0b4647d.lhr.life']
+CSRF_TRUSTED_ORIGINS = [
+    'https://adoptpets-python-production.up.railway.app'
+]
 
 # Application definition
 INSTALLED_APPS = [
