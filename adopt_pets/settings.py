@@ -13,8 +13,18 @@ CSRF_TRUSTED_ORIGINS = [
     'https://adoptpets-python-production.up.railway.app',
     'https://*.railway.app',
 ]
-CSRF_TRUSTED_ORIGINS = ['https://c88bedb0b4647d.lhr.life']
+# 1. Dominios de confianza para formularios seguros
+CSRF_TRUSTED_ORIGINS = [
+    'https://adoptpets-python-production.up.railway.app',
+    'https://*.railway.app',
+]
 
+# 2. Permitir que Django reconozca HTTPS a través del proxy de Railway
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+# 3. Forzar a que las cookies de CSRF viajen solo por conexiones seguras (HTTPS)
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = True
 # Application definition
 INSTALLED_APPS = [
     'usuarios',
