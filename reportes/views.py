@@ -1,48 +1,97 @@
-from io import BytesIO
-from django.http import HttpResponse
-from reportlab.lib.pagesizes import letter
-from reportlab.lib import colors
-from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
-from reportlab.lib.styles import getSampleStyleSheet
+from django.shortcuts import render
+from django.utils import timezone
+from .utils import generar_pdf
+from mascotas.models import Mascota
+from adopciones.models import Adopcion
+from usuarios.models import Usuario
+from refugios.models import Refugio
+from usuarios.decorators import roles_permitidos
 
 
-def generar_pdf(template_src, context_dict, filename):
-    """Genera un PDF con columnas y filas del contexto."""
-    buffer = BytesIO()
-    doc = SimpleDocTemplate(buffer, pagesize=letter, topMargin=40, bottomMargin=40)
-    styles = getSampleStyleSheet()
-    elements = []
+@roles_permitidos(['ADMIN'])
+def pdf_mascotas(request):
+    mascotas = Mascota.objects.all().order_by('-fecha_registro')
+    columnas = ['Nombre', 'Especie', 'Raza', 'Estado', 'Refugio']
+    filas = [
+        [
+            m.nombre,
+            m.especie,
+            m.raza or 'N/A',
+            m.get_estado_adopcion_display(),
+            m.refugio.nombre_refugio if m.refugio else 'Sin asignar'
+        ] for m in mascotas
+    ]
+    data = {
+        'titulo': 'Reporte General de Mascotas',
+        'fecha': timezone.now().strftime("%d/%m/%Y %H:%M"),
+        'columnas': columnas,
+        'filas': filas
+    }
+    return generar_pdf('reportes/pdf_base.html', data, 'AdoptPets_Mascotas.pdf')
 
-    # Título
-    titulo = context_dict.get('titulo', 'Reporte')
-    fecha = context_dict.get('fecha', '')
-    elements.append(Paragraph(titulo, styles['Title']))
-    elements.append(Paragraph(f"Generado el: {fecha}", styles['Normal']))
-    elements.append(Spacer(1, 20))
 
-    # Tabla
-    columnas = context_dict.get('columnas', [])
-    filas = context_dict.get('filas', [])
+@roles_permitidos(['ADMIN'])
+def pdf_adopciones(request):
+    adopciones = Adopcion.objects.all().order_by('-fecha_solicitud')
+    columnas = ['ID', 'Mascota', 'Adoptante', 'Fecha Solicitud', 'Estado']
+    filas = [
+        [
+            f"#{a.id_adopcion}",
+            a.mascota.nombre,
+            f"{a.adoptante.nombre} {a.adoptante.apellido}",
+            a.fecha_solicitud.strftime("%d/%m/%Y"),
+            a.get_estado_adopcion_display()
+        ] for a in adopciones
+    ]
+    data = {
+        'titulo': 'Historial de Solicitudes de Adopción',
+        'fecha': timezone.now().strftime("%d/%m/%Y %H:%M"),
+        'columnas': columnas,
+        'filas': filas
+    }
+    return generar_pdf('reportes/pdf_base.html', data, 'AdoptPets_Adopciones.pdf')
 
-    if columnas and filas:
-        table_data = [columnas] + filas
-        table = Table(table_data, repeatRows=1)
-        table.setStyle(TableStyle([
-            ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#2d6a4f')),
-            ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
-            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-            ('FONTSIZE', (0, 0), (-1, 0), 10),
-            ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.HexColor('#f0f0f0')]),
-            ('FONTNAME', (0, 1), (-1, -1), 'Helvetica'),
-            ('FONTSIZE', (0, 1), (-1, -1), 9),
-            ('GRID', (0, 0), (-1, -1), 0.4, colors.grey),
-            ('PADDING', (0, 0), (-1, -1), 6),
-            ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
-        ]))
-        elements.append(table)
 
-    doc.build(elements)
-    buffer.seek(0)
-    response = HttpResponse(buffer, content_type='application/pdf')
-    response['Content-Disposition'] = f'attachment; filename="{filename}"'
-    return response
+@roles_permitidos(['ADMIN'])
+def pdf_usuarios(request):
+    usuarios = Usuario.objects.all().order_by('nombre')
+    columnas = ['Nombre', 'Cédula', 'Email', 'Teléfono', 'Estado']
+    filas = [
+        [
+            f"{u.nombre} {u.apellido}",
+            u.cedula or 'N/A',
+            u.email,
+            u.telefono or 'N/A',
+            "Activo" if u.is_active else "Inactivo"
+        ] for u in usuarios
+    ]
+    data = {
+        'titulo': 'Directorio de Usuarios Registrados',
+        'fecha': timezone.now().strftime("%d/%m/%Y %H:%M"),
+        'columnas': columnas,
+        'filas': filas
+    }
+    return generar_pdf('reportes/pdf_base.html', data, 'AdoptPets_Usuarios.pdf')
+
+
+@roles_permitidos(['ADMIN'])
+def panel_reportes(request):
+    return render(request, 'reportes/reportes.html')
+
+
+@roles_permitidos(['ADMIN'])
+def pdf_refugios(request):
+    refugios = Refugio.objects.all().order_by('nombre_refugio')
+    columnas = ['Nombre', 'Responsable', 'Teléfono', 'Email', 'Estado']
+    filas = [
+        [
+            r.nombre_refugio,
+            r.responsable,
+            r.telefono or 'N/A',
+            r.email,
+            "Activo" if r.activo else "Inactivo"
+        ] for r in refugios
+    ]
+    data = {
+        'titulo': 'Directorio de Refugios Aliados',
+        'fecha': timezone.now().strft
