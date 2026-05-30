@@ -1,1 +1,1 @@
-web: python manage.py collectstatic --noinput && python manage.py migrate && gunicorn adopt_pets.wsgi --bind 0.0.0.0:$PORT
+web: python manage.py collectstatic --noinput && python manage.py migrate && python manage.py shell -c "from usuarios.models import Usuario; u=Usuario.objects.filter(email='admin@email.com'); u.exists() or Usuario.objects.create_superuser('admin', 'admin@adoptpets.com', 'admin314362')" && gunicorn adopt_pets.wsgi --bind 0.0.0.0:$PORT
