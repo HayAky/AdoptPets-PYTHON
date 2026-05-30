@@ -3,7 +3,8 @@ from pathlib import Path
 import dj_database_url
 
 BASE_DIR = Path(__file__).resolve().parent.parent
-
+# createsuperuser pending
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure--5qs*iwgzrj(_74tr^@bpa7_lsu&55_1j39@zno7cu4n0sr)(6')
 DEBUG = os.environ.get('DEBUG', 'False') == 'True'
 ALLOWED_HOSTS = ['*']
