@@ -94,4 +94,8 @@ def pdf_refugios(request):
     ]
     data = {
         'titulo': 'Directorio de Refugios Aliados',
-        'fecha': timezone.now().strft
+        'fecha': timezone.now().strftime("%d/%m/%Y %H:%M"),
+        'columnas': columnas,
+        'filas': filas
+    }
+    return generar_pdf('reportes/pdf_base.html', data, 'AdoptPets_Refugios.pdf')
