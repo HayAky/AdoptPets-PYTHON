@@ -11,6 +11,7 @@ ALLOWED_HOSTS = ['*']
 ALLOWED_HOSTS = ['*']
 CSRF_TRUSTED_ORIGINS = [
     'https://adoptpets-python-production.up.railway.app',
+    'https://*.railway.app',
 ]
 CSRF_TRUSTED_ORIGINS = ['https://c88bedb0b4647d.lhr.life']
 
