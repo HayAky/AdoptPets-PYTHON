@@ -1,0 +1,1 @@
+web: gunicorn adopt_pets.wsgi --log-file -
