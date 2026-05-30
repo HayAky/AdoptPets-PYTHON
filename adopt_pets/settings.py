@@ -10,8 +10,7 @@ ALLOWED_HOSTS = ['*']
 
 ALLOWED_HOSTS = ['*']
 CSRF_TRUSTED_ORIGINS = [
-    'https://c88bedb0b4647d.lhr.life'
-    'reliable-commitment-production-4459.up.railway.app'
+    'https://reliable-commitment-production-4459.up.railway.app'
 ]
 
 # Application definition
