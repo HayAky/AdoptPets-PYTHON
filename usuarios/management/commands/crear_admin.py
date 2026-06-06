@@ -13,3 +13,4 @@ class Command(BaseCommand):
             self.stdout.write('Superusuario creado')
         else:
             self.stdout.write('Superusuario ya existe')
+# force redeploy
