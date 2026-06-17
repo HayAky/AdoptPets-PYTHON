@@ -3,13 +3,16 @@ from pathlib import Path
 import dj_database_url
 
 BASE_DIR = Path(__file__).resolve().parent.parent
-
+# createsuperuser pending
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 SECRET_KEY = os.environ.get('SECRET_KEY', 'django-insecure--5qs*iwgzrj(_74tr^@bpa7_lsu&55_1j39@zno7cu4n0sr)(6')
-DEBUG = os.environ.get('DEBUG', 'False') == 'True'
+DEBUG = os.environ.get('DEBUG', 'False') == 'False'
 ALLOWED_HOSTS = ['*']
 
 ALLOWED_HOSTS = ['*']
-CSRF_TRUSTED_ORIGINS = ['https://c88bedb0b4647d.lhr.life']
+CSRF_TRUSTED_ORIGINS = [
+    'https://reliable-commitment-production-4459.up.railway.app'
+]
 
 # Application definition
 INSTALLED_APPS = [
@@ -102,3 +105,16 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 # Email config
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 DEFAULT_FROM_EMAIL = 'soporte@adoptpets.com'
+
+##===================================================================
+##pruebas pytest
+import sys
+
+# Si el sistema detecta que estamos corriendo pruebas, cambia la BD a SQLite en memoria
+if 'test' in sys.argv or 'pytest' in sys.modules:
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.sqlite3',
+            'NAME': ':memory:',
+        }
+    }

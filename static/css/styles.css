@@ -25,8 +25,10 @@ header {
     padding: 0 !important;
     margin: 0 !important;
     z-index: 1000 !important;
-    background-color: transparent !important; /* El padre no debe tener color */
-    box-shadow: none !important; /* Sin sombra para evitar líneas divisorias en la unión */
+    background-color: rgba(255, 255, 255, 0.7) !important;
+    backdrop-filter: blur(12px) !important;
+    -webkit-backdrop-filter: blur(12px) !important;
+    box-shadow: none !important;
 }
 
 /* ========================================
@@ -65,6 +67,12 @@ header .contenedor {
     justify-content: space-between;
     display: flex;
     max-width: 100%;
+    background-color: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
 }
 
 header nav {
@@ -84,12 +92,12 @@ header nav {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    /* EL AJUSTE DEL BLUR */
-    background-color: rgba(255, 255, 255, 0.6) !important; /* 0.6 de opacidad es el punto dulce */
-    backdrop-filter: blur(10px) !important;
-    -webkit-backdrop-filter: blur(10px) !important; /* Obligatorio para Safari/iOS */
 
-    /* ESTO ES LO QUE FALTA PARA QUE FUNCIONE */
+    background-color: rgba(255, 255, 255, 0.7) !important;
+    backdrop-filter: blur(12px) !important;
+    -webkit-backdrop-filter: blur(12px) !important;
+
+
     position: sticky !important;
     top: 0 !important;
     z-index: 1000 !important; /* Esto lo pone por encima del contenido que se va a desenfocar */

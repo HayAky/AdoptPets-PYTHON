@@ -1,1 +1,1 @@
-web: python manage.py collectstatic --noinput && python manage.py migrate && gunicorn adopt_pets.wsgi --bind 0.0.0.0:$PORT
+web: python manage.py collectstatic --noinput && python manage.py migrate && python manage.py crear_admin && gunicorn adopt_pets.wsgi --bind 0.0.0.0:$PORT
