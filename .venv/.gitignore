@@ -1,5 +1,0 @@
-.pytest_cache/
-test_db.sqlite3
-*.pyc
-__pycache__/
-.venv/
