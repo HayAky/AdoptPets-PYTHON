@@ -1,1 +1,1 @@
-web: source /app/.venv/bin/activate && python manage.py collectstatic --noinput && python manage.py migrate && python manage.py crear_admin && gunicorn adopt_pets.wsgi --bind 0.0.0.0:$PORT
+web: /app/.venv/bin/python manage.py collectstatic --noinput && /app/.venv/bin/python manage.py migrate && /app/.venv/bin/python manage.py crear_admin && /app/.venv/bin/gunicorn adopt_pets.wsgi --bind 0.0.0.0:$PORT
