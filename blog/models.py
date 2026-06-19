@@ -72,7 +72,7 @@ class Noticia(models.Model):
 class Comentario(models.Model):
     id_comentario = models.BigAutoField(primary_key=True)
     usuario = models.ForeignKey(Usuario, on_delete=models.CASCADE, db_column='id_usuario')
-    tipo_contenido = models.CharField(max_length=50)  # "noticia" o "blog"
+    tipo_contenido = models.CharField(max_length=50)
 
     noticia = models.ForeignKey(Noticia, on_delete=models.CASCADE, null=True, blank=True, db_column='id_noticia')
     blog = models.ForeignKey(Blog, on_delete=models.CASCADE, null=True, blank=True, db_column='id_blog')

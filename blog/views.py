@@ -24,7 +24,7 @@ def admin_lista_blogs(request):
 def crear_blog(request):
     categorias = CategoriaBlog.choices
     if request.method == 'POST':
-        try:  # <-- BLINDAJE
+        try:
             Blog.objects.create(
                 titulo=request.POST.get('titulo'),
                 resumen=request.POST.get('resumen'),
@@ -54,7 +54,7 @@ def editar_blog(request, blog_id):
         return redirect('admin_lista_blogs')
 
     if request.method == 'POST':
-        try:  # <-- BLINDAJE
+        try:
             blog.titulo = request.POST.get('titulo')
             blog.resumen = request.POST.get('resumen')
             blog.contenido = request.POST.get('contenido')
