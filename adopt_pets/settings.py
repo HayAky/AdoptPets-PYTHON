@@ -111,7 +111,7 @@ DEFAULT_FROM_EMAIL = 'soporte@adoptpets.com'
 import sys
 
 # Si el sistema detecta que estamos corriendo pruebas, cambia la BD a SQLite en memoria
-if 'test' in sys.argv or 'pytest' in sys.modules:
+if 'tests' in sys.argv or 'pytest' in sys.modules:
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.sqlite3',

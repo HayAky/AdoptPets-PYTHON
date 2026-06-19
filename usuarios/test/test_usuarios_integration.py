@@ -8,7 +8,7 @@ def test_create_user_integration(client):
     # Se añaden los campos obligatorios para pasar la validación del formulario
     data = {
         'username': 'nuevo_usuario',
-        'email': 'nuevo@test.com',
+        'email': 'nuevo@tests.com',
         'password': 'password123',
         'nombre': 'Andres',
         'apellido': 'Prueba'
