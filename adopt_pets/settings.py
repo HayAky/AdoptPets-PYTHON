@@ -14,6 +14,7 @@ CSRF_TRUSTED_ORIGINS = [
 
 # Application definition
 INSTALLED_APPS = [
+    'cloudinary_storage',  # <-- MODIFICADO: Debe ir obligatoriamente ANTES de staticfiles
     'usuarios',
     'mascotas',
     'refugios',
@@ -26,6 +27,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'cloudinary',          # <-- MODIFICADO: Añadido al final de las apps
 ]
 
 MIDDLEWARE = [
@@ -103,11 +105,21 @@ STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
+# MODIFICADO: Configuración de almacenamiento remoto con Cloudinary
+CLOUDINARY_STORAGE = {
+    'CLOUD_NAME': os.environ.get('CLOUDINARY_CLOUD_NAME'),
+    'API_KEY': os.environ.get('CLOUDINARY_API_KEY'),
+    'API_SECRET': os.environ.get('CLOUDINARY_API_SECRET'),
+}
+DEFAULT_FILE_STORAGE = 'cloudinary_storage.storage.MediaCloudinaryStorage'
+
+
 # Email config
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 DEFAULT_FROM_EMAIL = 'soporte@adoptpets.com'
 # Fuerza a Django a no usar 'RETURNING' en bases de datos MariaDB/MySQL antiguas
 SILENCED_SYSTEM_CHECKS = ['mysql.E002']
+
 # Trucos de compatibilidad para MariaDB 10.4 y PyTest
 from django.db.backends.base.base import BaseDatabaseWrapper
 from django.db.backends.mysql.features import DatabaseFeatures
