@@ -128,7 +128,11 @@
         {% for mascota in mascotas %}
         <div class="pet-card">
 
-            <img src="{% get_static_prefix %}img/{{ mascota.nombre }}.jpg" alt="Foto de {{ mascota.nombre }}" onerror="this.onerror=null; this.src='{% static 'img/default-pet.jpg' %}';">
+            {% if mascota.foto %}
+                <img src="{{ mascota.foto.url }}" alt="Foto de {{ mascota.nombre }}">
+            {% else %}
+                <img src="{% static 'img/default-pet.jpg' %}" alt="Foto de {{ mascota.nombre }}">
+            {% endif %}
 
             <div class="pet-info">
                 <h3>{{ mascota.nombre }}</h3>
