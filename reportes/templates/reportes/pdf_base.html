@@ -6,8 +6,18 @@
         @page {
             size: A4 portrait;
             margin: 2cm;
-            margin-bottom: 2.5cm; /* Dejamos margen en la hoja para que el pie no pise la tabla */
+            margin-bottom: 2.5cm;
+
+            /* ASIGNACIÓN NATIVA: Registramos el pie de página en un frame del motor PDF */
+            @frame footer_frame {
+                -pdf-frame-content: footerContent;
+                left: 2cm;
+                right: 2cm;
+                bottom: 1cm;
+                height: 1cm;
+            }
         }
+        
         body { font-family: Helvetica, Arial, sans-serif; color: #333; }
         h1 { color: #22C55E; text-align: center; border-bottom: 2px solid #22C55E; padding-bottom: 10px; }
         .info { font-size: 12px; color: #666; margin-bottom: 30px; }
@@ -16,12 +26,8 @@
         td { padding: 8px; border: 1px solid #d1d5db; font-size: 12px; }
         .row-even { background-color: #fafafa; }
 
-        /* NUEVO PIE DE PÁGINA (CSS Estándar, sin errores en el editor) */
+        /* Estilo limpio para el pie de página dentro de su zona segura */
         #footerContent {
-            position: fixed;
-            bottom: -1.5cm;
-            left: 0cm;
-            right: 0cm;
             text-align: right;
             font-size: 10px;
             color: #9ca3af;
