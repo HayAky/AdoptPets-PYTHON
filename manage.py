@@ -5,6 +5,11 @@ import sys
 
 
 def main():
+    # --- AQUÍ EMPIEZA EL TRUCO PARA TU COMPUTADORA ---
+    from django.db.backends.base.base import BaseDatabaseWrapper
+    BaseDatabaseWrapper.check_database_version_supported = lambda self: None
+    # --- AQUÍ TERMINA EL TRUCO ---
+
     """Run administrative tasks."""
     os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'adopt_pets.settings')
     try:

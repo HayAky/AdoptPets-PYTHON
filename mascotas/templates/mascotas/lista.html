@@ -6,7 +6,7 @@
 {% block extra_css %}
     <link href="{% static 'css/publicmasco.css' %}" rel="stylesheet">
     <style>
-        /* Estilos del Panel Multicriterio extraídos de tu Java original */
+        /* Estilos del Panel Multicriterio */
         .filter-container { background: white; border-radius: 15px; padding: 25px; margin-bottom: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
         .filter-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 2px solid #f0fdf4; padding-bottom: 15px;}
         .filter-header h3 { color: #22C55E; font-size: 20px; margin: 0; }
@@ -128,13 +128,7 @@
         {% for mascota in mascotas %}
         <div class="pet-card">
 
-            {% if mascota.foto %}
-                <img src="{{ mascota.foto.url }}" alt="Foto de {{ mascota.nombre }}">
-            {% elif mascota.galeriafoto_set.all %}
-                <img src="{{ mascota.galeriafoto_set.first.url_foto }}" alt="Foto de {{ mascota.nombre }}">
-            {% else %}
-                <img src="{% static 'img/default-pet.jpg' %}" alt="Imagen por defecto">
-            {% endif %}
+            <img src="{% get_static_prefix %}img/{{ mascota.nombre }}.jpg" alt="Foto de {{ mascota.nombre }}" onerror="this.onerror=null; this.src='{% static 'img/default-pet.jpg' %}';">
 
             <div class="pet-info">
                 <h3>{{ mascota.nombre }}</h3>
@@ -175,7 +169,6 @@
 <script>
     function toggleFilters() {
         const form = document.getElementById('filterForm');
-        // Usamos una pequeña animación CSS nativa cambiando el display
         if (form.style.display === 'none') {
             form.style.display = 'block';
         } else {

@@ -64,9 +64,12 @@ DATABASES = {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'adopcion_mascotas',
         'USER': 'root',
-        'PASSWORD': 'fabian123456',
+        'PASSWORD': '',
         'HOST': 'localhost',
         'PORT': '3306',
+        'OPTIONS': {
+            'init_command': "SET sql_mode='STRICT_TRANS_TABLES'",
+        },
     }
 }
 
@@ -103,3 +106,16 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 # Email config
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 DEFAULT_FROM_EMAIL = 'soporte@adoptpets.com'
+# Fuerza a Django a no usar 'RETURNING' en bases de datos MariaDB/MySQL antiguas
+SILENCED_SYSTEM_CHECKS = ['mysql.E002']
+# Trucos de compatibilidad para MariaDB 10.4 y PyTest
+from django.db.backends.base.base import BaseDatabaseWrapper
+from django.db.backends.mysql.features import DatabaseFeatures
+
+# 1. Saltarse la validación de versión vieja
+BaseDatabaseWrapper.check_database_version_supported = lambda self: None
+
+# 2. Desactivar el comando RETURNING que rompe la sintaxis SQL
+DatabaseFeatures.can_return_rows_from_bulk_insert = False
+DatabaseFeatures.can_return_columns_from_insert = False
+DatabaseFeatures.has_select_for_update_skip_locked = False
