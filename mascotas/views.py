@@ -8,10 +8,6 @@ from .forms import MascotaForm
 from mascotas.models import Mascota
 
 
-# mascotas/views.py
-def inicio(request):
-    mascotas = Mascota.objects.all() # Verifica que existan registros
-    return render(request, 'main.html', {'mascotas': mascotas})
 def lista_mascotas(request):
     mascotas = Mascota.objects.filter(estado_adopcion='disponible').order_by('-fecha_registro')
 
