@@ -19,147 +19,16 @@
             <form method="post" action="" enctype="multipart/form-data">
                 {% csrf_token %}
 
-                <div class="form-row">
+                {% for field in form %}
                     <div class="form-group">
-                        <label for="nombre">Nombre *</label>
-                        <input type="text" id="nombre" name="nombre" value="{{ mascota.nombre|default:'' }}" required>
+                        {{ field.label_tag }}
+                        {{ field }}
+                        {% if field.errors %}
+                            <div class="error">{{ field.errors }}</div>
+                        {% endif %}
                     </div>
+                {% endfor %}
 
-                    <div class="form-group">
-                        <label for="especie">Especie *</label>
-                        <select id="especie" name="especie" required>
-                            <option value="">Seleccionar</option>
-                            <option value="perro" {% if mascota.especie == 'perro' %}selected{% endif %}>Perro</option>
-                            <option value="gato" {% if mascota.especie == 'gato' %}selected{% endif %}>Gato</option>
-                            <option value="conejo" {% if mascota.especie == 'conejo' %}selected{% endif %}>Conejo</option>
-                            <option value="otro" {% if mascota.especie == 'otro' %}selected{% endif %}>Otro</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="form-group" style="background: #f0fdf4; padding: 15px; border-radius: 8px; border: 1px dashed #22c55e; margin-bottom: 15px;">
-                    <label style="color: #166534;">📸 Fotografía de la Mascota</label>
-                    {% if mascota.foto %}
-                        <p style="font-size: 12px; color: #666;">Foto actual guardada. Sube una nueva si deseas cambiarla.</p>
-                    {% endif %}
-                    <input type="file" name="foto" accept="image/*" style="border: none; padding: 0;">
-                </div>
-
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="raza">Raza</label>
-                        <input type="text" id="raza" name="raza" value="{{ mascota.raza|default:'' }}">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="edadAproximada">Edad Aproximada</label>
-                        <div style="display: flex; align-items: center;">
-                            <input type="number" id="edadAproximada" name="edadAproximada"
-                                   value="{{ mascota.edad_aproximada|default:'' }}" min="0"
-                                   style="width: 100px;">
-                            <span style="margin-left: 10px; color: #666;">años</span>
-                        </div>
-                    </div>
-
-                </div>
-
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="sexo">Sexo *</label>
-                        <select id="sexo" name="sexo" required>
-                            <option value="">Seleccionar</option>
-                            <option value="macho" {% if mascota.sexo == 'macho' %}selected{% endif %}>Macho</option>
-                            <option value="hembra" {% if mascota.sexo == 'hembra' %}selected{% endif %}>Hembra</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="tamano">Tamaño *</label>
-                        <select id="tamano" name="tamano" required>
-                            <option value="">Seleccionar</option>
-                            <option value="pequeño" {% if mascota.tamano == 'pequeño' %}selected{% endif %}>Pequeño</option>
-                            <option value="mediano" {% if mascota.tamano == 'mediano' %}selected{% endif %}>Mediano</option>
-                            <option value="grande" {% if mascota.tamano == 'grande' %}selected{% endif %}>Grande</option>
-                        </select>
-                    </div>
-                </div>
-
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="peso">Peso (kg)</label>
-                        <input type="number" step="0.1" id="peso" name="peso" value="{{ mascota.peso|default:'' }}" min="0">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="color">Color</label>
-                        <input type="text" id="color" name="color" value="{{ mascota.color|default:'' }}">
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label for="refugio">Refugio *</label>
-
-                    {% if request.user.es_admin %}
-                        <select id="refugio" name="refugio" required style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #ccc;">
-                            <option value="">Seleccione un refugio</option>
-                            {% for ref in refugios %}
-                                <option value="{{ ref.id_refugio }}" {% if mascota.refugio.id_refugio == ref.id_refugio %}selected{% endif %}>
-                                    {{ ref.nombre_refugio }}
-                                </option>
-                            {% endfor %}
-                        </select>
-                    {% else %}
-                        <div style="padding: 12px; border-radius: 8px; background: #e0f2fe; color: #0369a1; font-weight: bold; border: 1px solid #bae6fd;">
-                            🏠 Asignado automáticamente a: {{ mi_refugio.nombre_refugio }}
-                        </div>
-                        <p style="margin: 5px 0 0 0; font-size: 12px; color: #666;">Como usuario de refugio, esta mascota se vinculará a tu sede.</p>
-                    {% endif %}
-                </div>
-
-                <div class="form-group">
-                    <label for="descripcion">Descripción</label>
-                    <textarea id="descripcion" name="descripcion" placeholder="Describe la personalidad...">{{ mascota.descripcion|default:'' }}</textarea>
-                </div>
-
-                <div class="form-group">
-                    <label for="estadoSalud">Estado de Salud</label>
-                    <textarea id="estadoSalud" name="estadoSalud">{{ mascota.estado_salud|default:'' }}</textarea>
-                </div>
-
-                <div class="form-group">
-                    <label>Características</label>
-                    <div class="checkbox-group">
-                        <div class="checkbox-item">
-                            <input type="checkbox" id="vacunado" name="vacunado" {% if mascota.vacunado %}checked{% endif %}>
-                            <label for="vacunado">Vacunado</label>
-                        </div>
-                        <div class="checkbox-item">
-                            <input type="checkbox" id="esterilizado" name="esterilizado" {% if mascota.esterilizado %}checked{% endif %}>
-                            <label for="esterilizado">Esterilizado</label>
-                        </div>
-                        <div class="checkbox-item">
-                            <input type="checkbox" id="microchip" name="microchip" {% if mascota.microchip %}checked{% endif %}>
-                            <label for="microchip">Microchip</label>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="estadoAdopcion">Estado de Adopción</label>
-                        <select id="estadoAdopcion" name="estadoAdopcion">
-                            <option value="disponible" {% if mascota.estado_adopcion == 'disponible' %}selected{% endif %}>Disponible</option>
-                            <option value="pendiente" {% if mascota.estado_adopcion == 'pendiente' %}selected{% endif %}>Pendiente</option>
-                            <option value="adoptado" {% if mascota.estado_adopcion == 'adoptado' %}selected{% endif %}>Adoptado</option>
-                        </select>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="fechaIngreso">Fecha de Ingreso</label>
-                        <input type="date" id="fechaIngreso" name="fechaIngreso" value="{% if mascota.fecha_ingreso %}{{ mascota.fecha_ingreso|date:'Y-m-d' }}{% else %}{% now 'Y-m-d' %}{% endif %}"
-                        max="{% now 'Y-m-d' %}">
-                    </div>
-                </div>
                 <div class="form-buttons">
                     <button type="submit" class="btn btn-primary">💾 Guardar Mascota</button>
                     <a href="{% url 'admin_lista_mascotas' %}" class="btn btn-secondary">Cancelar</a>

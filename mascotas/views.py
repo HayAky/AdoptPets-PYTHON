@@ -134,7 +134,7 @@ def editar_mascota(request, mascota_id):
         return redirect('admin_lista_mascotas')
 
     if request.method == 'POST':
-        try:  # <--- INICIA EL BLINDAJE
+        try:
             guardar_datos_mascota(request, mascota)
 
             if request.user.es_admin:
@@ -145,6 +145,7 @@ def editar_mascota(request, mascota_id):
                 mascota.refugio = mi_refugio
 
             mascota.save()
+
             messages.success(request, 'Mascota actualizada correctamente.')
             return redirect('admin_lista_mascotas')
 
@@ -205,7 +206,9 @@ def guardar_datos_mascota(request, mascota):
 
     # 6. Guardar la fotografía si el usuario subió una nueva
     if 'foto' in request.FILES:
+        # Esto asigna el archivo al campo foto
         mascota.foto = request.FILES['foto']
+
 
 
 # mascotas/views.py
