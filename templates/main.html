@@ -17,20 +17,18 @@
     </div>
 </section>
 
-{% load cloudinary %} <section class="recien-llegados" style="padding: 40px 0; background-color: #ffffff;">
-    <h2 style="text-align: center; margin-bottom: 60px; color: #22C55E; font-size: 36px">Recién Llegados</h2>
+ <section class="recien-llegados" style="padding: 40px 0; background-color: #ffffff;">
+    <h2 style="text-align: center; margin-bottom: 60px; color: #22C55E; font-size: 36px;">Recién Llegados</h2>
 
-    <div class="swiper carrusel-mascotas" style="max-width: 1200px; margin: 0 auto; padding-bottom: 50px;">
+    <div class="swiper carrusel-mascotas" style="max-width: 1200px; margin: 0 auto; padding-bottom: 50px; overflow: hidden;">
         <div class="swiper-wrapper">
             {% for mascota in mascotas_destacadas %}
-            <div class="swiper-slide" style="border: 1px solid #e0e0e0; border-radius: 8px; overflow: hidden; background: #fff;">
-                <div style="height: 250px; width: 100%; background: #eaeaea;">
-                    {% if mascota.foto %}
-                        {% cloudinary mascota.foto width=300 height=250 crop="fill" %}
-
-                        {% cloudinary mascota.foto.name width=300 height=250 crop="fill" %}
+            <div class="swiper-slide" style="border: 1px solid #e0e0e0; border-radius: 8px; overflow: hidden; background: #fff; min-width: 250px;">
+                <div style="height: 250px; width: 100%; background: #eaeaea; display: flex; align-items: center; justify-content: center;">
+                    {% if mascota.foto_url %}
+                        <img src="{{ mascota.foto_url }}" alt="{{ mascota.nombre }}" style="width: 100%; height: 100%; object-fit: cover;">
                     {% else %}
-                        <div style="display: flex; align-items: center; justify-content: center; height: 100%; color: #888;">Sin foto</div>
+                        <span style="color: #888;">Sin foto</span>
                     {% endif %}
                 </div>
                 <div style="padding: 15px; text-align: center;">
@@ -40,6 +38,7 @@
             </div>
             {% endfor %}
         </div>
+
         <div class="swiper-pagination"></div>
         <div class="swiper-button-next" style="color: #333;"></div>
         <div class="swiper-button-prev" style="color: #333;"></div>

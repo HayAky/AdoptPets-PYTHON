@@ -208,12 +208,19 @@ def guardar_datos_mascota(request, mascota):
         mascota.foto = request.FILES['foto']
 
 
-def inicio(request):
-    # ... tu código existente ...
-    mascotas_destacadas = Mascota.objects.order_by('-fecha_registro')[:6]
+# mascotas/views.py
 
-    contexto = {
-        # ... el resto de tus variables existentes ...
-        'mascotas_destacadas': mascotas_destacadas,
-    }
-    return render(request, 'main.html', contexto)
+def inicio(request):
+    mascotas = Mascota.objects.order_by('-fecha_registro')[:6]
+    mascotas_procesadas = []
+
+    for m in mascotas:
+        mascotas_procesadas.append({
+            'nombre': m.nombre,
+            'especie': m.especie,
+            'edad_aproximada': m.edad_aproximada,
+            # Extraemos la URL como string plano aquí
+            'foto_url': m.foto.url if m.foto else None
+        })
+
+    return render(request, 'main.html', {'mascotas_destacadas': mascotas_procesadas})
