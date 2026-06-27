@@ -9,15 +9,12 @@ from .forms import MascotaForm
 
 
 def inicio(request):
-    # Traemos los objetos de base de datos directamente
-    mascotas_destacadas = Mascota.objects.filter(estado_adopcion='disponible').order_by('-fecha_registro')[:6]
-    blogs_destacados = Blog.objects.filter(activo=True).order_by('-fecha_publicacion')[:2]
+    mascotas_carrusel = Mascota.objects.all()[:5]
 
-    # Pasamos el queryset directamente, NO crees diccionarios manuales
-    return render(request, 'main.html', {
-        'mascotas_destacadas': mascotas_destacadas,
-        'blogs': blogs_destacados
-    })
+    contexto = {
+        'mascotas': mascotas_carrusel
+    }
+    return render(request, 'main.html', contexto)
 def lista_mascotas(request):
     mascotas = Mascota.objects.filter(estado_adopcion='disponible').order_by('-fecha_registro')
 
