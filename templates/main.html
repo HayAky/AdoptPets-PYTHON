@@ -24,14 +24,14 @@
         <div class="swiper-wrapper">
             {% for mascota in mascotas_destacadas %}
                 <div class="swiper-slide">
-                    <p style="color: red; font-size: 10px;">
-                        Debug: {{ mascota }} | Foto: {{ mascota.foto }}
-                    </p>
+                    <div style="border: 2px solid red; padding: 5px; font-size: 10px;">
+                        DEBUG: {{ mascota.nombre }} | ID: {{ mascota.id_mascota }} |
+                        Foto: "{{ mascota.foto }}" |
+                        ¿Tiene foto?: {% if mascota.foto %} SÍ {% else %} NO {% endif %}
+                    </div>
 
                     {% if mascota.foto %}
                         <img src="{{ mascota.foto.url }}" alt="{{ mascota.nombre }}">
-                    {% else %}
-                        <p>La variable foto está totalmente vacía o es nula.</p>
                     {% endif %}
                 </div>
             {% endfor %}
