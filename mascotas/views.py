@@ -207,5 +207,13 @@ def guardar_datos_mascota(request, mascota):
     if 'foto' in request.FILES:
         mascota.foto = request.FILES['foto']
 
-    # El mascota.save() se ejecuta de forma segura desde las funciones
-    # crear_mascota y editar_mascota, no aquí.
+
+def inicio(request):
+    # ... tu código existente ...
+    mascotas_destacadas = Mascota.objects.order_by('-fecha_registro')[:6]
+
+    contexto = {
+        # ... el resto de tus variables existentes ...
+        'mascotas_destacadas': mascotas_destacadas,
+    }
+    return render(request, 'main.html', contexto)
