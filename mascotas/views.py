@@ -1,20 +1,19 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
-from .models import Mascota
 from refugios.models import Refugio
 from blog.models import Blog
 from django.db.models import Q
 from usuarios.decorators import roles_permitidos
 from .forms import MascotaForm
+from mascotas.models import Mascota
 
 
 def inicio(request):
-    mascotas_carrusel = Mascota.objects.all()[:5]
+    # Consulta la base de datos.
+    lista_mascotas = Mascota.objects.all()
 
-    contexto = {
-        'mascotas': mascotas_carrusel
-    }
-    return render(request, 'main.html', contexto)
+    # Asegúrate de pasar la variable al contexto
+    return render(request, 'main.html', {'mascotas': lista_mascotas})
 def lista_mascotas(request):
     mascotas = Mascota.objects.filter(estado_adopcion='disponible').order_by('-fecha_registro')
 

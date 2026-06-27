@@ -23,16 +23,16 @@
     <div class="swiper carrusel-mascotas" style="max-width: 1200px; margin: 0 auto; padding-bottom: 50px; overflow: hidden; height: 350px;">
         <div class="swiper-wrapper">
             {% for mascota in mascotas %}
-                    <div class="carousel-item {% if forloop.first %}active{% endif %}">
-                        {% if mascota.foto %}
-                            <img src="{{ mascota.foto.url }}" alt="{{ mascota.nombre }}">
-                        {% else %}
-                            <img src="{% static 'img/default-pet.jpg' %}" alt="Imagen por defecto">
-                        {% endif %}
-                    </div>
-                {% empty %}
-                    <p>No hay mascotas registradas.</p>
-                {% endfor %}
+                <div class="swiper-slide">
+                    {% if mascota.foto %}
+                        <img src="{{ mascota.foto.url }}" alt="{{ mascota.nombre }}">
+                    {% else %}
+                        <img src="{% static 'img/default-pet.jpg' %}" alt="Imagen por defecto">
+                    {% endif %}
+                </div>
+            {% empty %}
+                <p>No hay mascotas registradas.</p>
+            {% endfor %}
         </div>
         <div class="swiper-pagination"></div>
     </div>
