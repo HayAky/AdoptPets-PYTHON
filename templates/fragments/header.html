@@ -100,7 +100,6 @@
         <nav>
             <a href="{% url 'lista_mascotas' %}">Mascotas</a>
             <a href="{% url 'lista_refugios' %}">Refugios</a>
-            <a href="#">Contáctanos</a>
 
             {% if not request.user.is_authenticated %}
             <div style="display: flex; align-items: center;">
