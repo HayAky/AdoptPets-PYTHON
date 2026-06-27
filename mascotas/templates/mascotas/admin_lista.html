@@ -19,14 +19,16 @@
                     <a href="{% url 'admin_lista_mascotas' %}" class="btn btn-secondary" style="padding: 10px 20px; background: #6b7280; color: white; text-decoration: none; border-radius: 8px;">Limpiar</a>
                 {% endif %}
             </form>
+
+            <div style="color: #666; font-size: 14px; display: flex; align-items: center; gap: 10px;">
+                <span>Total: <strong>{{ mascotas.count }}</strong> mascota(s)</span>
+                <a href="{% url 'crear_mascota' %}" class="btn btn-primary">
+                    ➕ Nueva Mascota
+                </a>
+            </div>
         </div>
 
-        <div style="color: #666; font-size: 14px; display: flex; align-items: center; gap: 10px;">
-            <span>Total: <strong>{{ mascotas.count }}</strong> mascota(s)</span>
-            <a href="{% url 'crear_mascota' %}" class="btn btn-primary">
-                ➕ Nueva Mascota
-            </a>
-        </div>
+
 
         {% if messages %}
             {% for message in messages %}
