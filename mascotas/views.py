@@ -5,6 +5,7 @@ from refugios.models import Refugio
 from blog.models import Blog
 from django.db.models import Q
 from usuarios.decorators import roles_permitidos
+from .forms import MascotaForm
 
 
 def inicio(request):
@@ -95,32 +96,34 @@ def admin_lista_mascotas(request):
         'busqueda': busqueda  # Lo enviamos para que la barra no se borre
     })
 
+
 @roles_permitidos(['ADMIN', 'REFUGIO'])
 def crear_mascota(request):
     refugios = Refugio.objects.filter(activo=True)
     mi_refugio = getattr(request.user, 'mi_refugio', None) if not request.user.es_admin else None
 
     if request.method == 'POST':
-        try:
-            mascota = Mascota()
-            guardar_datos_mascota(request, mascota)
+        form = MascotaForm(request.POST, request.FILES)
+        if form.is_valid():
+            mascota = form.save(commit=False)
 
+            # Asignación de refugio
             if request.user.es_admin:
-                refugio_id = request.POST.get('refugio')
-                if refugio_id:
-                    mascota.refugio_id = refugio_id
+                mascota.refugio_id = request.POST.get('refugio')
             else:
                 mascota.refugio = mi_refugio
 
-            mascota.save()
+            mascota.save()  # Aquí Cloudinary sube la foto
             messages.success(request, 'Mascota registrada correctamente.')
             return redirect('admin_lista_mascotas')
+    else:
+        form = MascotaForm()
 
-        except Exception as e:  # <--- SI ALGO FALLA, LO ATRAPAMOS AQUÍ
-            messages.error(request, f'Error crítico al guardar la mascota: {str(e)}')
-            # No hacemos redirect, dejamos que se vuelva a renderizar el formulario
-
-    return render(request, 'mascotas/form.html', {'refugios': refugios, 'mi_refugio': mi_refugio})
+    return render(request, 'mascotas/form.html', {
+        'form': form,
+        'refugios': refugios,
+        'mi_refugio': mi_refugio
+    })
 
 
 @roles_permitidos(['ADMIN', 'REFUGIO'])
@@ -129,30 +132,45 @@ def editar_mascota(request, mascota_id):
     refugios = Refugio.objects.filter(activo=True)
     mi_refugio = getattr(request.user, 'mi_refugio', None) if not request.user.es_admin else None
 
+    # Mantenemos tu seguridad de refugios
     if not request.user.es_admin and mascota.refugio != mi_refugio:
         messages.error(request, 'Acceso Denegado: Esta mascota pertenece a otro refugio.')
         return redirect('admin_lista_mascotas')
 
     if request.method == 'POST':
-        try:
-            guardar_datos_mascota(request, mascota)
+        # Usamos el form para procesar los datos (incluyendo la foto automáticamente)
+        form = MascotaForm(request.POST, request.FILES, instance=mascota)
 
-            if request.user.es_admin:
-                refugio_id = request.POST.get('refugio')
-                if refugio_id:
-                    mascota.refugio_id = refugio_id
-            else:
-                mascota.refugio = mi_refugio
+        if form.is_valid():
+            try:
+                # Guardamos los datos del formulario (esto incluye la foto en Cloudinary)
+                mascota_actualizada = form.save(commit=False)
 
-            mascota.save()
+                # Mantenemos tu lógica de asignación de refugio
+                if request.user.es_admin:
+                    refugio_id = request.POST.get('refugio')
+                    if refugio_id:
+                        mascota_actualizada.refugio_id = refugio_id
+                else:
+                    mascota_actualizada.refugio = mi_refugio
 
-            messages.success(request, 'Mascota actualizada correctamente.')
-            return redirect('admin_lista_mascotas')
+                mascota_actualizada.save()
+                messages.success(request, 'Mascota actualizada correctamente.')
+                return redirect('admin_lista_mascotas')
 
-        except Exception as e:  # <--- ATRAPAMOS EL ERROR
-            messages.error(request, f'Error al intentar actualizar: {str(e)}')
+            except Exception as e:
+                messages.error(request, f'Error al intentar actualizar: {str(e)}')
+        else:
+            messages.error(request, 'Error en el formulario. Revisa los datos.')
+    else:
+        form = MascotaForm(instance=mascota)
 
-    return render(request, 'mascotas/form.html', {'mascota': mascota, 'refugios': refugios, 'mi_refugio': mi_refugio})
+    return render(request, 'mascotas/form.html', {
+        'form': form,  # Pasamos el formulario
+        'mascota': mascota,
+        'refugios': refugios,
+        'mi_refugio': mi_refugio
+    })
 
 
 @roles_permitidos(['ADMIN', 'REFUGIO'])
@@ -172,44 +190,6 @@ def eliminar_mascota(request, mascota_id):
                        f'No se pudo eliminar la mascota. Es posible que tenga adopciones vinculadas. Detalle: {str(e)}')
 
     return redirect('admin_lista_mascotas')
-
-
-def guardar_datos_mascota(request, mascota):
-    # 1. Campos de texto básicos que ya coincidían
-    mascota.nombre = request.POST.get('nombre')
-    mascota.especie = request.POST.get('especie')
-    mascota.raza = request.POST.get('raza') or None
-    mascota.sexo = request.POST.get('sexo')
-    mascota.tamano = request.POST.get('tamano')
-    mascota.peso = request.POST.get('peso') or None
-    mascota.color = request.POST.get('color') or None
-    mascota.descripcion = request.POST.get('descripcion') or None
-
-    # 2. CORREGIDO: Emparejamos 'edadAproximada' del HTML con el modelo
-    edad_aprox = request.POST.get('edadAproximada')
-    mascota.edad_aproximada = edad_aprox if edad_aprox else None
-
-    # 3. CORREGIDO: Emparejamos 'estadoSalud' del HTML con el modelo
-    mascota.estado_salud = request.POST.get('estadoSalud') or None
-
-    # 4. NUEVO: Ahora sí guardamos los checkboxes médicos
-    mascota.vacunado = request.POST.get('vacunado') == 'on'
-    mascota.esterilizado = request.POST.get('esterilizado') == 'on'
-    mascota.microchip = request.POST.get('microchip') == 'on'
-
-    # 5. Estado y Fechas
-    mascota.estado_adopcion = request.POST.get('estadoAdopcion')
-
-    fecha_ingreso = request.POST.get('fechaIngreso')
-    if fecha_ingreso:
-        mascota.fecha_ingreso = fecha_ingreso
-
-    # 6. Guardar la fotografía si el usuario subió una nueva
-    if 'foto' in request.FILES:
-        # Esto asigna el archivo al campo foto
-        mascota.foto = request.FILES['foto']
-
-
 
 # mascotas/views.py
 
