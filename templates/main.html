@@ -28,9 +28,10 @@
                     {% if mascota.foto %}
                         <img src="{{ mascota.foto.url }}"
                              alt="{{ mascota.nombre }}"
-                             style="width: 100%; height: 100%; object-fit: cover; display: block;">
+                             style="width: 100%; height: 250px; object-fit: cover; display: block;"
+                             onerror="this.style.display='none'; console.error('Error cargando: {{ mascota.foto.url }}');">
                     {% else %}
-                        <div style="width: 100%; height: 100%; background: #ccc;">Sin foto</div>
+                        <p>La variable 'foto' está vacía para {{ mascota.nombre }}</p>
                     {% endif %}
                 </div>
                 <div style="padding: 15px; text-align: center;">
