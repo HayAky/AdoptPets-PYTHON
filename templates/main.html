@@ -27,6 +27,8 @@
                 <div style="height: 250px; width: 100%; background: #eaeaea;">
                     {% if mascota.foto %}
                         {% cloudinary mascota.foto width=300 height=250 crop="fill" %}
+
+                        {% cloudinary mascota.foto.name width=300 height=250 crop="fill" %}
                     {% else %}
                         <div style="display: flex; align-items: center; justify-content: center; height: 100%; color: #888;">Sin foto</div>
                     {% endif %}
