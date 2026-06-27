@@ -17,32 +17,26 @@
     </div>
 </section>
 
-{% load cloudinary %}<section class="recien-llegados" style="padding: 40px 0; background-color: #ffffff;">
+<section class="recien-llegados" style="padding: 40px 0; background-color: #ffffff;">
     <h2 style="text-align: center; margin-bottom: 60px; color: #22C55E; font-size: 36px;">Recién Llegados</h2>
 
-    <div class="swiper carrusel-mascotas" style="max-width: 1200px; margin: 0 auto; padding-bottom: 50px; overflow: hidden;">
+    <div class="swiper carrusel-mascotas" style="max-width: 1200px; margin: 0 auto; padding-bottom: 50px; overflow: hidden; height: 350px;">
         <div class="swiper-wrapper">
             {% for mascota in mascotas_destacadas %}
-            <div class="swiper-slide">
-                <div style="height: 250px; width: 100%; overflow: hidden; position: relative;">
+            <div class="swiper-slide" style="border: 1px solid #e0e0e0; border-radius: 8px; overflow: hidden; background: #fff;">
+                <div style="height: 250px; width: 100%; display: flex; align-items: center; justify-content: center; overflow: hidden; background-color: #f0f0f0;">
                     {% if mascota.foto %}
-                        {% cloudinary mascota.foto width=300 height=250 crop="fill" gravity="face" style="width: 100%; height: 100%; object-fit: cover;" %}
-                    {% else %}
-                        <div style="width: 100%; height: 250px; background: #ccc; display: flex; align-items: center; justify-content: center;">
-                            Sin foto
-                        </div>
+                        <img src="{{ mascota.foto.url }}" alt="{{ mascota.nombre }}" style="width: 100%; height: 100%; object-fit: cover;">
                     {% endif %}
                 </div>
                 <div style="padding: 15px; text-align: center;">
-                    <h3>{{ mascota.nombre }}</h3>
+                    <h3 style="margin: 0 0 10px 0; font-size: 1.2rem;">{{ mascota.nombre }}</h3>
+                    <p style="margin: 0; color: #555;">{{ mascota.especie }}</p>
                 </div>
             </div>
             {% endfor %}
         </div>
-
         <div class="swiper-pagination"></div>
-        <div class="swiper-button-next" style="color: #333;"></div>
-        <div class="swiper-button-prev" style="color: #333;"></div>
     </div>
 </section>
 <div style="text-align: center; margin-top: 40px;">
@@ -106,10 +100,14 @@
             slidesPerView: 1,
             spaceBetween: 20,
             loop: true,
+            observer: true,      // <--- AÑADE ESTO
+            observeParents: true, // <--- AÑADE ESTO
             autoplay: { delay: 3000, disableOnInteraction: false },
             pagination: { el: '.swiper-pagination', clickable: true },
-            navigation: { nextEl: '.swiper-button-next', prevEl: '.swiper-button-prev' },
-            breakpoints: { 640: { slidesPerView: 2 }, 1024: { slidesPerView: 3 } }
+            breakpoints: {
+                640: { slidesPerView: 2 },
+                1024: { slidesPerView: 3 }
+            }
         });
     });
 </script>
