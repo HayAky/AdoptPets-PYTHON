@@ -17,7 +17,7 @@
     </div>
 </section>
 
- <section class="recien-llegados" style="padding: 40px 0; background-color: #ffffff;">
+<section class="recien-llegados" style="padding: 40px 0; background-color: #ffffff;">
     <h2 style="text-align: center; margin-bottom: 60px; color: #22C55E; font-size: 36px;">Recién Llegados</h2>
 
     <div class="swiper carrusel-mascotas" style="max-width: 1200px; margin: 0 auto; padding-bottom: 50px; overflow: hidden;">
@@ -28,7 +28,7 @@
                     {% if mascota.foto_url %}
                         <img src="{{ mascota.foto_url }}" alt="{{ mascota.nombre }}" style="width: 100%; height: 100%; object-fit: cover;">
                     {% else %}
-                        <span style="color: #888;">Sin foto</span>
+                        <span style="color: red; font-size: 0.8rem;">URL vacía (ID: {{ mascota.id }})</span>
                     {% endif %}
                 </div>
                 <div style="padding: 15px; text-align: center;">
@@ -44,6 +44,11 @@
         <div class="swiper-button-prev" style="color: #333;"></div>
     </div>
 </section>
+<div style="text-align: center; margin-top: 40px;">
+    <a href="{% url 'lista_mascotas' %}" class="btn btn-primary" style="padding: 12px 30px; font-size: 18px; border-radius: 30px;">
+        Ver todas las mascotas ➔
+    </a>
+</div>
 
 <section style="background: #ffffff; padding: 60px 20px; margin-bottom: 40px;">
     <div style="max-width: 1200px; margin: 0 auto;">
