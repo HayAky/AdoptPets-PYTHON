@@ -21,17 +21,17 @@
     <h2 style="text-align: center; margin-bottom: 60px; color: #22C55E; font-size: 36px;">Recién Llegados</h2>
 
     <div class="swiper carrusel-mascotas" style="max-width: 1200px; margin: 0 auto; padding-bottom: 50px; overflow: hidden; height: 350px;">
+        <p>Cantidad de mascotas encontradas: {{ mascotas|length }}</p>
+
         <div class="swiper-wrapper">
             {% for mascota in mascotas %}
                 <div class="swiper-slide">
                     {% if mascota.foto %}
                         <img src="{{ mascota.foto.url }}" alt="{{ mascota.nombre }}">
                     {% else %}
-                        <img src="{% static 'img/default-pet.jpg' %}" alt="Imagen por defecto">
+                        <img src="{% static 'img/default-pet.jpg' %}" alt="Sin foto">
                     {% endif %}
                 </div>
-            {% empty %}
-                <p>No hay mascotas registradas.</p>
             {% endfor %}
         </div>
         <div class="swiper-pagination"></div>
