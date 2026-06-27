@@ -21,9 +21,12 @@ from django.contrib.auth import views as auth_views
 from usuarios import views as usuarios_views
 from django.conf import settings
 from django.conf.urls.static import static
+from mascotas import views as mascotas_views
 
 urlpatterns = [
     path('django-admin/', admin.site.urls),
+
+    path('', mascotas_views.inicio, name='home'),
 
     # Tu nuevo Dashboard Administrativo personalizado
     path('admin/', usuarios_views.admin_dashboard, name='admin_dashboard'),
@@ -46,4 +49,5 @@ urlpatterns = [
 ]
 if settings.DEBUG:
     urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
 
