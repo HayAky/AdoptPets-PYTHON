@@ -17,23 +17,26 @@
     </div>
 </section>
 
-<section class="recien-llegados" style="padding: 40px 0; background-color: #ffffff;">
+{% cloudinary mascota.foto width=300 height=250 crop="fill" gravity="face" style="width: 100%; height: 100%; object-fit: cover;" %}<section class="recien-llegados" style="padding: 40px 0; background-color: #ffffff;">
     <h2 style="text-align: center; margin-bottom: 60px; color: #22C55E; font-size: 36px;">Recién Llegados</h2>
 
     <div class="swiper carrusel-mascotas" style="max-width: 1200px; margin: 0 auto; padding-bottom: 50px; overflow: hidden;">
         <div class="swiper-wrapper">
             {% for mascota in mascotas_destacadas %}
-                <div class="swiper-slide">
-                    <div style="border: 2px solid red; padding: 5px; font-size: 10px;">
-                        DEBUG: {{ mascota.nombre }} | ID: {{ mascota.id_mascota }} |
-                        Foto: "{{ mascota.foto }}" |
-                        ¿Tiene foto?: {% if mascota.foto %} SÍ {% else %} NO {% endif %}
-                    </div>
-
+            <div class="swiper-slide">
+                <div style="height: 250px; width: 100%; overflow: hidden; position: relative;">
                     {% if mascota.foto %}
-                        <img src="{{ mascota.foto.url }}" alt="{{ mascota.nombre }}">
+                        {% cloudinary mascota.foto width=300 height=250 crop="fill" %}
+                    {% else %}
+                        <div style="width: 100%; height: 250px; background: #ccc; display: flex; align-items: center; justify-content: center;">
+                            Sin foto
+                        </div>
                     {% endif %}
                 </div>
+                <div style="padding: 15px; text-align: center;">
+                    <h3>{{ mascota.nombre }}</h3>
+                </div>
+            </div>
             {% endfor %}
         </div>
 
