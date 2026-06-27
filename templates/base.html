@@ -6,9 +6,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}AdoptPets{% endblock %}</title>
 
-    <link rel="preload" href="static/css/styles.css" as="style">
-    <link rel="preload" href="static/css/componentes.css" as="style">
-    <link href='https://fonts.googleapis.com/css?family=Noto Sans' rel='stylesheet'>
+    <link rel="preload" href="{% static 'css/styles.css' %}" as="style">
+    <link rel="preload" href="{% static 'css/main.css' %}" as="style">
+    <link rel="preload" href="https://fonts.googleapis.com/css?family=Noto+Sans" as="style">
+
+    <link href="https://fonts.googleapis.com/css?family=Noto+Sans" rel="stylesheet">
     <link href="{% static 'css/main.css' %}" rel="stylesheet">
     <link href="{% static 'css/styles.css' %}" rel="stylesheet">
 
