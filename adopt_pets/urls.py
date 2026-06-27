@@ -26,7 +26,7 @@ from mascotas import views as mascotas_views
 urlpatterns = [
     path('django-admin/', admin.site.urls),
 
-    path('', mascotas_views.inicio, name='home'),
+    path('', mascotas_views.inicio, name='inicio'),
 
     # Tu nuevo Dashboard Administrativo personalizado
     path('admin/', usuarios_views.admin_dashboard, name='admin_dashboard'),
