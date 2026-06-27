@@ -19,9 +19,9 @@
 
 <section class="recien-llegados" style="padding: 40px 0; background-color: #ffffff;">
     <h2 style="text-align: center; margin-bottom: 60px; color: #22C55E; font-size: 36px;">Recién Llegados</h2>
-<p>Cantidad de mascotas encontradas: {{ mascotas|length }}</p>  {# ← SACAR AQUÍ #}
 
 <div class="swiper carrusel-mascotas" style="...">
+    <p>Cantidad de mascotas encontradas: {{ mascotas|length }}</p>  {# ← SACAR AQUÍ #}
     <div class="swiper-wrapper">
         {% for mascota in mascotas %}
             <div class="swiper-slide">
@@ -96,7 +96,7 @@
         new Swiper('.carrusel-mascotas', {
             slidesPerView: 1,
             spaceBetween: 20,
-            loop: true,
+            loop: false,
             observer: true,      // <--- AÑADE ESTO
             observeParents: true, // <--- AÑADE ESTO
             autoplay: { delay: 3000, disableOnInteraction: false },
