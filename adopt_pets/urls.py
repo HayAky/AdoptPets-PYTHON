@@ -36,8 +36,6 @@ urlpatterns = [
     path('logout/', auth_views.LogoutView.as_view(next_page='/login/?logout=true'), name='logout'),
     path('register/', usuarios_views.registro, name='registro'),
 
-    # Ruta raíz
-    path('', TemplateView.as_view(template_name='main.html'), name='inicio'),
 
     # Tus aplicaciones
     path('mascotas/', include('mascotas.urls')),
