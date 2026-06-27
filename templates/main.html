@@ -24,9 +24,11 @@
         <div class="swiper-wrapper">
             {% for mascota in mascotas_destacadas %}
             <div class="swiper-slide">
-                <div style="height: 250px; width: 100%; overflow: hidden;">
+                <div style="height: 250px; width: 100%; overflow: hidden; position: relative;">
                     {% if mascota.foto %}
-                        <img src="{{ mascota.foto.url }}" alt="{{ mascota.nombre }}" style="width: 100%; height: 100%; object-fit: cover;">
+                        <img src="{{ mascota.foto.url }}"
+                             alt="{{ mascota.nombre }}"
+                             style="width: 100%; height: 100%; object-fit: cover; display: block;">
                     {% else %}
                         <div style="width: 100%; height: 100%; background: #ccc;">Sin foto</div>
                     {% endif %}
