@@ -16,9 +16,26 @@
         </div>
 
         <div class="form-container">
-            <form method="post" enctype="multipart/form-data">
+            <form method="post" action="" enctype="multipart/form-data">
                 {% csrf_token %}
-                {{ form.as_p }} <button type="submit">💾 Guardar</button>
+
+                {% for field in form %}
+                    <div class="form-group">
+                        <label for="{{ field.id_for_label }}">{{ field.label }}</label>
+                        {{ field }}
+                        {% if field.help_text %}
+                            <small class="help-text">{{ field.help_text }}</small>
+                        {% endif %}
+                        {% if field.errors %}
+                            <div class="error-msg" style="color: red; font-size: 0.8rem;">{{ field.errors }}</div>
+                        {% endif %}
+                    </div>
+                {% endfor %}
+
+                <div class="form-buttons">
+                    <button type="submit" class="btn btn-primary">💾 Guardar Mascota</button>
+                    <a href="{% url 'admin_lista_mascotas' %}" class="btn btn-secondary">Cancelar</a>
+                </div>
             </form>
         </div>
     </main>
