@@ -1,5 +1,6 @@
 from django.db import models
 from refugios.models import Refugio
+from cloudinary.models import CloudinaryField
 
 class EstadoAdopcion(models.TextChoices):
     DISPONIBLE = 'disponible', 'Disponible'
@@ -21,7 +22,7 @@ class Mascota(models.Model):
     color = models.CharField(max_length=50, null=True, blank=True)
 
     # NUEVO CAMPO DE IMAGEN
-    foto = models.ImageField(upload_to='mascotas_fotos/', null=True, blank=True)
+    foto = CloudinaryField('image', folder='mascotas_fotos', null=True, blank=True)
 
     descripcion = models.TextField(null=True, blank=True)
     # ...
