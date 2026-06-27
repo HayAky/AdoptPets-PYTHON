@@ -15,7 +15,8 @@
     cursor: pointer;
     transition: all 0.3s ease;
     text-decoration: none;
-    height: auto !important; /* Evita que se deformen en el header */
+    height: auto !important;
+    margin-bottom: 20px;
 }
 
 .btn-primary, .boton, button { background-color: #22C55E !important; color: white !important; }
@@ -90,10 +91,9 @@
     box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.1) !important;
 }
 
-/* OCULTAMOS EL TEXTO DE AYUDA LARGO QUE ESTORBA */
 .auth-card .helptext,
 .auth-card ul.helptext {
-    display: none !important; /* Esto quita la lista gigante de requisitos */
+    display: none !important;
 }
 
 .auth-card label {
