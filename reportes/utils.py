@@ -1,6 +1,5 @@
 from io import BytesIO
 from django.http import HttpResponse
-from django.template.loader import get_template
 from reportlab.lib.pagesizes import letter
 from reportlab.lib import colors
 from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
@@ -8,7 +7,6 @@ from reportlab.lib.styles import getSampleStyleSheet
 
 
 def generar_pdf(template_src, context_dict, filename):
-    """Genera un PDF con los datos del contexto."""
     buffer = BytesIO()
     doc = SimpleDocTemplate(buffer, pagesize=letter)
     styles = getSampleStyleSheet()
@@ -19,41 +17,36 @@ def generar_pdf(template_src, context_dict, filename):
     elements.append(Paragraph(titulo, styles['Title']))
     elements.append(Spacer(1, 20))
 
-    # Datos en tabla
-    datos = context_dict.get('datos', [])
-    if datos:
-        # Encabezados desde las claves del primer elemento
-        headers = list(datos[0].keys())
-        table_data = [headers]
-        for item in datos:
-            table_data.append([str(item.get(h, '')) for h in headers])
+    # Fecha
+    fecha = context_dict.get('fecha', '')
+    if fecha:
+        elements.append(Paragraph(f"Generado el: {fecha}", styles['Normal']))
+        elements.append(Spacer(1, 12))
 
-        table = Table(table_data)
+    # Tabla con columnas y filas
+    columnas = context_dict.get('columnas', [])
+    filas = context_dict.get('filas', [])
+
+    if columnas and filas:
+        table_data = [columnas] + filas  # encabezado + datos
+
+        table = Table(table_data, repeatRows=1)
         table.setStyle(TableStyle([
-            ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
+            ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#22C55E')),
             ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
             ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
-            ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.lightgrey]),
-            ('GRID', (0, 0), (-1, -1), 0.5, colors.black),
+            ('FONTSIZE', (0, 0), (-1, 0), 11),
+            ('ALIGN', (0, 0), (-1, -1), 'LEFT'),
+            ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.HexColor('#f0fdf4')]),
+            ('GRID', (0, 0), (-1, -1), 0.5, colors.grey),
             ('PADDING', (0, 0), (-1, -1), 6),
         ]))
         elements.append(table)
+    else:
+        elements.append(Paragraph("No hay datos para mostrar.", styles['Normal']))
 
     doc.build(elements)
     buffer.seek(0)
     response = HttpResponse(buffer, content_type='application/pdf')
     response['Content-Disposition'] = f'attachment; filename="{filename}"'
     return response
-
-def link_callback(uri, rel):
-    sUrl = settings.STATIC_URL
-    sRoot = settings.STATIC_ROOT
-    mUrl = settings.MEDIA_URL
-    mRoot = settings.MEDIA_ROOT
-    if uri.startswith(mUrl):
-        path = os.path.join(mRoot, uri.replace(mUrl, ""))
-    elif uri.startswith(sUrl):
-        path = os.path.join(sRoot, uri.replace(sUrl, ""))
-    else:
-        return uri
-    return path
