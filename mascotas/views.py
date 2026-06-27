@@ -197,4 +197,4 @@ def inicio(request):
             'foto_url': m.foto.url if m.foto else None
         })
 
-    return render(request, 'main.html', {'mascotas_destacadas': mascotas_procesadas})
+    return render(request, 'main.html', {'mascotas': mascotas_procesadas})
