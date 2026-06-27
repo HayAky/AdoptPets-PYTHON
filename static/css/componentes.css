@@ -16,7 +16,6 @@
     transition: all 0.3s ease;
     text-decoration: none;
     height: auto !important;
-    margin-bottom: 20px;
 }
 
 .btn-primary, .boton, button { background-color: #22C55E !important; color: white !important; }
