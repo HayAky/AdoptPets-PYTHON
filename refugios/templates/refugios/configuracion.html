@@ -12,69 +12,27 @@
 
 <div class="dashboard-container" style="max-width: 900px; margin: 20px auto; padding: 0 20px;">
 
-    <div style="margin-bottom: 30px;">
-        <h1 style="color: #0ea5e9;">⚙️ Configuración del Perfil</h1>
-    </div>
+    <h1 style="color: #0ea5e9;">⚙️ Configuración del Perfil</h1>
 
-    {% if messages %}
-        {% for message in messages %}
-            <div class="alert" style="padding: 15px; border-radius: 8px; margin-bottom: 20px; background: {% if message.tags == 'success' %}#d1fae5{% else %}#fee2e2{% endif %};">
-                {{ message }}
-            </div>
-        {% endfor %}
-    {% endif %}
-
+    {% if refugio %}
     <section class="config-card">
         <h3>🏠 Datos del Refugio</h3>
         <form method="POST">
             {% csrf_token %}
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-                {% for field in form_refugio %}
-                    <div style="margin-bottom: 15px;">
-                        <label style="font-weight: 600; color: #475569; display: block; margin-bottom: 5px;">{{ field.label }}</label>
-                        {{ field }}
-                        {% if field.errors %}
-                            <ul style="color: #dc2626; font-size: 0.85rem; margin: 5px 0 0 0; padding-left: 20px;">
-                                {% for error in field.errors %}<li>{{ error }}</li>{% endfor %}
-                            </ul>
-                        {% endif %}
-                    </div>
-                {% endfor %}
-            </div>
+            {{ form_refugio.as_p }}
             <button type="submit" name="btn_refugio" class="btn-save">Guardar Cambios del Refugio</button>
         </form>
     </section>
+    {% else %}
+    <div class="config-card" style="border-left: 4px solid #f59e0b;">
+        <p>⚠️ Aún no tienes un refugio asignado. Contacta al administrador para gestionar tu refugio.</p>
+    </div>
+    {% endif %}
 
     <section class="config-card">
         <h3>👤 Datos Personales</h3>
         <form method="POST">
-            {% csrf_token %}
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
-                {% for field in form_usuario %}
-                    <div style="margin-bottom: 15px;">
-                        <label style="font-weight: 600; color: #475569; display: block; margin-bottom: 5px;">{{ field.label }}</label>
-                        {{ field }}
-                        {% if field.errors %}
-                            <ul style="color: #dc2626; font-size: 0.85rem; margin: 5px 0 0 0; padding-left: 20px;">
-                                {% for error in field.errors %}<li>{{ error }}</li>{% endfor %}
-                            </ul>
-                        {% endif %}
-                    </div>
-                {% endfor %}
-            </div>
-            <button type="submit" name="btn_usuario" class="btn-save">Guardar Cambios Personales</button>
-        </form>
-    </section>
-
-    <section class="config-card">
-        <h3>🔒 Seguridad y Contraseña</h3>
-        <form method="POST">
-            {% csrf_token %}
-            <div style="max-width: 400px;">
-                {{ form_pass.as_p }}
-            </div>
-            <button type="submit" name="btn_pass" class="btn-save" style="background: #1c8b00;">Actualizar Contraseña</button>
-        </form>
+            </form>
     </section>
 
 </div>

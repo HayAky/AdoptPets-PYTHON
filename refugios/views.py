@@ -144,52 +144,45 @@ def dashboard_refugio(request):
 def configuracion_refugio(request):
     usuario = request.user
 
-    # 1. Intentamos obtener el refugio de forma segura
-    try:
-        refugio = usuario.mi_refugio
-    except Refugio.DoesNotExist:
-        # Si no existe, no podemos cargar la configuración,
-        # así que detenemos la ejecución y mostramos el mensaje
-        return render(request, 'refugios/crear_refugio.html', {
-            'mensaje': "Aún no tienes un refugio asignado. Contacta al administrador."
-        })
+    # 1. Obtención segura (si no existe, será None)
+    refugio = getattr(usuario, 'mi_refugio', None)
 
-    # 2. Inicialización de formularios (Solo si el refugio existe)
-    # IMPORTANTE: Pasamos 'user=request.user' para que RefugioForm aplique la lógica del admin
-    form_refugio = RefugioForm(instance=refugio, user=request.user)
+    # 2. Inicialización de formularios
     form_usuario = EditUsuarioForm(instance=usuario)
     form_pass = PasswordChangeForm(user=usuario)
+    form_refugio = None
 
-    # 3. Lógica de guardado (POST)
+    # Solo creamos el form_refugio si existe el refugio
+    if refugio:
+        form_refugio = RefugioForm(instance=refugio, user=usuario)
+
+    # 3. Procesamiento de POST
     if request.method == 'POST':
-        if 'btn_refugio' in request.POST:
-            # También pasamos 'user=request.user' aquí para mantener la lógica de permisos
-            form_refugio = RefugioForm(request.POST, instance=refugio, user=request.user)
+        # Procesar Refugio (Solo si existe)
+        if 'btn_refugio' in request.POST and refugio:
+            form_refugio = RefugioForm(request.POST, instance=refugio, user=usuario)
             if form_refugio.is_valid():
                 form_refugio.save()
                 messages.success(request, 'Datos del refugio actualizados.')
-            else:
-                messages.error(request, 'Error al guardar el refugio. Revisa los campos.')
 
+        # Procesar Usuario
         elif 'btn_usuario' in request.POST:
             form_usuario = EditUsuarioForm(request.POST, instance=usuario)
             if form_usuario.is_valid():
                 form_usuario.save()
-                messages.success(request, 'Tus datos personales han sido actualizados.')
-            else:
-                messages.error(request, 'Error en tus datos personales.')
+                messages.success(request, 'Datos personales actualizados.')
 
+        # Procesar Contraseña
         elif 'btn_pass' in request.POST:
             form_pass = PasswordChangeForm(user=usuario, data=request.POST)
             if form_pass.is_valid():
                 user = form_pass.save()
                 update_session_auth_hash(request, user)
-                messages.success(request, 'Contraseña actualizada correctamente.')
-            else:
-                messages.error(request, 'Error al cambiar la contraseña.')
+                messages.success(request, 'Contraseña actualizada.')
 
     return render(request, 'refugios/configuracion.html', {
         'form_refugio': form_refugio,
         'form_usuario': form_usuario,
-        'form_pass': form_pass
+        'form_pass': form_pass,
+        'refugio': refugio  # Pasamos la variable para usarla en el HTML
     })
