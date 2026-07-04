@@ -151,6 +151,17 @@ def configuracion_refugio(request):
     form_pass = PasswordChangeForm(user=usuario)
 
     # Dentro de tu función configuracion_refugio en views.py
+    try:
+        refugio = request.user.mi_refugio
+    except Refugio.DoesNotExist:
+        refugio = None
+
+    # Ahora, verifica si existe antes de usarlo
+    if refugio is None:
+        # Opcional: Maneja el caso donde el usuario no tiene refugio
+        # Por ejemplo, redirigirlo o mostrar un mensaje
+        messages.warning(request, "No tienes un refugio asignado.")
+        return redirect('nombre_de_tu_dashboard')  # O donde quieras mandarlo
 
     if request.method == 'POST':
         if 'btn_refugio' in request.POST:
