@@ -91,7 +91,7 @@ def panel_solicitudes(request):
 @login_required
 @roles_permitidos(['REFUGIO', 'ADMIN'])
 def historial_adopciones(request):
-    # Filtramos todo lo que NO sea pendiente (Aprobados, Rechazados, Finalizados)
+    # Filtramos
     historial = Adopcion.objects.filter(
         mascota__refugio=request.user.mi_refugio
     ).exclude(estado_adopcion='pendiente').select_related('adoptante', 'mascota').order_by('-fecha_solicitud')
