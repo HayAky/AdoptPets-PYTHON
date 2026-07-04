@@ -6,7 +6,7 @@ from blog.models import Blog
 from django.db.models import Q
 from usuarios.decorators import roles_permitidos
 from usuarios.models import HistorialActividad
-
+from .forms import MascotaForm
 
 def inicio(request):
     # Usamos active_objects para que solo salgan las disponibles/activas en la home
@@ -157,33 +157,25 @@ def crear_mascota(request):
 @roles_permitidos(['ADMIN', 'REFUGIO'])
 def editar_mascota(request, mascota_id):
     mascota = get_object_or_404(Mascota, id_mascota=mascota_id)
-    refugios = Refugio.objects.filter(activo=True)
-    mi_refugio = getattr(request.user, 'mi_refugio', None) if not request.user.es_admin else None
-
-    if not request.user.es_admin and mascota.refugio != mi_refugio:
-        messages.error(request, 'Acceso Denegado: Esta mascota pertenece a otro refugio.')
-        return redirect('admin_lista_mascotas')
 
     if request.method == 'POST':
-        try:  # <--- INICIA EL BLINDAJE
-            guardar_datos_mascota(request, mascota)
-
-            if request.user.es_admin:
-                refugio_id = request.POST.get('refugio')
-                if refugio_id:
-                    mascota.refugio_id = refugio_id
-            else:
-                mascota.refugio = mi_refugio
-
-            mascota.save()
+        # Instanciamos el formulario con los datos recibidos y la mascota actual
+        form = MascotaForm(request.POST, request.FILES, instance=mascota)
+        if form.is_valid():
+            form.save()  # Guarda automáticamente
             messages.success(request, 'Mascota actualizada correctamente.')
             return redirect('admin_lista_mascotas')
+        else:
+            messages.error(request, 'Error al actualizar. Revisa los campos.')
+    else:
+        # Aquí inicializas el formulario para que se rellene con los datos actuales
+        form = MascotaForm(instance=mascota)
 
-        except Exception as e:  # <--- ATRAPAMOS EL ERROR
-            messages.error(request, f'Error al intentar actualizar: {str(e)}')
-
-    return render(request, 'mascotas/form.html', {'mascota': mascota, 'refugios': refugios, 'mi_refugio': mi_refugio})
-
+    # AQUÍ ES DONDE ESTABA EL ERROR: Debes enviar 'form' al contexto
+    return render(request, 'mascotas/form.html', {
+        'form': form,
+        'mascota': mascota
+    })
 
 @roles_permitidos(['ADMIN', 'REFUGIO'])
 def eliminar_mascota(request, mascota_id):
