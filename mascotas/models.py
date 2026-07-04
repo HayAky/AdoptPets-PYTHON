@@ -5,7 +5,20 @@ class EstadoAdopcion(models.TextChoices):
     DISPONIBLE = 'disponible', 'Disponible'
     PENDIENTE = 'pendiente', 'Pendiente'
     ADOPTADO = 'adoptado', 'Adoptado'
+class EspecieChoices(models.TextChoices):
+    PERRO = 'perro', 'Perro'
+    GATO = 'gato', 'Gato'
+    CONEJO = 'conejo', 'Conejo'
+    OTRO = 'otro', 'Otro'
 
+class SexoChoices(models.TextChoices):
+    MACHO = 'macho', 'Macho'
+    HEMBRA = 'hembra', 'Hembra'
+
+class TamanoChoices(models.TextChoices):
+    PEQUENO = 'pequeno', 'Pequeño'
+    MEDIANO = 'mediano', 'Mediano'
+    GRANDE = 'grande', 'Grande'
 class ActiveManager(models.Manager):
     def get_queryset(self):
         return super().get_queryset().filter(activo=True)
