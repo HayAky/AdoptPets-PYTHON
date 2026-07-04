@@ -15,24 +15,34 @@
     <h1 style="color: #0ea5e9;">⚙️ Configuración del Perfil</h1>
 
     {% if refugio %}
-    <section class="config-card">
-        <h3>🏠 Datos del Refugio</h3>
-        <form method="POST">
-            {% csrf_token %}
-            {{ form_refugio.as_p }}
-            <button type="submit" name="btn_refugio" class="btn-save">Guardar Cambios del Refugio</button>
-        </form>
-    </section>
+        <section class="config-card">
+            <h3>🏠 Datos del Refugio</h3>
+            <form method="POST">
+                {% csrf_token %}
+                {{ form_refugio.as_p }}
+                <button type="submit" name="btn_refugio" class="btn-save">Guardar Cambios del Refugio</button>
+            </form>
+        </section>
     {% else %}
-    <div class="config-card" style="border-left: 4px solid #f59e0b;">
-        <p>⚠️ Aún no tienes un refugio asignado. Contacta al administrador para gestionar tu refugio.</p>
-    </div>
-    {% endif %}
-
-    <section class="config-card">
+        <div class="config-card" style="border-left: 4px solid #f59e0b;">
+            <p>⚠️ Aún no tienes un refugio asignado. Contacta al administrador para gestionar tu refugio.</p>
+        </div>
+    {% endif %} <section class="config-card">
         <h3>👤 Datos Personales</h3>
         <form method="POST">
-            </form>
+            {% csrf_token %}
+            {{ form_usuario.as_p }}
+            <button type="submit" name="btn_usuario" class="btn-save">Guardar Cambios Personales</button>
+        </form>
+    </section>
+
+    <section class="config-card">
+        <h3>🔒 Seguridad y Contraseña</h3>
+        <form method="POST">
+            {% csrf_token %}
+            {{ form_pass.as_p }}
+            <button type="submit" name="btn_pass" class="btn-save">Cambiar Contraseña</button>
+        </form>
     </section>
 
 </div>
