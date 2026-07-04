@@ -158,24 +158,26 @@ def crear_mascota(request):
 def editar_mascota(request, mascota_id):
     mascota = get_object_or_404(Mascota, id_mascota=mascota_id)
 
+    # Blindaje de seguridad
+    if not request.user.es_admin and mascota.refugio != getattr(request.user, 'mi_refugio', None):
+        messages.error(request, 'Acceso Denegado.')
+        return redirect('admin_lista_mascotas')
+
     if request.method == 'POST':
-        # Instanciamos el formulario con los datos recibidos y la mascota actual
+        # Usamos el formulario para procesar los datos
         form = MascotaForm(request.POST, request.FILES, instance=mascota)
         if form.is_valid():
-            form.save()  # Guarda automáticamente
+            form.save()
             messages.success(request, 'Mascota actualizada correctamente.')
             return redirect('admin_lista_mascotas')
         else:
-            messages.error(request, 'Error al actualizar. Revisa los campos.')
+            messages.error(request, 'Error al guardar. Revisa los datos.')
     else:
-        # Aquí inicializas el formulario para que se rellene con los datos actuales
+        # Aquí instanciamos el formulario con la mascota actual
         form = MascotaForm(instance=mascota)
 
-    # AQUÍ ES DONDE ESTABA EL ERROR: Debes enviar 'form' al contexto
-    return render(request, 'mascotas/form.html', {
-        'form': form,
-        'mascota': mascota
-    })
+    # Ahora sí enviamos 'form' al template
+    return render(request, 'mascotas/form.html', {'form': form, 'mascota': mascota})
 
 @roles_permitidos(['ADMIN', 'REFUGIO'])
 def eliminar_mascota(request, mascota_id):
