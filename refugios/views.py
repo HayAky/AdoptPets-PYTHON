@@ -75,19 +75,23 @@ def crear_refugio(request):
         form = RefugioForm()
     return render(request, 'refugios/form.html', {'form': form})
 
+
 @roles_permitidos(['ADMIN'])
 def editar_refugio(request, refugio_id):
     refugio = get_object_or_404(Refugio, id_refugio=refugio_id)
+
     if request.method == 'POST':
-        form = RefugioForm(request.POST, instance=refugio)
+        # Instanciamos el formulario correctamente (sin repetir la línea)
+        form = RefugioForm(request.POST, instance=refugio, user=request.user)
         if form.is_valid():
             form.save()
             messages.success(request, 'Refugio actualizado correctamente.')
             return redirect('admin_lista_refugios')
     else:
-        form = RefugioForm(instance=refugio)
-    return render(request, 'refugios/form.html', {'form': form, 'refugio': refugio})
+        # Instanciamos el formulario para carga inicial
+        form = RefugioForm(instance=refugio, user=request.user)
 
+    return render(request, 'refugios/form.html', {'form': form, 'refugio': refugio})
 
 @roles_permitidos(['ADMIN'])
 def eliminar_refugio(request, refugio_id):

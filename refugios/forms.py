@@ -58,7 +58,6 @@ class RefugioForm(FormStyleMixin, forms.ModelForm):
         # Lógica de seguridad: Si el usuario NO es admin, bloqueamos el campo
         if self.user and not self.user.es_admin:
             self.fields['usuario_encargado'].disabled = True
-            self.fields['usuario_encargado'].help_text = "Solo el administrador puede cambiar el encargado."
 
     # Validación estricta de correo
     def clean_email(self):
