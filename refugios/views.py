@@ -1,13 +1,14 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
 from .models import Refugio
-from usuarios.decorators import roles_permitidos
 from mascotas.models import Mascota
 from adopciones.models import Adopcion
-from usuarios.models import Usuario
 from django.db.models import Count, Q
-from .forms import RefugioForm
-
+from django.contrib.auth.decorators import login_required
+from usuarios.decorators import roles_permitidos
+from django.contrib.auth import update_session_auth_hash
+from django.contrib.auth.forms import PasswordChangeForm
+from .forms import RefugioForm, EditUsuarioForm
 
 LOCALIDADES_BOGOTA = [
     "Usaquén", "Chapinero", "Santa Fe", "San Cristóbal", "Usme", "Tunjuelito",
@@ -91,12 +92,20 @@ def editar_refugio(request, refugio_id):
 @roles_permitidos(['ADMIN'])
 def eliminar_refugio(request, refugio_id):
     refugio = get_object_or_404(Refugio, id_refugio=refugio_id)
-    try:  # <-- BLINDAJE CRÍTICO
-        refugio.delete()
-        messages.success(request, 'Refugio eliminado correctamente.')
-    except Exception as e:
-        messages.error(request, 'No puedes eliminar este refugio porque tiene mascotas o procesos vinculados a él.')
 
+    # En lugar de refugio.delete(), hacemos esto:
+    refugio.activo = False
+    refugio.save()
+
+    messages.success(request, 'Refugio desactivado correctamente.')
+    return redirect('admin_lista_refugios')
+
+@roles_permitidos(['ADMIN'])
+def reactivar_refugio(request, refugio_id):
+    refugio = get_object_or_404(Refugio, id_refugio=refugio_id)
+    refugio.activo = True
+    refugio.save()
+    messages.success(request, 'Refugio reactivado correctamente.')
     return redirect('admin_lista_refugios')
 
 
@@ -124,3 +133,48 @@ def dashboard_refugio(request):
     }
 
     return render(request, 'refugios/dashboard_refugio.html', context)
+
+
+@login_required
+@roles_permitidos(['REFUGIO', 'ADMIN'])
+def configuracion_refugio(request):
+    refugio = request.user.mi_refugio
+    usuario = request.user
+
+    # Inicialización de formularios
+    form_refugio = RefugioForm(instance=refugio)
+    form_usuario = EditUsuarioForm(instance=usuario)
+    form_pass = PasswordChangeForm(user=usuario)
+
+    # Dentro de tu función configuracion_refugio en views.py
+
+    if request.method == 'POST':
+        if 'btn_refugio' in request.POST:
+            form_refugio = RefugioForm(request.POST, instance=refugio)
+            if form_refugio.is_valid():
+                form_refugio.save()
+                messages.success(request, 'Datos del refugio actualizados.')
+            else:
+                messages.error(request, 'Error al guardar el refugio. Revisa los campos.')
+
+        elif 'btn_usuario' in request.POST:
+            form_usuario = EditUsuarioForm(request.POST, instance=usuario)
+            if form_usuario.is_valid():
+                form_usuario.save()
+                messages.success(request, 'Tus datos personales han sido actualizados.')
+            else:
+                messages.error(request, 'Error en tus datos personales.')
+        elif 'btn_pass' in request.POST:
+            form_pass = PasswordChangeForm(user=usuario, data=request.POST)
+            if form_pass.is_valid():
+                user = form_pass.save()
+                update_session_auth_hash(request, user)  # Importante para no cerrar sesión
+                messages.success(request, 'Contraseña actualizada correctamente.')
+            else:
+                messages.error(request, 'Error al cambiar la contraseña. Revisa los campos.')
+
+    return render(request, 'refugios/configuracion.html', {
+        'form_refugio': form_refugio,
+        'form_usuario': form_usuario,
+        'form_pass': form_pass
+    })

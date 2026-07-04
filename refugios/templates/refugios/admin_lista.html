@@ -82,50 +82,23 @@
                     </span>
                 </div>
 
-                <div class="refugio-info">
-                    <p><strong>📧 Email:</strong> <span>{{ refugio.email|default:"-" }}</span></p>
-                    <p><strong>📞 Teléfono:</strong> <span>{{ refugio.telefono|default:"-" }}</span></p>
-                    <p><strong>👤 Responsable:</strong> <span>{{ refugio.responsable }}</span></p>
-                    <p><strong>📍 Dirección:</strong> <span>{{ refugio.direccion }}</span></p>
-                    {% if refugio.capacidad_maxima %}
-                    <p>
-                        <strong>🏠 Capacidad:</strong>
-                        <span>{{ refugio.capacidad_maxima }} mascotas</span>
-                    </p>
-                    {% endif %}
-                </div>
-
-                <div class="refugio-stats">
-                    <div class="stat-item">
-                        <div class="number">{{ refugio.mascotas.count }}</div>
-                        <div class="label">Mascotas Totales</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="number">
-                            -
-                        </div>
-                        <div class="label">Disponibles</div>
-                    </div>
-                </div>
-
-                {% if refugio.descripcion %}
-                <p style="color: #666; font-size: 14px; line-height: 1.6;">
-                    {{ refugio.descripcion|truncatewords:20 }}
-                </p>
-                {% endif %}
-
                 <div class="refugio-actions">
                     <a href="{% url 'editar_refugio' refugio.id_refugio %}" class="btn btn-secondary btn-sm" style="flex: 1; text-align: center;">
                         ✏️ Editar
                     </a>
-                    <a href="{% url 'eliminar_refugio' refugio.id_refugio %}" class="btn btn-danger btn-sm" style="flex: 1; text-align: center;"
-                       onclick="return confirm('¿Eliminar refugio? Esto dejará sin refugio a sus mascotas asociadas.')">
-                        🗑️ Eliminar
-                    </a>
+
+                    {% if refugio.activo %}
+                        <a href="{% url 'eliminar_refugio' refugio.id_refugio %}" class="btn btn-danger btn-sm" style="flex: 1; text-align: center;"
+                           onclick="return confirm('¿Desactivar este refugio?')">
+                            🗑️ Desactivar
+                        </a>
+                    {% else %}
+                        <a href="{% url 'reactivar_refugio' refugio.id_refugio %}" class="btn btn-success btn-sm" style="flex: 1; text-align: center;">
+                            ✅ Reactivar
+                        </a>
+                    {% endif %}
                 </div>
             </div>
-            {% empty %}
-                <p style="text-align: center; color: #999; width: 100%; grid-column: 1 / -1;">No hay refugios registrados.</p>
             {% endfor %}
         </div>
     </main>

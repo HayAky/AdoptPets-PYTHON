@@ -1,6 +1,10 @@
 from django.db import models
 from usuarios.models import Usuario
 
+class ActiveManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().filter(activo=True)
+
 class Refugio(models.Model):
     id_refugio = models.BigAutoField(primary_key=True)
     nombre_refugio = models.CharField(max_length=255)
@@ -12,6 +16,8 @@ class Refugio(models.Model):
     localidad = models.CharField(max_length=255, null=True, blank=True)
     descripcion = models.TextField(null=True, blank=True)
     activo = models.BooleanField(default=True)
+    objects = models.Manager()
+    active_objects = ActiveManager()
     fecha_registro = models.DateTimeField(auto_now_add=True)
     usuario_encargado = models.OneToOneField(Usuario, on_delete=models.SET_NULL, null=True, blank=True,
                                              related_name='mi_refugio')

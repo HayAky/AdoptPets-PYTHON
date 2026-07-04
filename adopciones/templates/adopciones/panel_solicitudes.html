@@ -1,0 +1,52 @@
+{% extends 'base.html' %}
+
+{% block title %}Solicitudes Pendientes - AdoptPets{% endblock %}
+
+{% block content %}
+<div class="container" style="padding: 30px; margin-left: 300px; max-width: 1200px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h2>Solicitudes Pendientes de mi Refugio</h2>
+        <a href="{% url 'historial_adopciones' %}" style="background: #10b981; color: white; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-weight: bold;">
+            🕰️ Ver Historial
+        </a>
+    </div>
+
+    <div style="background: white; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); overflow-x: auto;">
+        <table class="table" style="width: 100%; border-collapse: collapse; text-align: left;">
+            <thead>
+                <tr style="background: #f8fafc; border-bottom: 2px solid #e2e8f0;">
+                    <th style="padding: 15px;">ID</th>
+                    <th style="padding: 15px;">Mascota</th>
+                    <th style="padding: 15px;">Adoptante Interesado</th>
+                    <th style="padding: 15px;">Fecha Solicitud</th>
+                    <th style="padding: 15px;">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for adopcion in solicitudes %}
+                <tr style="border-bottom: 1px solid #edf2f7;">
+                    <td style="padding: 15px; font-weight: bold; color: #64748b;">#{{ adopcion.id_adopcion }}</td>
+                    <td style="padding: 15px; font-weight: bold;">{{ adopcion.mascota.nombre }}</td>
+                    <td style="padding: 15px;">
+                        {{ adopcion.adoptante.nombre }} {{ adopcion.adoptante.apellido }}
+                        <br>
+                        <span style="font-size: 12px; color: #64748b;">📞 {{ adopcion.adoptante.telefono|default:"No registró" }}</span>
+                    </td>
+                    <td style="padding: 15px; color: #475569;">{{ adopcion.fecha_solicitud|date:"d/m/Y" }}</td>
+                    <td style="padding: 15px;">
+                        <a href="{% url 'detalle_solicitud' adopcion.id_adopcion %}" style="background: #3b82f6; color: white; padding: 6px 12px; border: none; border-radius: 5px; text-decoration: none; display: inline-block; font-weight: bold; font-size: 14px;">Ver Detalles</a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" style="text-align: center; padding: 40px; color: #64748b;">
+                        <span style="font-size: 40px; display: block; margin-bottom: 10px;">📋</span>
+                        No tienes solicitudes pendientes en este momento.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

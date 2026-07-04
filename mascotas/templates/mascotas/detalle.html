@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Detalles de {{ mascota.nombre }} - AdoptPets{% endblock %}
+
+{% block content %}
+<div class="container" style="max-width: 1000px; margin: 0 auto; padding: 30px;">
+    
+    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 40px; background: white; padding: 30px; border-radius: 15px; box-shadow: 0 4px 15px rgba(0,0,0,0.05);">
+        
+        <!-- Columna de Imágenes -->
+        <div>
+            {% if mascota.foto %}
+                <img src="{{ mascota.foto.url }}" alt="{{ mascota.nombre }}" style="width: 100%; border-radius: 10px; margin-bottom: 15px;">
+            {% else %}
+                <img src="{% static 'img/default-pet.jpg' %}" alt="Sin foto" style="width: 100%; border-radius: 10px; margin-bottom: 15px;">
+            {% endif %}
+
+            <!-- Galería -->
+            {% if mascota.fotos.all %}
+                <div style="display: flex; gap: 10px; overflow-x: auto;">
+                    {% for foto_galeria in mascota.fotos.all %}
+                        <img src="{{ foto_galeria.url_foto }}" style="width: 80px; height: 80px; object-fit: cover; border-radius: 5px;">
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+
+        <!-- Columna de Información -->
+        <div>
+            <h1 style="color: #22C55E; margin-top: 0;">{{ mascota.nombre }}</h1>
+            <p><strong>Refugio:</strong> {{ mascota.refugio.nombre_refugio|default:"No asignado" }}</p>
+            <p><strong>Descripción:</strong> {{ mascota.descripcion|default:"Sin descripción" }}</p>
+            
+            <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                <p><strong>Especie:</strong> {{ mascota.especie|title }}</p>
+                <p><strong>Raza:</strong> {{ mascota.raza|default:"Mestizo" }}</p>
+                <p><strong>Sexo:</strong> {{ mascota.sexo|title }}</p>
+                <p><strong>Tamaño:</strong> {{ mascota.tamano|title }}</p>
+                <p><strong>Peso:</strong> {{ mascota.peso|default:"--" }} kg</p>
+                <p><strong>Edad aprox:</strong> {{ mascota.edad_aproximada|default:"--" }} años</p>
+                <p><strong>Color:</strong> {{ mascota.color|default:"--" }}</p>
+            </div>
+
+            <hr style="border: 0; border-top: 1px solid #eee; margin: 20px 0;">
+
+            <h3>Estado de Salud</h3>
+            <p>{{ mascota.estado_salud|default:"Sin información detallada." }}</p>
+            <ul style="list-style-type: none; padding: 0;">
+                <li>Vacunado: {% if mascota.vacunado %}✅{% else %}❌{% endif %}</li>
+                <li>Esterilizado: {% if mascota.esterilizado %}✅{% else %}❌{% endif %}</li>
+                <li>Microchip: {% if mascota.microchip %}✅{% else %}❌{% endif %}</li>
+            </ul>
+
+            <div style="margin-top: 30px;">
+                {% if request.user.es_adoptante %}
+                    <a href="{% url 'solicitar_adopcion' mascota.id_mascota %}" class="adopt-btn" style="background: #22C55E; color: white; padding: 15px 30px; text-decoration: none; border-radius: 8px; font-weight: bold; display: inline-block;">Solicitar Adopción</a>
+                {% endif %}
+                <a href="{% url 'lista_mascotas' %}" style="margin-left: 15px; color: #6b7280; text-decoration: none;">Volver a la lista</a>
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}

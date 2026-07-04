@@ -4,6 +4,9 @@ from .models import Adopcion, Seguimiento
 from mascotas.models import Mascota
 from usuarios.decorators import roles_permitidos
 from django.utils import timezone
+from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
+from adopciones.models import Adopcion
 
 
 # =========================================================
@@ -73,6 +76,28 @@ def admin_detalle_adopcion(request, adopcion_id):
     return render(request, 'adopciones/admin_detalle.html', {'adopcion': adopcion})
 
 
+@login_required
+@roles_permitidos(['REFUGIO', 'ADMIN'])
+def panel_solicitudes(request):
+    # Filtramos las solicitudes PENDIENTES que pertenecen al refugio del usuario logueado
+    solicitudes = Adopcion.objects.filter(
+        mascota__refugio=request.user.mi_refugio,
+        estado_adopcion='pendiente'
+    ).select_related('adoptante', 'mascota').order_by('-fecha_solicitud')
+
+    return render(request, 'adopciones/panel_solicitudes.html', {'solicitudes': solicitudes})
+
+
+@login_required
+@roles_permitidos(['REFUGIO', 'ADMIN'])
+def historial_adopciones(request):
+    # Filtramos todo lo que NO sea pendiente (Aprobados, Rechazados, Finalizados)
+    historial = Adopcion.objects.filter(
+        mascota__refugio=request.user.mi_refugio
+    ).exclude(estado_adopcion='pendiente').select_related('adoptante', 'mascota').order_by('-fecha_solicitud')
+
+    return render(request, 'adopciones/historial.html', {'historial': historial})
+
 @roles_permitidos(['ADMIN', 'REFUGIO'])
 def crear_seguimiento(request, adopcion_id):
     adopcion = get_object_or_404(Adopcion, id_adopcion=adopcion_id)
@@ -104,3 +129,61 @@ def crear_seguimiento(request, adopcion_id):
         'estados_bienestar': Seguimiento.ESTADO_BIENESTAR_CHOICES
     }
     return render(request, 'adopciones/form_seguimiento.html', context)
+
+
+from django.shortcuts import get_object_or_404
+
+
+@login_required
+@roles_permitidos(['REFUGIO', 'ADMIN'])
+def detalle_solicitud(request, adopcion_id):
+    # Trae la adopción asegurando que pertenezca a una mascota de este refugio
+    adopcion = get_object_or_404(
+        Adopcion.objects.select_related('adoptante', 'mascota'),
+        id_adopcion=adopcion_id,
+        mascota__refugio=request.user.mi_refugio
+    )
+
+    return render(request, 'adopciones/detalle_solicitud.html', {'adopcion': adopcion})
+
+
+@login_required
+@roles_permitidos(['REFUGIO', 'ADMIN'])
+def procesar_solicitud(request, adopcion_id, accion):
+    if request.method == 'POST':
+        adopcion = get_object_or_404(
+            Adopcion,
+            id_adopcion=adopcion_id,
+            mascota__refugio=request.user.mi_refugio
+        )
+        mascota = adopcion.mascota
+
+        if accion == 'aprobar':
+            # 1. Actualizar adopción
+            adopcion.estado_adopcion = 'adoptado'
+            adopcion.fecha_aprobacion = timezone.now()
+            adopcion.save()
+
+            # 2. Actualizar mascota
+            mascota.estado_adopcion = 'adoptado'
+            mascota.save()
+
+            # 3. Limpiar otras solicitudes concurrentes
+            Adopcion.objects.filter(mascota=mascota, estado_adopcion='pendiente').exclude(
+                id_adopcion=adopcion.id_adopcion).delete()
+            messages.success(request, f'¡Aprobado! {mascota.nombre} ha sido adoptado(a).')
+
+        elif accion == 'rechazar':
+            # Eliminar la solicitud denegada
+            adopcion.estado_adopcion = 'rechazado'
+            adopcion.save()
+
+            # Verificar si quedan otras solicitudes, si no, liberar mascota
+            if not Adopcion.objects.filter(mascota=mascota, estado_adopcion='pendiente').exists():
+                mascota.estado_adopcion = 'disponible'
+                mascota.save()
+            messages.warning(request, 'La solicitud fue rechazada y se registro en el historial.')
+
+        return redirect('panel_solicitudes')
+
+    return redirect('detalle_solicitud', adopcion_id=adopcion_id)

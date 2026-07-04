@@ -1,14 +1,13 @@
-from django.shortcuts import render, redirect
 from django.contrib.auth import login
-from django.contrib import messages
 from .models import Usuario, Rol
 from mascotas.models import Mascota
 from refugios.models import Refugio
-from django.contrib.auth import get_user_model
-from django.contrib.auth.hashers import make_password
 from adopciones.models import Adopcion
 from .decorators import roles_permitidos
 from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib import messages
+from django.contrib.auth import update_session_auth_hash
+from .forms import EditUsuarioForm, CustomPasswordChangeForm
 
 def lista_usuarios(request):
     usuarios = Usuario.objects.all()
@@ -97,8 +96,6 @@ def admin_lista_usuarios(request):
 
     adoptantes = todos_los_usuarios.filter(roles__nombre_rol='ADOPTANTE').distinct()
     refugios = todos_los_usuarios.filter(roles__nombre_rol='REFUGIO').distinct()
-
-
     cantidad_activos = todos_los_usuarios.filter(is_active=True).count()
 
     context = {
@@ -167,6 +164,8 @@ def editar_usuario(request, usuario_id):
     usuario = get_object_or_404(Usuario, id_usuario=usuario_id)
     todos_los_roles = Rol.objects.all()
 
+    historial = usuario.historial.all()[:20]
+
     if request.method == 'POST':
         try:
             usuario.nombre = request.POST.get('nombre')
@@ -195,7 +194,8 @@ def editar_usuario(request, usuario_id):
     context = {
         'usuario': usuario,
         'todosLosRoles': todos_los_roles,
-        'roles_usuario_ids': list(usuario.roles.values_list('id_rol', flat=True))
+        'roles_usuario_ids': list(usuario.roles.values_list('id_rol', flat=True)),
+        'historial': historial
     }
     return render(request, 'usuarios/form.html', context)
 
@@ -205,16 +205,13 @@ def eliminar_usuario(request, usuario_id):
     usuario = get_object_or_404(Usuario, id_usuario=usuario_id)
 
     if request.user.id_usuario == usuario.id_usuario:
-        messages.error(request, 'No puedes eliminar tu propia cuenta de administrador.')
+        messages.error(request, 'No puedes desactivar tu propia cuenta.')
         return redirect('admin_lista_usuarios')
 
-    try:  # <--- BLINDAJE
-        usuario.delete()
-        messages.success(request, 'Usuario eliminado correctamente.')
-    except Exception as e:
-        # Aquí el error suele ser de "Integridad Referencial" (llaves foráneas)
-        messages.error(request,
-                       'No se puede eliminar este usuario porque tiene registros importantes vinculados (adopciones, mascotas a cargo, etc.).')
+    # CAMBIO: Ya no usamos delete()
+    usuario.is_active = False
+    usuario.save()
+    messages.success(request, 'Usuario desactivado correctamente.')
 
     return redirect('admin_lista_usuarios')
 
@@ -245,19 +242,30 @@ def toggle_usuario(request, usuario_id):
 def perfil_adoptante(request):
     usuario = request.user
 
-    if request.method == 'POST':
-        try:
-            usuario.nombre = request.POST.get('nombre')
-            usuario.apellido = request.POST.get('apellido')
-            usuario.telefono = request.POST.get('telefono')
-            usuario.direccion = request.POST.get('direccion')
-            usuario.ciudad = request.POST.get('ciudad')
-            usuario.cedula = request.POST.get('cedula') or usuario.cedula
-            usuario.save()
-            messages.success(request, 'Tus datos han sido actualizados correctamente.')
-            return redirect('perfil_adoptante')
-        except Exception as e:
-            messages.error(request, f'Ocurrió un error al guardar tu perfil: {str(e)}')
+    # Inicializamos formularios
+    form_perfil = EditUsuarioForm(instance=usuario)
+    form_pass = CustomPasswordChangeForm(user=usuario)
 
-    mis_adopciones = Adopcion.objects.filter(adoptante=usuario).order_by('-fecha_solicitud')
-    return render(request, 'usuarios/perfil_adoptante.html', {'mis_adopciones': mis_adopciones})
+    if request.method == 'POST':
+        if 'btn_perfil' in request.POST:
+            form_perfil = EditUsuarioForm(request.POST, instance=usuario)
+            if form_perfil.is_valid():
+                form_perfil.save()
+                messages.success(request, 'Datos actualizados.')
+                return redirect('perfil_adoptante')
+            # SI NO ES VALIDO, NO REDIRIGES. El formulario se pasa al render abajo con los errores.
+
+        elif 'btn_pass' in request.POST:
+            form_pass = CustomPasswordChangeForm(user=usuario, data=request.POST)
+            if form_pass.is_valid():
+                form_pass.save()
+                update_session_auth_hash(request, usuario)
+                messages.success(request, 'Contraseña actualizada.')
+                return redirect('perfil_adoptante')
+            # SI NO ES VALIDO, NO REDIRIGES.
+
+    return render(request, 'usuarios/perfil_adoptante.html', {
+        'form_perfil': form_perfil,  # Contiene los errores si form.is_valid() fue False
+        'form_pass': form_pass,  # Contiene los errores si form.is_valid() fue False
+        'mis_adopciones': Adopcion.objects.filter(adoptante=usuario)
+    })

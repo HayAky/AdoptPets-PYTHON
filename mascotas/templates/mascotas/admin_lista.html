@@ -56,6 +56,16 @@
                 <tbody>
                 {% for mascota in mascotas %}
                 <tr>
+                    <td>
+                        {% if mascota.activo %}
+                            <span class="badge {% if mascota.estado_adopcion == 'disponible' %}badge-available{% elif mascota.estado_adopcion == 'pendiente' %}badge-process{% else %}badge-adopted{% endif %}">
+                                {{ mascota.estado_adopcion|title }}
+                            </span>
+                        {% else %}
+                            <span class="badge" style="background-color: #6c757d; color: white;">Adoptado</span>
+                        {% endif %}
+                    </td>
+
                     <td>{{ mascota.id_mascota }}</td>
                     <td><strong>{{ mascota.nombre }}</strong></td>
                     <td>{{ mascota.especie }}</td>
@@ -63,23 +73,24 @@
                     <td>{{ mascota.edad_aproximada|default:"-" }} años</td>
                     <td>{{ mascota.sexo }}</td>
                     <td>{{ mascota.refugio.nombre_refugio|default:"-" }}</td>
-                    <td>
-                        <span class="badge 
-                            {% if mascota.estado_adopcion == 'disponible' %}badge-available
-                            {% elif mascota.estado_adopcion == 'pendiente' %}badge-process
-                            {% else %}badge-adopted{% endif %}">
-                            {{ mascota.estado_adopcion }}
-                        </span>
-                    </td>
+
                     <td>
                         <div class="actions">
                             <a href="{% url 'editar_mascota' mascota.id_mascota %}" class="btn btn-secondary btn-sm">
                                 ✏️ Editar
                             </a>
-                            <a href="{% url 'eliminar_mascota' mascota.id_mascota %}" class="btn btn-danger btn-sm"
-                               onclick="return confirm('¿Está seguro de eliminar esta mascota?')">
-                                🗑️ Eliminar
-                            </a>
+
+                            {% if mascota.activo %}
+                                <a href="{% url 'eliminar_mascota' mascota.id_mascota %}" class="btn btn-danger btn-sm"
+                                   onclick="return confirm('¿Está seguro de marcar esta mascota como adoptada/inactiva?')">
+                                    🗑️ Desactivar
+                                </a>
+                            {% else %}
+                                <a href="{% url 'reactivar_mascota' mascota.id_mascota %}" class="btn btn-success btn-sm"
+                                   onclick="return confirm('¿Está seguro de reactivar esta mascota?')">
+                                   ✅ Reactivar
+                                </a>
+                            {% endif %}
                         </div>
                     </td>
                 </tr>

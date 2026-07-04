@@ -66,9 +66,7 @@
                 </button>
 
                 <div class="user-dropdown">
-                    <a href="#" class="dropdown-link" style="display:block; padding: 10px 20px; color: #333; text-decoration: none;">
-                        Configurar Refugio
-                    </a>
+                    <a href="{% url 'configuracion_refugio' %}" class="btn-config">Configurar Refugio</a>
                     <form action="{% url 'logout' %}" method="post">
                         {% csrf_token %}
                         <button type="submit" class="logout-btn">Cerrar sesión</button>
@@ -83,7 +81,8 @@
             <a href="{% url 'inicio' %}">Ir al sitio</a>
             <a href="{% url 'dashboard_refugio' %}">Dashboard</a>
             <a href="{% url 'admin_lista_mascotas' %}">Mis Mascotas</a>
-            <a href="#">Solicitudes</a>
+            <a href="{% url 'panel_solicitudes' %}"> Ver Todas las Solicitudes</a>
+            <a href="{% url 'historial_adopciones' %}">Historial de Adopciones</a>
             <a href="{% url 'admin_lista_blogs' %}">Blogs</a>
         </nav>
     </div>

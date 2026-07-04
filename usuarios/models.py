@@ -74,3 +74,13 @@ class Usuario(AbstractBaseUser, PermissionsMixin):
     @property
     def es_adoptante(self):
         return self.roles.filter(nombre_rol__in=['ADOPTANTE', 'ROLE_ADOPTANTE']).exists()
+
+class HistorialActividad(models.Model):
+    id_actividad = models.BigAutoField(primary_key=True)
+    usuario = models.ForeignKey('Usuario', on_delete=models.CASCADE, related_name='historial')
+    accion = models.CharField(max_length=255)
+    fecha = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        db_table = 'historial_actividad'
+        ordering = ['-fecha']

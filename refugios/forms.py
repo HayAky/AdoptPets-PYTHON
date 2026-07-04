@@ -1,38 +1,54 @@
 from django import forms
-from .models import Refugio
+from django.contrib.auth.forms import PasswordChangeForm
+from .models import Refugio, Usuario
 
-LOCALIDADES_BOGOTA = [
-    ("Usaquén", "Usaquén"), ("Chapinero", "Chapinero"), ("Santa Fe", "Santa Fe"),
-    ("San Cristóbal", "San Cristóbal"), ("Usme", "Usme"), ("Tunjuelito", "Tunjuelito"),
-    ("Bosa", "Bosa"), ("Kennedy", "Kennedy"), ("Fontibón", "Fontibón"),
-    ("Engativá", "Engativá"), ("Suba", "Suba"), ("Barrios Unidos", "Barrios Unidos"),
-    ("Teusaquillo", "Teusaquillo"), ("Los Mártires", "Los Mártires"),
-    ("Antonio Nariño", "Antonio Nariño"), ("Puente Aranda", "Puente Aranda"),
-    ("La Candelaria", "La Candelaria"), ("Rafael Uribe Uribe", "Rafael Uribe Uribe"),
-    ("Ciudad Bolívar", "Ciudad Bolívar"), ("Sumapaz", "Sumapaz")
-]
+# --- MIXIN PARA ESTILOS ---
+class FormStyleMixin:
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        for field in self.fields.values():
+            field.widget.attrs.update({'class': 'form-control'})
 
-class RefugioForm(forms.ModelForm):
+# --- FORMULARIOS ---
+
+# forms.py
+class EditUsuarioForm(FormStyleMixin, forms.ModelForm):
+    class Meta:
+        model = Usuario
+        fields = ['nombre', 'apellido', 'email', 'telefono']
+
+    def clean_nombre(self):
+        nombre = self.cleaned_data.get('nombre')
+        if len(nombre) < 3:
+            raise forms.ValidationError("El nombre debe tener al menos 3 caracteres.")
+        return nombre
+
+    def clean_telefono(self):
+        telefono = self.cleaned_data.get('telefono')
+        if telefono and (len(telefono) < 7 or not telefono.isdigit()):
+            raise forms.ValidationError("Ingrese un número de teléfono válido (mínimo 7 dígitos).")
+        return telefono
+
+class RefugioForm(FormStyleMixin, forms.ModelForm):
+    # Definimos el campo de localidad explícitamente para mantener la lista de opciones
     localidad = forms.ChoiceField(
-        choices=LOCALIDADES_BOGOTA,
-        widget=forms.Select(attrs={'class': 'form-control'})
+        choices=[
+            ("Usaquén", "Usaquén"), ("Chapinero", "Chapinero"), ("Santa Fe", "Santa Fe"),
+            ("San Cristóbal", "San Cristóbal"), ("Usme", "Usme"), ("Tunjuelito", "Tunjuelito"),
+            ("Bosa", "Bosa"), ("Kennedy", "Kennedy"), ("Fontibón", "Fontibón"),
+            ("Engativá", "Engativá"), ("Suba", "Suba"), ("Barrios Unidos", "Barrios Unidos"),
+            ("Teusaquillo", "Teusaquillo"), ("Los Mártires", "Los Mártires"),
+            ("Antonio Nariño", "Antonio Nariño"), ("Puente Aranda", "Puente Aranda"),
+            ("La Candelaria", "La Candelaria"), ("Rafael Uribe Uribe", "Rafael Uribe Uribe"),
+            ("Ciudad Bolívar", "Ciudad Bolívar"), ("Sumapaz", "Sumapaz")
+        ]
     )
 
     class Meta:
         model = Refugio
         fields = ['nombre_refugio', 'responsable', 'localidad', 'direccion',
-                  'telefono', 'email', 'capacidad_maxima', 'descripcion',
-                  'usuario_encargado', 'activo']
-        widgets = {
-            'nombre_refugio': forms.TextInput(attrs={'class': 'form-control'}),
-            'responsable': forms.TextInput(attrs={'class': 'form-control'}),
-            'direccion': forms.TextInput(attrs={'class': 'form-control'}),
-            'telefono': forms.TextInput(attrs={'class': 'form-control'}),
-            'email': forms.EmailInput(attrs={'class': 'form-control'}),
-            'capacidad_maxima': forms.NumberInput(attrs={'class': 'form-control'}),
-            'descripcion': forms.Textarea(attrs={'class': 'form-control', 'rows': 3}),
-            'usuario_encargado': forms.Select(attrs={'class': 'form-control'}),
-        }
+                  'telefono', 'email', 'capacidad_maxima', 'descripcion', 'activo']
+
     # Validación estricta de correo
     def clean_email(self):
         email = self.cleaned_data.get('email')
@@ -46,3 +62,18 @@ class RefugioForm(forms.ModelForm):
         if telefono and not telefono.isdigit():
             raise forms.ValidationError("El teléfono debe contener solo números.")
         return telefono
+
+class CustomPasswordChangeForm(PasswordChangeForm):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Aplicar estilos
+        for field in self.fields.values():
+            field.widget.attrs.update({'class': 'form-control'})
+
+        # Sobrescribir mensajes de error al español
+        self.fields['old_password'].error_messages = {
+            'password_incorrect': "La contraseña actual es incorrecta."
+        }
+        self.fields['new_password1'].error_messages = {
+            'password_mismatch': "Las contraseñas no coinciden."
+        }

@@ -13,4 +13,7 @@ urlpatterns = [
 
     # Rutas del Empleado del Refugio
     path('panel/', views.dashboard_refugio, name='dashboard_refugio'),
+# En la lista urlpatterns de refugios/urls.py
+    path('configuracion/', views.configuracion_refugio, name='configuracion_refugio'),
+    path('refugios/reactivar/<int:refugio_id>/', views.reactivar_refugio, name='reactivar_refugio'),
 ]

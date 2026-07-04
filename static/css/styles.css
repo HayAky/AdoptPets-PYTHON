@@ -182,17 +182,21 @@ header nav {
    ======================================== */
 .user-menu {
     position: relative;
-    display: inline-block;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
 }
 
 .user-button {
-    background: transparent;
-    border: none;
-    font-size: 18px;
-    font-weight: 600;
-    color: var(--color-primary);
-    cursor: pointer;
-    padding: 6px 10px;
+    /* Fuerza estos valores para verificar si el CSS está aplicando */
+    background-color: #22C55E !important;
+    color: white !important;
+    padding: 10px 20px !important;
+    border-radius: 8px !important;
+    border: none !important;
+    font-size: 18px !important;
+    cursor: pointer !important;
 }
 
 .user-button:hover {
@@ -200,6 +204,7 @@ header nav {
 }
 
 .user-dropdown {
+    margin-top: -5px;
     position: absolute;
     right: 0;
     top: 100%;

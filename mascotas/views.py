@@ -1,15 +1,24 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib import messages
+from .models import Mascota
 from refugios.models import Refugio
 from blog.models import Blog
 from django.db.models import Q
 from usuarios.decorators import roles_permitidos
-from .forms import MascotaForm
-from mascotas.models import Mascota
+from usuarios.models import HistorialActividad
 
 
+def inicio(request):
+    mascotas = Mascota.objects.select_related('refugio').filter(estado_adopcion='disponible').order_by('-fecha_registro')
+    blogs_destacados = Blog.objects.filter(activo=True).order_by('-fecha_publicacion')[:2]
+
+    # AQUÍ ESTÁ EL CAMBIO IMPORTANTE:
+    return render(request, 'main.html', {
+        'mascotas': mascotas_destacadas,
+        'blogs': blogs_destacados
+    })
 def lista_mascotas(request):
-    mascotas = Mascota.objects.filter(estado_adopcion='disponible').order_by('-fecha_registro')
+    mascotas = Mascota.objects.select_related('refugio').filter(estado_adopcion__in=['disponible', 'pendiente']).order_by('-fecha_registro')
 
     busqueda = request.GET.get('busqueda', '')
     especie = request.GET.get('especie', '')
@@ -44,6 +53,38 @@ def lista_mascotas(request):
         mascotas = mascotas.filter(esterilizado=True)
     if microchip:
         mascotas = mascotas.filter(microchip=True)
+
+    busqueda = request.GET.get('busqueda', '')
+
+    if busqueda and request.user.is_authenticated:
+        HistorialActividad.objects.create(
+            usuario=request.user,
+            accion=f"Búsqueda: {busqueda}"
+        )
+    filtros = {
+        'Busqueda': request.GET.get('busqueda', ''),
+        'Especie': request.GET.get('especie', ''),
+        'Sexo': request.GET.get('sexo', ''),
+        'Tamaño': request.GET.get('tamano', ''),
+        'Raza': request.GET.get('raza', ''),
+        'Vacunado': 'Sí' if request.GET.get('vacunado') else '',
+        'Esterilizado': 'Sí' if request.GET.get('esterilizado') else '',
+        'Microchip': 'Sí' if request.GET.get('microchip') else '',
+    }
+    filtros_activos = [f"{k}: {v}" for k, v in filtros.items() if v]
+    if filtros_activos and request.user.is_authenticated:
+        accion_registrada = "Filtros aplicados: " + " | ".join(filtros_activos)
+
+        # Evitamos registros duplicados rápidos (opcional)
+        from usuarios.models import HistorialActividad
+        ultima_accion = HistorialActividad.objects.filter(usuario=request.user).first()
+
+        if not ultima_accion or ultima_accion.accion != accion_registrada:
+            HistorialActividad.objects.create(
+                usuario=request.user,
+                accion=accion_registrada
+            )
+
 
     # 3. Enviamos todo al contexto para mantener los valores en el formulario HTML
     context = {
@@ -87,34 +128,32 @@ def admin_lista_mascotas(request):
         'busqueda': busqueda  # Lo enviamos para que la barra no se borre
     })
 
-
 @roles_permitidos(['ADMIN', 'REFUGIO'])
 def crear_mascota(request):
     refugios = Refugio.objects.filter(activo=True)
     mi_refugio = getattr(request.user, 'mi_refugio', None) if not request.user.es_admin else None
 
     if request.method == 'POST':
-        form = MascotaForm(request.POST, request.FILES)
-        if form.is_valid():
-            mascota = form.save(commit=False)
+        try:
+            mascota = Mascota()
+            guardar_datos_mascota(request, mascota)
 
-            # Asignación de refugio
             if request.user.es_admin:
-                mascota.refugio_id = request.POST.get('refugio')
+                refugio_id = request.POST.get('refugio')
+                if refugio_id:
+                    mascota.refugio_id = refugio_id
             else:
                 mascota.refugio = mi_refugio
 
-            mascota.save()  # Aquí Cloudinary sube la foto
+            mascota.save()
             messages.success(request, 'Mascota registrada correctamente.')
             return redirect('admin_lista_mascotas')
-    else:
-        form = MascotaForm()
 
-    return render(request, 'mascotas/form.html', {
-        'form': form,
-        'refugios': refugios,
-        'mi_refugio': mi_refugio
-    })
+        except Exception as e:  # <--- SI ALGO FALLA, LO ATRAPAMOS AQUÍ
+            messages.error(request, f'Error crítico al guardar la mascota: {str(e)}')
+            # No hacemos redirect, dejamos que se vuelva a renderizar el formulario
+
+    return render(request, 'mascotas/form.html', {'refugios': refugios, 'mi_refugio': mi_refugio})
 
 
 @roles_permitidos(['ADMIN', 'REFUGIO'])
@@ -123,78 +162,111 @@ def editar_mascota(request, mascota_id):
     refugios = Refugio.objects.filter(activo=True)
     mi_refugio = getattr(request.user, 'mi_refugio', None) if not request.user.es_admin else None
 
-    # Mantenemos tu seguridad de refugios
     if not request.user.es_admin and mascota.refugio != mi_refugio:
         messages.error(request, 'Acceso Denegado: Esta mascota pertenece a otro refugio.')
         return redirect('admin_lista_mascotas')
 
     if request.method == 'POST':
-        # Usamos el form para procesar los datos (incluyendo la foto automáticamente)
-        form = MascotaForm(request.POST, request.FILES, instance=mascota)
+        try:  # <--- INICIA EL BLINDAJE
+            guardar_datos_mascota(request, mascota)
 
-        if form.is_valid():
-            try:
-                # Guardamos los datos del formulario (esto incluye la foto en Cloudinary)
-                mascota_actualizada = form.save(commit=False)
+            if request.user.es_admin:
+                refugio_id = request.POST.get('refugio')
+                if refugio_id:
+                    mascota.refugio_id = refugio_id
+            else:
+                mascota.refugio = mi_refugio
 
-                # Mantenemos tu lógica de asignación de refugio
-                if request.user.es_admin:
-                    refugio_id = request.POST.get('refugio')
-                    if refugio_id:
-                        mascota_actualizada.refugio_id = refugio_id
-                else:
-                    mascota_actualizada.refugio = mi_refugio
+            mascota.save()
+            messages.success(request, 'Mascota actualizada correctamente.')
+            return redirect('admin_lista_mascotas')
 
-                mascota_actualizada.save()
-                messages.success(request, 'Mascota actualizada correctamente.')
-                return redirect('admin_lista_mascotas')
+        except Exception as e:  # <--- ATRAPAMOS EL ERROR
+            messages.error(request, f'Error al intentar actualizar: {str(e)}')
 
-            except Exception as e:
-                messages.error(request, f'Error al intentar actualizar: {str(e)}')
-        else:
-            messages.error(request, 'Error en el formulario. Revisa los datos.')
-    else:
-        form = MascotaForm(instance=mascota)
-
-    return render(request, 'mascotas/form.html', {
-        'form': form,  # Pasamos el formulario
-        'mascota': mascota,
-        'refugios': refugios,
-        'mi_refugio': mi_refugio
-    })
+    return render(request, 'mascotas/form.html', {'mascota': mascota, 'refugios': refugios, 'mi_refugio': mi_refugio})
 
 
 @roles_permitidos(['ADMIN', 'REFUGIO'])
 def eliminar_mascota(request, mascota_id):
     mascota = get_object_or_404(Mascota, id_mascota=mascota_id)
-    mi_refugio = getattr(request.user, 'mi_refugio', None) if not request.user.es_admin else None
 
-    if not request.user.es_admin and mascota.refugio != mi_refugio:
-        messages.error(request, 'Acceso Denegado: No puedes eliminar mascotas de otros refugios.')
+    # Blindaje de seguridad (si no es admin y no es su refugio)
+    if not request.user.es_admin and mascota.refugio != getattr(request.user, 'mi_refugio', None):
+        messages.error(request, 'Acceso Denegado.')
         return redirect('admin_lista_mascotas')
 
-    try:
-        mascota.delete()
-        messages.success(request, 'Mascota eliminada del sistema.')
-    except Exception as e:
-        messages.error(request,
-                       f'No se pudo eliminar la mascota. Es posible que tenga adopciones vinculadas. Detalle: {str(e)}')
+    # CAMBIO: Aquí ya no se hace .delete()
+    mascota.activo = False
+    mascota.save()
 
+    messages.success(request, 'Mascota marcada como Adoptada/Inactiva.')
     return redirect('admin_lista_mascotas')
 
-# mascotas/views.py
+
+@roles_permitidos(['ADMIN', 'REFUGIO'])
+def reactivar_mascota(request, mascota_id):
+    mascota = get_object_or_404(Mascota, id_mascota=mascota_id)
+
+    # Simplemente volvemos a poner activo en True
+    mascota.activo = True
+    mascota.save()
+
+    messages.success(request, 'Mascota reactivada correctamente.')
+    return redirect('admin_lista_mascotas')
+
+
+def guardar_datos_mascota(request, mascota):
+    # 1. Campos de texto básicos que ya coincidían
+    mascota.nombre = request.POST.get('nombre')
+    mascota.especie = request.POST.get('especie')
+    mascota.raza = request.POST.get('raza') or None
+    mascota.sexo = request.POST.get('sexo')
+    mascota.tamano = request.POST.get('tamano')
+    mascota.peso = request.POST.get('peso') or None
+    mascota.color = request.POST.get('color') or None
+    mascota.descripcion = request.POST.get('descripcion') or None
+
+    # 2. CORREGIDO: Emparejamos 'edadAproximada' del HTML con el modelo
+    edad_aprox = request.POST.get('edadAproximada')
+    mascota.edad_aproximada = edad_aprox if edad_aprox else None
+
+    # 3. CORREGIDO: Emparejamos 'estadoSalud' del HTML con el modelo
+    mascota.estado_salud = request.POST.get('estadoSalud') or None
+
+    # 4. NUEVO: Ahora sí guardamos los checkboxes médicos
+    mascota.vacunado = request.POST.get('vacunado') == 'on'
+    mascota.esterilizado = request.POST.get('esterilizado') == 'on'
+    mascota.microchip = request.POST.get('microchip') == 'on'
+
+    # 5. Estado y Fechas
+    mascota.estado_adopcion = request.POST.get('estadoAdopcion')
+
+    fecha_ingreso = request.POST.get('fechaIngreso')
+    if fecha_ingreso:
+        mascota.fecha_ingreso = fecha_ingreso
+
+    # 6. Guardar la fotografía si el usuario subió una nueva
+    if 'foto' in request.FILES:
+        mascota.foto = request.FILES['foto']
+
 
 def inicio(request):
-    mascotas = Mascota.objects.order_by('-fecha_registro')[:6]
-    mascotas_procesadas = []
+    # ... tu código existente ...
+    mascotas_destacadas = Mascota.objects.order_by('-fecha_registro')[:6]
 
-    for m in mascotas:
-        mascotas_procesadas.append({
-            'nombre': m.nombre,
-            'especie': m.especie,
-            'edad_aproximada': m.edad_aproximada,
-            # Extraemos la URL como string plano aquí
-            'foto_url': m.foto.url if m.foto else None
-        })
+    contexto = {
+        # ... el resto de tus variables existentes ...
+        'mascotas_destacadas': mascotas_destacadas,
+    }
+    return render(request, 'main.html', contexto)
 
-    return render(request, 'main.html', {'mascotas': mascotas_procesadas})
+
+def detalle_mascota(request, mascota_id):
+    # Trae la mascota, su refugio y sus fotos asociadas
+    mascota = get_object_or_404(
+        Mascota.objects.select_related('refugio').prefetch_related('fotos'),
+        id_mascota=mascota_id
+    )
+
+    return render(request, 'mascotas/detalle.html', {'mascota': mascota})

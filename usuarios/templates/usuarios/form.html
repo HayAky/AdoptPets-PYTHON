@@ -38,6 +38,29 @@
                 </div>
             {% endfor %}
         {% endif %}
+        <div class="historial-container" style="margin-top: 40px; background: #fff; padding: 20px; border-radius: 10px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+            <h3>📜 Historial de Actividad</h3>
+            {% if historial %}
+                <table class="table" style="width: 100%; border-collapse: collapse;">
+                    <thead>
+                        <tr style="text-align: left; border-bottom: 2px solid #eee;">
+                            <th style="padding: 10px;">Fecha</th>
+                            <th style="padding: 10px;">Acción Realizada</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for movimiento in historial %}
+                        <tr style="border-bottom: 1px solid #eee;">
+                            <td style="padding: 10px; color: #666;">{{ movimiento.fecha|date:"d/m/Y H:i" }}</td>
+                            <td style="padding: 10px; font-weight: 500;">{{ movimiento.accion }}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            {% else %}
+                <p style="color: #999;">No hay registros de actividad para este usuario.</p>
+            {% endif %}
+        </div>
 
         <div class="card" style="background: white; padding: 25px; border-radius: 12px; margin-top: 20px;">
             <h2 style="margin-bottom: 20px;">Información del Usuario</h2>
@@ -140,21 +163,33 @@
         </div>
 
         {% if usuario %}
-        <div class="danger-zone">
-            <h3>⚠️ Zona de Peligro</h3>
+        <div class="danger-zone" style="border-color: {% if usuario.is_active %}#fca5a5{% else %}#86efac{% endif %}; background: {% if usuario.is_active %}#fef2f2{% else %}#f0fdf4{% endif %};">
+            <h3 style="color: {% if usuario.is_active %}#dc2626{% else %}#16a34a{% endif %};">
+                {% if usuario.is_active %}⚠️ Gestión de Seguridad{% else %}✅ Cuenta Desactivada{% endif %}
+            </h3>
             <div class="danger-actions">
                 <div class="action-card">
                     <h4 style="margin-bottom: 5px;">Resetear Contraseña</h4>
-                    <p style="color: #666; font-size: 14px; margin-bottom: 15px;">Se establecerá la contraseña por defecto: 123456</p>
+                    <p style="color: #666; font-size: 14px; margin-bottom: 15px;">Establecer contraseña: 123456</p>
                     <a href="{% url 'resetear_password' usuario.id_usuario %}" class="btn btn-warning" style="padding: 6px 12px; border-radius: 4px; text-decoration: none;"
                        onclick="return confirm('¿Resetear contraseña del usuario?')">🔑 Resetear</a>
                 </div>
 
                 <div class="action-card">
-                    <h4 style="margin-bottom: 5px;">Eliminar Usuario</h4>
-                    <p style="color: #666; font-size: 14px; margin-bottom: 15px;">Esta acción no se puede deshacer</p>
-                    <a href="{% url 'eliminar_usuario' usuario.id_usuario %}" class="btn btn-danger" style="padding: 6px 12px; border-radius: 4px; text-decoration: none;"
-                       onclick="return confirm('¿Está seguro de eliminar este usuario? Esta acción no se puede deshacer.')">🗑️ Eliminar</a>
+                    <h4 style="margin-bottom: 5px;">Estado de Cuenta</h4>
+                    <p style="color: #666; font-size: 14px; margin-bottom: 15px;">
+                        {% if usuario.is_active %}El usuario tiene acceso al sistema.{% else %}El usuario no puede iniciar sesión.{% endif %}
+                    </p>
+
+                    <form method="POST" action="{% url 'toggle_usuario' usuario.id_usuario %}">
+                        {% csrf_token %}
+                        <button type="submit"
+                                class="btn {% if usuario.is_active %}btn-danger{% else %}btn-success{% endif %}"
+                                style="padding: 6px 12px; border-radius: 4px; border: none; cursor: pointer;"
+                                onclick="return confirm('¿Está seguro de {% if usuario.is_active %}desactivar{% else %}reactivar{% endif %} este usuario?')">
+                            {% if usuario.is_active %}🚫 Desactivar{% else %}✅ Reactivar{% endif %}
+                        </button>
+                    </form>
                 </div>
             </div>
         </div>

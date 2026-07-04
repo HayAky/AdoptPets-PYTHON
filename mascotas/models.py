@@ -1,12 +1,14 @@
 from django.db import models
 from refugios.models import Refugio
-from cloudinary.models import CloudinaryField
 
 class EstadoAdopcion(models.TextChoices):
     DISPONIBLE = 'disponible', 'Disponible'
     PENDIENTE = 'pendiente', 'Pendiente'
     ADOPTADO = 'adoptado', 'Adoptado'
 
+class ActiveManager(models.Manager):
+    def get_queryset(self):
+        return super().get_queryset().filter(activo=True)
 
 class Mascota(models.Model):
     id_mascota = models.BigAutoField(primary_key=True)
@@ -17,21 +19,16 @@ class Mascota(models.Model):
     sexo = models.CharField(max_length=255)
     tamano = models.CharField(max_length=255)
     peso = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
-    color = models.CharField(max_length=255, null=True, blank=True)
-    # ...
     color = models.CharField(max_length=50, null=True, blank=True)
-
-    # NUEVO CAMPO DE IMAGEN
-    foto = CloudinaryField('image', folder='mascotas_fotos', null=True, blank=True)
-
-    descripcion = models.TextField(null=True, blank=True)
-    # ...
+    foto = models.ImageField(upload_to='mascotas_fotos/', null=True, blank=True)
     descripcion = models.TextField(null=True, blank=True)
     estado_salud = models.TextField(null=True, blank=True)
     vacunado = models.BooleanField(default=False)
     esterilizado = models.BooleanField(default=False)
     microchip = models.BooleanField(default=False)
-
+    objects = models.Manager()
+    activo = models.BooleanField(default=True)
+    active_objects = ActiveManager()
     estado_adopcion = models.CharField(
         max_length=20,
         choices=EstadoAdopcion.choices,

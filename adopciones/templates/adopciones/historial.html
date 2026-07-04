@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+
+{% block title %}Historial de Adopciones - AdoptPets{% endblock %}
+
+{% block content %}
+<div class="container" style="padding: 30px; max-width: 1200px; margin-left:300px;">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h2>Historial de Adopciones del Refugio</h2>
+        <a href="{% url 'panel_solicitudes' %}" style="background: #3b82f6; color: white; padding: 10px 20px; border-radius: 8px; text-decoration: none; font-weight: bold;">
+            📋 Ver Solicitudes Pendientes
+        </a>
+    </div>
+    
+    <div style="background: white; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); overflow-x: auto;">
+        <table class="table" style="width: 100%; border-collapse: collapse; text-align: left;">
+            <thead>
+                <tr style="background: #f8fafc; border-bottom: 2px solid #e2e8f0;">
+                    <th style="padding: 15px;">ID Solicitud</th>
+                    <th style="padding: 15px;">Mascota</th>
+                    <th style="padding: 15px;">Adoptante</th>
+                    <th style="padding: 15px;">Fecha Solicitud</th>
+                    <th style="padding: 15px;">Fecha Resolución</th>
+                    <th style="padding: 15px;">Estado Final</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for adopcion in historial %}
+                <tr style="border-bottom: 1px solid #edf2f7;">
+                    <td style="padding: 15px; font-weight: bold; color: #64748b;">#{{ adopcion.id_adopcion }}</td>
+                    <td style="padding: 15px; font-weight: bold;">{{ adopcion.mascota.nombre }}</td>
+                    <td style="padding: 15px;">
+                        {{ adopcion.adoptante.nombre }} {{ adopcion.adoptante.apellido }}
+                        <br>
+                        <span style="font-size: 12px; color: #64748b;">📞 {{ adopcion.adoptante.telefono|default:"Sin teléfono" }}</span>
+                    </td>
+                    <td style="padding: 15px; color: #475569;">{{ adopcion.fecha_solicitud|date:"d/m/Y" }}</td>
+                    <td style="padding: 15px; color: #475569;">{{ adopcion.fecha_aprobacion|date:"d/m/Y"|default:"--" }}</td>
+                    <td style="padding: 15px;">
+                        {% if adopcion.estado_adopcion == 'adoptado' %}
+                            <span class="badge" style="background-color: #10b981; color: white; padding: 5px 10px; border-radius: 20px; font-size: 12px; font-weight: bold;">✓ Adoptado</span>
+                        {% else %}
+                            <span class="badge" style="background-color: #ef4444; color: white; padding: 5px 10px; border-radius: 20px; font-size: 12px; font-weight: bold;">{{ adopcion.get_estado_adopcion_display }}</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" style="text-align: center; padding: 40px; color: #64748b;">
+                        <span style="font-size: 40px; display: block; margin-bottom: 10px;">📅</span>
+                        No hay registros históricos de adopciones finalizadas o rechazadas todavía.
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    
+    <div style="margin-top: 20px;">
+        <a href="{% url 'admin_dashboard' %}" style="color: #64748b; text-decoration: none;">← Volver al Dashboard</a>
+    </div>
+</div>
+{% endblock %}

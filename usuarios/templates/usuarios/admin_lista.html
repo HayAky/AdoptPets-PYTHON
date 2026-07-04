@@ -144,7 +144,7 @@
                                 <td>
                                     <div class="actions">
                                         <a href="{% url 'editar_usuario' usuario.id_usuario %}" class="btn btn-primary btn-sm">Editar</a>
-                                        
+
                                         <form action="{% url 'toggle_usuario' usuario.id_usuario %}" method="post" style="display: inline;">
                                             {% csrf_token %}
                                             <button type="submit" class="btn btn-secondary btn-sm">
