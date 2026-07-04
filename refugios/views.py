@@ -142,30 +142,29 @@ def dashboard_refugio(request):
 @login_required
 @roles_permitidos(['REFUGIO', 'ADMIN'])
 def configuracion_refugio(request):
-    refugio = request.user.mi_refugio
     usuario = request.user
 
-    # Inicialización de formularios
-    form_refugio = RefugioForm(instance=refugio)
+    # 1. Intentamos obtener el refugio de forma segura
+    try:
+        refugio = usuario.mi_refugio
+    except Refugio.DoesNotExist:
+        # Si no existe, no podemos cargar la configuración,
+        # así que detenemos la ejecución y mostramos el mensaje
+        return render(request, 'refugios/crear_refugio.html', {
+            'mensaje': "Aún no tienes un refugio asignado. Contacta al administrador."
+        })
+
+    # 2. Inicialización de formularios (Solo si el refugio existe)
+    # IMPORTANTE: Pasamos 'user=request.user' para que RefugioForm aplique la lógica del admin
+    form_refugio = RefugioForm(instance=refugio, user=request.user)
     form_usuario = EditUsuarioForm(instance=usuario)
     form_pass = PasswordChangeForm(user=usuario)
 
-    # Dentro de tu función configuracion_refugio en views.py
-    try:
-        refugio = request.user.mi_refugio
-    except Refugio.DoesNotExist:
-        refugio = None
-
-    # Ahora, verifica si existe antes de usarlo
-    if refugio is None:
-        # Opcional: Maneja el caso donde el usuario no tiene refugio
-        # Por ejemplo, redirigirlo o mostrar un mensaje
-        messages.warning(request, "No tienes un refugio asignado.")
-        return redirect('nombre_de_tu_dashboard')  # O donde quieras mandarlo
-
+    # 3. Lógica de guardado (POST)
     if request.method == 'POST':
         if 'btn_refugio' in request.POST:
-            form_refugio = RefugioForm(request.POST, instance=refugio)
+            # También pasamos 'user=request.user' aquí para mantener la lógica de permisos
+            form_refugio = RefugioForm(request.POST, instance=refugio, user=request.user)
             if form_refugio.is_valid():
                 form_refugio.save()
                 messages.success(request, 'Datos del refugio actualizados.')
@@ -179,14 +178,15 @@ def configuracion_refugio(request):
                 messages.success(request, 'Tus datos personales han sido actualizados.')
             else:
                 messages.error(request, 'Error en tus datos personales.')
+
         elif 'btn_pass' in request.POST:
             form_pass = PasswordChangeForm(user=usuario, data=request.POST)
             if form_pass.is_valid():
                 user = form_pass.save()
-                update_session_auth_hash(request, user)  # Importante para no cerrar sesión
+                update_session_auth_hash(request, user)
                 messages.success(request, 'Contraseña actualizada correctamente.')
             else:
-                messages.error(request, 'Error al cambiar la contraseña. Revisa los campos.')
+                messages.error(request, 'Error al cambiar la contraseña.')
 
     return render(request, 'refugios/configuracion.html', {
         'form_refugio': form_refugio,
