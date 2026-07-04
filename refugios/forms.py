@@ -47,7 +47,18 @@ class RefugioForm(FormStyleMixin, forms.ModelForm):
     class Meta:
         model = Refugio
         fields = ['nombre_refugio', 'responsable', 'localidad', 'direccion',
-                  'telefono', 'email', 'capacidad_maxima', 'descripcion', 'activo']
+                  'telefono', 'email', 'capacidad_maxima', 'descripcion',
+                  'activo', 'usuario_encargado']
+
+    def __init__(self, *args, **kwargs):
+        # Extraemos el usuario que pasamos desde la vista
+        self.user = kwargs.pop('user', None)
+        super().__init__(*args, **kwargs)
+
+        # Lógica de seguridad: Si el usuario NO es admin, bloqueamos el campo
+        if self.user and not self.user.es_admin:
+            self.fields['usuario_encargado'].disabled = True
+            self.fields['usuario_encargado'].help_text = "Solo el administrador puede cambiar el encargado."
 
     # Validación estricta de correo
     def clean_email(self):
