@@ -26,10 +26,22 @@
     <main class="main-content">
 
         <div style="background: white; padding: 15px 20px; border-radius: 10px; margin-bottom: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); display: flex; justify-content: space-between; align-items: center;">
-            <form method="get" action="" style="display: flex; gap: 10px; width: 100%; max-width: 500px;">
+            <form method="get" action="" style="display: flex; gap: 10px; width: 100%; max-width: 900px;">
                 <input type="text" name="busqueda" value="{{ busqueda }}" placeholder="Buscar por nombre, especie o estado..." style="flex-grow: 1; padding: 10px; border-radius: 8px; border: 1px solid #ccc;">
                 <button type="submit" class="btn btn-primary" style="padding: 10px 20px;">🔍 Buscar</button>
                 {% if busqueda %}
+                    <a href="{% url 'admin_lista_refugios' %}" class="btn btn-secondary" style="padding: 10px 20px; background: #6b7280; color: white; text-decoration: none; border-radius: 8px;">Limpiar</a>
+                {% endif %}
+                <select name="localidad" onchange="this.form.submit()" style="padding: 10px; border-radius: 8px; border: 1px solid #ccc;">
+                    <option value="">Todas las localidades</option>
+                    {% for loc in localidades %}
+                        <option value="{{ loc }}" {% if localidad_query == loc %}selected{% endif %}>{{ loc }}</option>
+                    {% endfor %}
+                </select>
+
+                <button type="submit" class="btn btn-primary" style="padding: 10px 20px;">🔍 Filtrar</button>
+
+                {% if busqueda or localidad_query %}
                     <a href="{% url 'admin_lista_refugios' %}" class="btn btn-secondary" style="padding: 10px 20px; background: #6b7280; color: white; text-decoration: none; border-radius: 8px;">Limpiar</a>
                 {% endif %}
             </form>
@@ -50,6 +62,10 @@
                 </div>
             {% endfor %}
         {% endif %}
+
+        <form method="get" action="" style="display: flex; gap: 10px; width: 100%; max-width: 700px;">
+
+        </form>
 
         <div class="refugios-grid">
             {% for refugio in refugios %}

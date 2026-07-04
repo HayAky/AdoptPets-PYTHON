@@ -13,7 +13,19 @@
         <h1 class="page-title">🏠 Refugios Aliados</h1>
         <p class="page-subtitle">Conoce a las increíbles organizaciones que trabajan día a día para salvar vidas.</p>
     </div>
+    <form method="GET" action="{% url 'lista_refugios' %}" class="filtros-container" style="margin-bottom: 30px; display: flex; gap: 10px; justify-content: center;">
+        <input type="text" name="nombre" placeholder="Buscar por nombre..." value="{{ nombre_query }}" style="padding: 10px; border-radius: 8px; border: 1px solid #ccc;">
 
+        <select name="localidad" onchange="this.form.submit()" style="padding: 10px; border-radius: 8px; border: 1px solid #ccc;">
+            <option value="">Todas las localidades</option>
+            {% for loc in localidades %}
+                <option value="{{ loc }}" {% if localidad_query == loc %}selected{% endif %}>{{ loc }}</option>
+            {% endfor %}
+        </select>
+
+        <button type="submit" class="btn btn-primary">Filtrar</button>
+        <a href="{% url 'lista_refugios' %}" class="btn btn-secondary">Limpiar</a>
+    </form>
     <div class="refugios-grid">
         {% for refugio in refugios %}
         <div class="refugio-card">

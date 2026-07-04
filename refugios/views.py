@@ -6,48 +6,86 @@ from mascotas.models import Mascota
 from adopciones.models import Adopcion
 from usuarios.models import Usuario
 from django.db.models import Count, Q
+from .forms import RefugioForm
 
+
+LOCALIDADES_BOGOTA = [
+    "Usaquén", "Chapinero", "Santa Fe", "San Cristóbal", "Usme", "Tunjuelito",
+    "Bosa", "Kennedy", "Fontibón", "Engativá", "Suba", "Barrios Unidos",
+    "Teusaquillo", "Los Mártires", "Antonio Nariño", "Puente Aranda",
+    "La Candelaria", "Rafael Uribe Uribe", "Ciudad Bolívar", "Sumapaz"
+]
 def lista_refugios(request):
+    # Captura de parámetros GET
+    nombre_query = request.GET.get('nombre', '')
+    localidad_query = request.GET.get('localidad', '')
+
+    # Query base
     refugios = Refugio.objects.filter(activo=True).annotate(
         mascotas_disponibles_count=Count('mascotas', filter=Q(mascotas__estado_adopcion='disponible'))
     ).order_by('nombre_refugio')
 
-    return render(request, 'refugios/lista.html', {'refugios': refugios})
+    # Aplicar filtros
+    if nombre_query:
+        refugios = refugios.filter(nombre_refugio__icontains=nombre_query)
+    if localidad_query:
+        refugios = refugios.filter(localidad=localidad_query)
+
+    return render(request, 'refugios/lista.html', {
+        'refugios': refugios,
+        'localidades': LOCALIDADES_BOGOTA,
+        'nombre_query': nombre_query,
+        'localidad_query': localidad_query
+    })
 
 
 @roles_permitidos(['ADMIN'])
 def admin_lista_refugios(request):
+    # Captura de filtros
+    busqueda = request.GET.get('busqueda', '')
+    localidad_query = request.GET.get('localidad', '')
+
+    # Query inicial
     todos_los_refugios = Refugio.objects.all().order_by('-fecha_registro')
-    return render(request, 'refugios/admin_lista.html', {'refugios': todos_los_refugios})
+
+    # Aplicar filtros
+    if busqueda:
+        todos_los_refugios = todos_los_refugios.filter(nombre_refugio__icontains=busqueda)
+    if localidad_query:
+        todos_los_refugios = todos_los_refugios.filter(localidad=localidad_query)
+
+    return render(request, 'refugios/admin_lista.html', {
+        'refugios': todos_los_refugios,
+        'busqueda': busqueda,
+        'localidad_query': localidad_query,
+        'localidades': LOCALIDADES_BOGOTA # Asegúrate de que esta lista esté definida en el archivo
+    })
 
 
 @roles_permitidos(['ADMIN'])
 def crear_refugio(request):
-    usuarios_refugio = Usuario.objects.filter(roles__nombre_rol='REFUGIO', is_active=True)
     if request.method == 'POST':
-        try:  # <-- BLINDAJE
-            guardar_datos_refugio(request, Refugio())
+        form = RefugioForm(request.POST)
+        if form.is_valid():
+            form.save()
             messages.success(request, 'Refugio creado correctamente.')
             return redirect('admin_lista_refugios')
-        except Exception as e:
-            messages.error(request, f'Error al crear el refugio: {str(e)}')
-
-    return render(request, 'refugios/form.html', {'usuarios_refugio': usuarios_refugio})
-
+    else:
+        form = RefugioForm()
+    return render(request, 'refugios/form.html', {'form': form})
 
 @roles_permitidos(['ADMIN'])
 def editar_refugio(request, refugio_id):
     refugio = get_object_or_404(Refugio, id_refugio=refugio_id)
-    usuarios_refugio = Usuario.objects.filter(roles__nombre_rol='REFUGIO', is_active=True)
     if request.method == 'POST':
-        try:  # <-- BLINDAJE
-            guardar_datos_refugio(request, refugio)
+        form = RefugioForm(request.POST, instance=refugio)
+        if form.is_valid():
+            form.save()
             messages.success(request, 'Refugio actualizado correctamente.')
             return redirect('admin_lista_refugios')
-        except Exception as e:
-            messages.error(request, f'Error al actualizar el refugio: {str(e)}')
-
-    return render(request, 'refugios/form.html', {'refugio': refugio, 'usuarios_refugio': usuarios_refugio})
+    else:
+        form = RefugioForm(instance=refugio)
+    return render(request, 'refugios/form.html', {'form': form, 'refugio': refugio})
 
 
 @roles_permitidos(['ADMIN'])
@@ -60,28 +98,6 @@ def eliminar_refugio(request, refugio_id):
         messages.error(request, 'No puedes eliminar este refugio porque tiene mascotas o procesos vinculados a él.')
 
     return redirect('admin_lista_refugios')
-
-
-# --- FUNCIÓN AUXILIAR PARA GUARDAR DATOS ---
-def guardar_datos_refugio(request, refugio):
-    refugio.nombre_refugio = request.POST.get('nombreRefugio')
-    refugio.responsable = request.POST.get('responsable')
-    refugio.localidad = request.POST.get('localidad')
-    refugio.direccion = request.POST.get('direccion')
-    refugio.telefono = request.POST.get('telefono')
-    refugio.email = request.POST.get('email')
-    refugio.capacidad_maxima = request.POST.get('capacidadMaxima') or None
-    refugio.descripcion = request.POST.get('descripcion')
-    refugio.activo = request.POST.get('activo') == 'on'
-
-    usuario_id = request.POST.get('usuarioEncargado')
-    if usuario_id:
-        refugio.usuario_encargado_id = usuario_id
-    else:
-        refugio.usuario_encargado = None
-
-    refugio.save()
-
 
 
 @roles_permitidos(['REFUGIO'])
