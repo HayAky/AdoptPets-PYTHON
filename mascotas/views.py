@@ -9,12 +9,12 @@ from usuarios.models import HistorialActividad
 
 
 def inicio(request):
-    mascotas = Mascota.objects.select_related('refugio').filter(estado_adopcion='disponible').order_by('-fecha_registro')
+    # Usamos active_objects para que solo salgan las disponibles/activas en la home
+    mascotas_destacadas = Mascota.active_objects.order_by('-fecha_registro')[:6]
     blogs_destacados = Blog.objects.filter(activo=True).order_by('-fecha_publicacion')[:2]
 
-    # AQUÍ ESTÁ EL CAMBIO IMPORTANTE:
     return render(request, 'main.html', {
-        'mascotas': mascotas_destacadas,
+        'mascotas_destacadas': mascotas_destacadas, # Nombre consistente
         'blogs': blogs_destacados
     })
 def lista_mascotas(request):
@@ -75,8 +75,7 @@ def lista_mascotas(request):
     if filtros_activos and request.user.is_authenticated:
         accion_registrada = "Filtros aplicados: " + " | ".join(filtros_activos)
 
-        # Evitamos registros duplicados rápidos (opcional)
-        from usuarios.models import HistorialActividad
+        # YA NO HAGAS EL IMPORT AQUÍ, USA EL QUE ESTÁ ARRIBA
         ultima_accion = HistorialActividad.objects.filter(usuario=request.user).first()
 
         if not ultima_accion or ultima_accion.accion != accion_registrada:
@@ -249,17 +248,6 @@ def guardar_datos_mascota(request, mascota):
     # 6. Guardar la fotografía si el usuario subió una nueva
     if 'foto' in request.FILES:
         mascota.foto = request.FILES['foto']
-
-
-def inicio(request):
-    # ... tu código existente ...
-    mascotas_destacadas = Mascota.objects.order_by('-fecha_registro')[:6]
-
-    contexto = {
-        # ... el resto de tus variables existentes ...
-        'mascotas_destacadas': mascotas_destacadas,
-    }
-    return render(request, 'main.html', contexto)
 
 
 def detalle_mascota(request, mascota_id):
