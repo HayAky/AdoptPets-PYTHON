@@ -75,7 +75,6 @@ def lista_mascotas(request):
     if filtros_activos and request.user.is_authenticated:
         accion_registrada = "Filtros aplicados: " + " | ".join(filtros_activos)
 
-        # YA NO HAGAS EL IMPORT AQUÍ, USA EL QUE ESTÁ ARRIBA
         ultima_accion = HistorialActividad.objects.filter(usuario=request.user).first()
 
         if not ultima_accion or ultima_accion.accion != accion_registrada:
